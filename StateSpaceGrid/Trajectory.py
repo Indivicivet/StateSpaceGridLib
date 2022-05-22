@@ -92,24 +92,6 @@ def truncate_nan_data(x_data, y_data, t_data):
     if nan_present_y:
         y_data.pop(-1)
 
-
-def check_trajectory_list(trajectory_list):
-    assert trajectory_list, "A list of trajectories must be supplied to Grid"
-    for trajectory in trajectory_list.values():
-        assert isinstance(trajectory, Trajectory), "All trajectory data supplied in trajectory list must be instances of the trajectory class"
-
-    meta_names = {column for column in next(iter(trajectory_list.values())).meta.keys()}
-
-    for trajectory in trajectory_list.values():
-        # possibly go for a more type-agnostic approach here? (see above)
-        assert len(meta_names) == len \
-            (trajectory.meta), "trajectory ID {}: metadata fields don't match with others in list".format(trajectory.meta["ID"])
-        assert time_column == trajectory.time_column_name, "trajectory ID {}: time_column field name doesn't match with others in list".format(trajectory.meta["ID"])
-        for i in trajectory.data.keys():
-            assert i in column_names, "data field name {} in trajectory ID {} does not exist in first trajectory".format(i, trajectory.meta["ID"])
-        for i in trajectory.meta.keys():
-            assert i in meta_names, "metadata field name {} in trajectory ID {} does not exist in first trajectory".format(i, trajectory.meta["ID"])
-
 def convert_on_ordering(data, ordering):
     index = {ordering[i] : i for i in range(len(ordering))}
     return [index[x] for x in data]
