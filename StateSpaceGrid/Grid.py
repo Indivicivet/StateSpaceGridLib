@@ -126,10 +126,7 @@ class Grid:
         self.style.x_max += (x_scale - ((self.style.x_max % x_scale) if self.style.x_max % x_scale else x_scale))
         self.style.y_min -= (self.style.y_min % y_scale)
         self.style.y_max += (y_scale - ((self.style.y_max % y_scale) if self.style.y_max % y_scale else y_scale))
-        if self.style.tick_increment_x is None:
-            self.style.tick_increment_x = x_scale
-        if self.style.tick_increment_y is None:
-            self.style.tick_increment_y = y_scale
+
         x_padding = x_scale / 2
         y_padding = y_scale / 2
 
@@ -181,13 +178,6 @@ class Grid:
             self.style.tick_increment_x = x_scale
         if not self.style.tick_increment_y:
             self.style.tick_increment_y = y_scale
-
-        x_padding = x_scale / 2
-        y_padding = y_scale / 2
-
-        # Set view of axes
-        self.ax.set_xlim([x_min - x_padding, x_max + x_padding])
-        self.ax.set_ylim([y_min - y_padding, y_max + y_padding])
 
         # If same state is repeated, offset states so they don't sit on top of one another:
         offset_within_bin(x_data, x_scale, y_data, y_scale)
