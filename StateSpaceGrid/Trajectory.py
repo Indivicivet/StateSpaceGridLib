@@ -85,10 +85,12 @@ class Trajectory:
         return loop_nodes, new_x_data, new_y_data, new_time_data
 
 def truncate_nan_data(x_data, y_data, t_data):
-    nan_present = math.isnan(x_data[-1]) or math.isnan(y_data[-1])
-    if nan_present:
-        x_data = x_data[:-1]
-        y_data = y_data[:-1]
+    nan_present_x = len(x_data) == len(t_data)
+    nan_present_y = len(y_data) == len(t_data)
+    if nan_present_x:
+        x_data.pop(-1)
+    if nan_present_y:
+        y_data.pop(-1)
 
 
 def check_trajectory_list(trajectory_list):
@@ -109,5 +111,5 @@ def check_trajectory_list(trajectory_list):
             assert i in meta_names, "metadata field name {} in trajectory ID {} does not exist in first trajectory".format(i, trajectory.meta["ID"])
 
 def convert_on_ordering(data, ordering):
-    index = {ordering[i]:i for i in range(len(ordering))}
+    index = {ordering[i] : i for i in range(len(ordering))}
     return [index[x] for x in data]

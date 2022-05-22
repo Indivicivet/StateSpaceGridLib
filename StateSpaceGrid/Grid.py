@@ -9,11 +9,12 @@ import math
 
 
 class Gridstyle:
-    def __init__(self, labelfontsize=14, tickfontsize=14, titlefontsize=14, tick_increment_x = None, tick_increment_y = None,
+    def __init__(self, title="", labelfontsize=14, tickfontsize=14, titlefontsize=14, tick_increment_x = None, tick_increment_y = None,
                  x_label = None, y_label = None, x_order = None, y_order = None, x_min = None, x_max = None, y_min = None, y_max = None):
         self.labelfontsize = labelfontsize
         self.tickfontsize = tickfontsize
         self.titlefontsize = titlefontsize
+        self.title = title
         self.tick_increment_x = tick_increment_x
         self.tick_increment_y = tick_increment_y
         self.x_label = x_label
@@ -110,6 +111,9 @@ class Grid:
         self.ax.set_xlabel(self.style.x_label, fontsize=self.style.labelfontsize)
         self.ax.set_ylabel(self.style.y_label, fontsize=self.style.labelfontsize)
 
+        if self.style.title:
+            self.ax.set_title(self.style.title, fontsize=self.style.titlefontsize)
+
     def __draw_background_and_view(self):
         # Make an estimate for scale size of checkerboard grid sizing
         x_scale = calculate_scale(self.style.x_min, self.style.x_max) if self.style.tick_increment_x is None else self.style.tick_increment_x
@@ -137,8 +141,7 @@ class Grid:
         self.__set_background(self.style.x_min, self.style.y_min, x_scale, y_scale, self.style.x_max, self.style.y_max)
 
 
-    def __add_plot(self, trajectory, x_state_increment: int = None, y_state_increment: int = None,
-                   merge_repeated_states: bool = True):
+    def __add_plot(self, trajectory, merge_repeated_states: bool = True):
 
         # Get relevant data (and do merging of repeated states if desired)
         loop_nodes, x_data, y_data, time_data = self.__get_data(trajectory,
@@ -171,8 +174,14 @@ class Grid:
             self.style.y_max = y_max
 
         # Make an estimate for scale size of checkerboard grid sizing
-        x_scale = calculate_scale(x_min, x_max) if not x_state_increment else x_state_increment
-        y_scale = calculate_scale(y_min, y_max) if not y_state_increment else y_state_increment
+        x_scale = calculate_scale(x_min, x_max) if not self.style.tick_increment_x else self.style.tick_increment_x
+        y_scale = calculate_scale(y_min, y_max) if not self.style.tick_increment_y else self.style.tick_increment_y
+
+        if not self.style.tick_increment_x:
+            self.style.tick_increment_x = x_scale
+        if not self.style.tick_increment_y:
+            self.style.tick_increment_y = y_scale
+
         x_padding = x_scale / 2
         y_padding = y_scale / 2
 
@@ -180,15 +189,10 @@ class Grid:
         self.ax.set_xlim([x_min - x_padding, x_max + x_padding])
         self.ax.set_ylim([y_min - y_padding, y_max + y_padding])
 
-        # Set background checkerboard:
-        self.__set_background(x_min, y_min, x_scale, y_scale, x_max, y_max)
-
         # If same state is repeated, offset states so they don't sit on top of one another:
         offset_within_bin(x_data, x_scale, y_data, y_scale)
 
-        # Draw graph
-        drawstyle = trajectory.style
-        self.__draw_graph(x_data, y_data, time_data, loop_nodes, drawstyle)
+        self.__draw_graph(x_data, y_data, time_data, loop_nodes, trajectory.style)
 
 
     def setStyle(self, gridstyle: Gridstyle):
