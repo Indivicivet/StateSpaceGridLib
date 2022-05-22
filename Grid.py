@@ -2,7 +2,6 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 from matplotlib.colors import ListedColormap
-import pandas as pd
 import numpy as np
 from .Trajectory import Trajectory, Trajectorystyle, check_trajectory_list
 from .States import *
