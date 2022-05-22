@@ -5,7 +5,6 @@ from matplotlib.colors import ListedColormap
 import numpy as np
 from .Trajectory import Trajectory, Trajectorystyle, check_trajectory_list
 from .States import *
-import math
 
 
 class Gridstyle:
@@ -31,11 +30,12 @@ class Gridstyle:
 
 
 class Grid:
-    def __init__(self, trajectories, style = Gridstyle()):
+    def __init__(self, trajectories, style=Gridstyle()):
         self.trajectory_list = [i for i in trajectories]
         self.graph = nx.Graph()
         self.ax = plt.gca()
         self.style = style
+        check_trajectory_list(self.trajectory_list)
     
     def __get_data(self, trajectory, merge_repeated_states):
         loop_nodes = set()
@@ -74,8 +74,8 @@ class Grid:
         self.graph.add_edges_from(edges)
 
         # Draw graphs
-        nodes = nx.draw_networkx_nodes(self.graph, pos, node_size=node_sizes, node_color='indigo')
-        nodes = nx.draw_networkx_edges(self.graph, pos, node_size=node_sizes, nodelist=[i for i in range(len(x_data))],
+        nx.draw_networkx_nodes(self.graph, pos, node_size=node_sizes, node_color='indigo')
+        nx.draw_networkx_edges(self.graph, pos, node_size=node_sizes, nodelist=[i for i in range(len(x_data))],
                                        edgelist=edges, arrows=True, arrowstyle=drawstyle.arrow_style, node_shape='.',
                                        arrowsize=10, width=2, connectionstyle=drawstyle.connection_style, )
 
@@ -137,9 +137,7 @@ class Grid:
         # Set background checkerboard:
         self.__set_background(self.style.x_min, self.style.y_min, x_scale, y_scale, self.style.x_max, self.style.y_max)
 
-
     def __add_plot(self, trajectory, merge_repeated_states: bool = True):
-
         # Get relevant data (and do merging of repeated states if desired)
         loop_nodes, x_data, y_data, time_data = self.__get_data(trajectory,
                                                                 merge_repeated_states)
@@ -184,11 +182,10 @@ class Grid:
 
         self.__draw_graph(x_data, y_data, time_data, loop_nodes, trajectory.style)
 
-
-    def setStyle(self, gridstyle: Gridstyle):
+    def set_style(self, gridstyle: Gridstyle):
         self.style = gridstyle
 
-    def getStyle(self):
+    def get_style(self):
         return self.style
 
     def add_trajectory_data(self, *trajectories: Trajectory):
@@ -196,7 +193,7 @@ class Grid:
             self.trajectory_list[trajectory.meta["ID"]] = trajectory
         if trajectories:
             check_trajectory_list(self.trajectory_list)
-    
+
     def draw(self, x_state_increment: int = None, y_state_increment: int = None, merge_repeated_states=True):
         for trajectory in self.trajectory_list:
             self.__add_plot(trajectory)
