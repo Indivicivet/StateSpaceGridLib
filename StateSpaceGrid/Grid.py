@@ -201,6 +201,7 @@ class Grid:
         self.__draw_background_and_view()
         self.__draw_ticks(self.trajectory_list[0].style)
         self.ax.set_aspect('auto')
+        plt.tight_layout()
         plt.show()
 
 
