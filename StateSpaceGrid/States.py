@@ -26,22 +26,9 @@ def calculate_min_max(vars):
     return var_min, var_max
 
 
-def offset_within_bin(x_data, x_scale, y_data, y_scale):
-    # assume 'state bin size' == scale - allow changing of this at some later point?
-    bin_counts = dict() # use dictionary of dictionaries in place of sparse matrix
-    for i in range(len(x_data)):
-        y = y_data[i]
-        x = x_data[i]
-        if y in bin_counts:
-            if x in bin_counts[y]:
-                bin_counts[y][x] = bin_counts[y][x] + 1
-            else:
-                bin_counts[y][x] = 1
-        else:
-            bin_counts[y] = {x: 1}
+def offset_within_bin(x_data, x_scale, y_data, y_scale, bin_counts, visit_count):
+
     partition_counts = {y: {x: (1 << (counts-1).bit_length()) for x, counts in x_and_counts.items()} for y, x_and_counts in bin_counts.items()}
-    # make a new count to keep track of our visits to each bin as we edit the data
-    visit_count = {y:{x:0 for x, counts in x_and_counts.items()} for y, x_and_counts in bin_counts.items()}
     for i in range(len(x_data)):
         x, y = x_data[i], y_data[i]
         partitions = partition_counts[y][x]
@@ -54,5 +41,5 @@ def offset_within_bin(x_data, x_scale, y_data, y_scale):
                              direction[0]*rotation[1][0] + direction[1]*rotation[1][1])
             x_data[i] = x+(direction[0]*x_scale/4)
             y_data[i] = y+(direction[1]*y_scale/4)
-            visit_count[y][x] = visit_count[y][x]+1
+            visit_count[y][x] += 1
 

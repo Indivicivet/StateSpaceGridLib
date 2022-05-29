@@ -15,11 +15,15 @@ class Trajectorystyle:
 
 class ProcessedTrajData:
     def __init__(self, x=[], y=[], t=[], loops={}, nodes=[]):
+        valid = False
         self.x = x
         self.y = y
         self.t = t
         self.loops = set()
-        self.nodes = nodes
+        self.nodes = nodes # (durations)
+        self.offset_x = []
+        self.offset_y = []
+        self.bin_counts = dict()
 
 
 class Trajectory:
@@ -79,14 +83,29 @@ class Trajectory:
         if "y" in self.style.ordering:
             self.processed_data.y = convert_on_ordering(self.processed_data.y, self.style.ordering["y"])
 
+    # returns if data has already been processed
     def process_data(self):
+        # check if already processed
+        if self.processed_data.valid:
+            return False
         if self.style.merge_repeated_states:
             self.__merge_equal_adjacent_states()
         else:
             self.processed_data.t = self.data_t
             self.processed_data.x = self.data_x
             self.processed_data.y = self.data_y
+
+        for i in range(len(self.processed_data.x)):
+            y = self.processed_data.y[i]
+            x = self.processed_data.x[i]
+            if y in self.processed_data.bin_counts:
+                self.processed_data.bin_counts[y][x] = self.processed_data.bin_counts[y].get(x, 0) + 1
+            else:
+                self.processed_data.bin_counts[y] = {x: 1}
+
         self.processed_data.nodes = [(self.processed_data.t[i + 1] - self.processed_data.t[i]) for i in range(len(self.processed_data.t) - 1)]
+        self.processed_data.valid = True
+        return True
 
 
 def truncate_nan_data(x_data, y_data, t_data):

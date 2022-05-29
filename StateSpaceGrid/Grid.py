@@ -5,6 +5,7 @@ from matplotlib.colors import ListedColormap
 import numpy as np
 from .Trajectory import Trajectory, Trajectorystyle, check_trajectory_list, ProcessedTrajData
 from .States import *
+import pprint
 
 
 class Gridstyle:
@@ -31,11 +32,51 @@ class Gridstyle:
 
 class GridCumulativeData:
     def __init__(self):
+        self.valid = False
         self.max_duration = 0
         self.rounded_x_min = 0
         self.rounded_x_max = 0
         self.rounded_y_min = 0
         self.rounded_y_max = 0
+        self.x_min = None
+        self.y_min = None
+        self.x_max = None
+        self.y_max = None
+        self.bin_counts = dict()
+        self.cell_size_x = 0
+        self.cell_size_y = 0
+
+    def clear(self):
+        self.valid = False
+        self.max_duration = 0
+        self.rounded_x_min = 0
+        self.rounded_x_max = 0
+        self.rounded_y_min = 0
+        self.rounded_y_max = 0
+        self.x_min = None
+        self.y_min = None
+        self.x_max = None
+        self.y_max = None
+        self.bin_counts = []
+        self.cell_size_x = 0
+        self.cell_size_y = 0
+
+
+class GridMeasures:
+    def __init__(self):
+        self.trajectory_ids = []
+        self.mean_duration = 0
+        self.mean_number_of_events = 0
+        self.mean_number_of_visits = 0
+        self.mean_cell_range = 0
+        self.overall_cell_range = 0
+        self.mean_duration_per_event = 0
+        self.mean_duration_per_visit = 0
+        self.mean_duration_per_cell = 0
+        self.dispersion = 0
+        self.mean_missing_events = 0
+        self.mean_missing_duration = 0
+
 
 class Grid:
     def __init__(self, trajectories, style=Gridstyle()):
@@ -87,13 +128,13 @@ class Grid:
         else:
             tick_label_x = drawstyle.ordering["x"] if "x" in drawstyle.ordering else [str(i) for i in
                                                                                  range(self._processed_data.rounded_x_min,
-                                                                                       self._processed_data.rounded_x_max + 1, self.style.tick_increment_x)]
+                                                                                       self._processed_data.rounded_x_max + 1, self._processed_data.cell_size_x)]
         if self.style.y_order:
             tick_label_y = self.style.y_order
         else:
             tick_label_y = drawstyle.ordering["y"] if "y" in drawstyle.ordering else [str(i) for i in
                                                                                                  range(self._processed_data.rounded_y_min,
-                                                                                                       self._processed_data.roundedd_y_max + 1, self.style.tick_increment_y)]
+                                                                                                       self._processed_data.rounded_y_max + 1, self._processed_data.cell_size_y)]
         # Set ticks for states
         self.ax.tick_params(left=True, bottom=True, labelleft=True, labelbottom=True)
         self.ax.tick_params(axis='x', labelsize=self.style.tickfontsize, rotation=90 if self.style.rotate_xlabels else 0)
@@ -110,72 +151,89 @@ class Grid:
         if self.style.title:
             self.ax.set_title(self.style.title, fontsize=self.style.titlefontsize)
 
+    def __offset_trajectories(self):
+        # get total bin counts
+        for trajectory in self.trajectory_list:
+            for y, x_and_count in trajectory.processed_data.bin_counts.items():
+                for x, count in x_and_count.items():
+                    if y in self._processed_data.bin_counts:
+                        self._processed_data.bin_counts[y][x] = self._processed_data.bin_counts[y].get(x, 0) + count
+                    else:
+                        self._processed_data.bin_counts[y] = {x: count}
+        current_bin_counter = {y:{x:0 for x in v.keys()} for y,v in self._processed_data.bin_counts.items()}
+        for trajectory in self.trajectory_list:
+            # If same state is repeated, offset states so they don't sit on top of one another:
+            offset_within_bin(trajectory.processed_data.x, self._processed_data.cell_size_x,
+                              trajectory.processed_data.y, self._processed_data.cell_size_y,
+                              self._processed_data.bin_counts, current_bin_counter)
+
     def __draw_background_and_view(self):
         # Make an estimate for scale size of checkerboard grid sizing
-        x_scale = calculate_scale(self.style.x_min, self.style.x_max) if self.style.tick_increment_x is None else self.style.tick_increment_x
-        y_scale = calculate_scale(self.style.y_min, self.style.y_max) if self.style.tick_increment_y is None else self.style.tick_increment_y
+        self._processed_data.cell_size_x = calculate_scale(self._processed_data.x_min, self._processed_data.x_max) if self.style.tick_increment_x is None else self.style.tick_increment_x
+        self._processed_data.cell_size_y = calculate_scale(self._processed_data.y_min, self._processed_data.y_max) if self.style.tick_increment_y is None else self.style.tick_increment_y
 
-        self._processed_data.rounded_x_min = self.style.x_min - (self.style.x_min % x_scale)
-        self._processed_data.rounded_x_max = self.style.x_max + (x_scale - ((self.style.x_max % x_scale) if self.style.x_max % x_scale else x_scale))
-        self._processed_data.rounded_y_min = self.style.y_min - (self.style.y_min % y_scale)
-        self._processed_data.rounded_y_max = self.style.y_max + (y_scale - ((self.style.y_max % y_scale) if self.style.y_max % y_scale else y_scale))
+        self._processed_data.rounded_x_min = self._processed_data.x_min - (self._processed_data.x_min % self._processed_data.cell_size_x)
+        self._processed_data.rounded_x_max = self._processed_data.x_max + (self._processed_data.cell_size_x - ((self._processed_data.x_max % self._processed_data.cell_size_x) if self._processed_data.x_max % self._processed_data.cell_size_x else self._processed_data.cell_size_x))
+        self._processed_data.rounded_y_min = self._processed_data.y_min - (self._processed_data.y_min % self._processed_data.cell_size_y)
+        self._processed_data.rounded_y_max = self._processed_data.y_max + (self._processed_data.cell_size_y - ((self._processed_data.y_max % self._processed_data.cell_size_y) if self._processed_data.y_max % self._processed_data.cell_size_y else self._processed_data.cell_size_y))
 
-        x_padding = x_scale / 2
-        y_padding = y_scale / 2
+        x_padding = self._processed_data.cell_size_x / 2
+        y_padding = self._processed_data.cell_size_y / 2
 
         # Set view of axes
         self.ax.set_xlim([self._processed_data.rounded_x_min - x_padding, self._processed_data.rounded_x_max + x_padding])
         self.ax.set_ylim([self._processed_data.rounded_y_min - y_padding, self._processed_data.rounded_y_max + y_padding])
 
         # Set background checkerboard:
-        self.__set_background(self._processed_data.rounded_x_min, self._processed_data.rounded_y_min, x_scale, y_scale, self._processed_data.rounded_x_max, self._processed_data.rounded_y_max)
+        self.__set_background(self._processed_data.rounded_x_min, self._processed_data.rounded_y_min, self._processed_data.cell_size_x, self._processed_data.cell_size_y, self._processed_data.rounded_x_max, self._processed_data.rounded_y_max)
 
     def __process(self, trajectory):
         # Get relevant data (and do merging of repeated states if desired)
-        trajectory.process_data()
 
-        # Get min and max values
-        x_min, x_max = calculate_min_max(trajectory.processed_data.x)
-        y_min, y_max = calculate_min_max(trajectory.processed_data.y)
-        if self.style.x_minmax_given[0]:
-            x_min = self.style.x_min
-        else:
-            # if x_min not given, we should keep track of this
-            x_min = x_min if self.style.x_min is None else min(x_min,self.style.x_min)
-            self.style.x_min = x_min
-        if self.style.x_minmax_given[1]:
-            x_max = self.style.x_max
-        else:
-            x_max = x_max if self.style.x_max is None else max(x_max,self.style.x_max)
-            self.style.x_max = x_max
-        if self.style.y_minmax_given[0]:
-            y_min = self.style.y_min
-        else:
-            # if y_min not given, we should keep track of this
-            y_min = y_min if self.style.y_min is None else min(y_min,self.style.y_min)
-            self.style.y_min = y_min
-        if self.style.y_minmax_given[1]:
-            y_max = self.style.y_max
-        else:
-            y_max = y_max if self.style.y_max is None else max(y_max,self.style.y_max)
-            self.style.y_max = y_max
-
-        # Make an estimate for scale size of checkerboard grid sizing
-        x_scale = calculate_scale(x_min, x_max) if not self.style.tick_increment_x else self.style.tick_increment_x
-        y_scale = calculate_scale(y_min, y_max) if not self.style.tick_increment_y else self.style.tick_increment_y
-
-        if not self.style.tick_increment_x:
-            self.style.tick_increment_x = x_scale
-        if not self.style.tick_increment_y:
-            self.style.tick_increment_y = y_scale
-
-        # If same state is repeated, offset states so they don't sit on top of one another:
-        offset_within_bin(trajectory.processed_data.x, x_scale, trajectory.processed_data.y, y_scale)
+        if not trajectory.process_data():
+            return # early return for cases where trajectory data already processed
 
         # used for deciding node sizes
         self._processed_data.max_duration = max(max(trajectory.processed_data.nodes),self._processed_data.max_duration)
 
+        # Get min and max values
+        x_min, x_max = calculate_min_max(trajectory.processed_data.x)
+        y_min, y_max = calculate_min_max(trajectory.processed_data.y)
+
+        if self.style.x_minmax_given[0]:
+            x_min = self.style.x_min
+            if self._processed_data.x_min is None:
+                self._processed_data.x_min = x_min
+        else:
+            # if x_min not given, we should keep track of this
+            x_min = x_min if self._processed_data.x_min is None else min(x_min, self._processed_data.x_min)
+            self._processed_data.x_min = x_min
+        if self.style.x_minmax_given[1]:
+            x_max = self.style.x_max
+            if self._processed_data.x_max is None:
+                self._processed_data.x_max = x_max
+        else:
+            x_max = x_max if self._processed_data.x_max is None else max(x_max, self._processed_data.x_max)
+            self._processed_data.x_max = x_max
+        if self.style.y_minmax_given[0]:
+            y_min = self.style.y_min
+            if self._processed_data.y_min is None:
+                self._processed_data.y_min = y_min
+        else:
+            # if y_min not given, we should keep track of this
+            y_min = y_min if self._processed_data.y_min is None else min(y_min, self._processed_data.y_min)
+            self._processed_data.y_min = y_min
+        if self.style.y_minmax_given[1]:
+            y_max = self.style.y_max
+            if self._processed_data.y_max is None:
+                self._processed_data.y_max = y_max
+        else:
+            y_max = y_max if self._processed_data.y_max is None else max(y_max, self._processed_data.y_max)
+            self._processed_data.y_max = y_max
+
+
     def set_style(self, gridstyle: Gridstyle):
+        self._processed_data.clear()
         self.style = gridstyle
 
     def get_style(self):
@@ -185,22 +243,29 @@ class Grid:
         for trajectory in trajectories:
             self.trajectory_list[trajectory.meta["ID"]] = trajectory
         if trajectories:
+            self._processed_data.clear()
             check_trajectory_list(self.trajectory_list)
 
     def draw(self, save_as=""):
-        for trajectory in self.trajectory_list:
-            self.__process(trajectory)
-        for trajectory in self.trajectory_list:
-            self.__draw_graph(trajectory)
+        if not self._processed_data.valid:
+            for trajectory in self.trajectory_list:
+                trajectory.processed_data.valid = False
+                self.__process(trajectory)
         self.__draw_background_and_view()
         self.__draw_ticks(self.trajectory_list[0].style)
+        self.__offset_trajectories()
+        for trajectory in self.trajectory_list:
+            self.__draw_graph(trajectory)
         self.ax.set_aspect('auto')
         plt.tight_layout()
         if save_as:
             self.ax.savefig(save_as)
         else:
             plt.show()
+        self._processed_data.valid = True
 
+    def get_measures(self):
+        return GridMeasures()
 
 
 
