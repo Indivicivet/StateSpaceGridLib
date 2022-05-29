@@ -24,8 +24,6 @@ class Trajectory:
         self.meta = meta if meta else {"ID": self.numTrajectories}
         assert "ID" in self.meta, "metadata must contain an 'ID' field"
         self.style = style
-        self.modifiers=[]
-        self.modifier_names=[]
         truncate_nan_data(self.data_x, self.data_y, self.data_t)
 
     def GetID(self):
@@ -52,16 +50,6 @@ class Trajectory:
     def addGlobalOrdering(self, ordering):
         self.style.add_ordering("x", ordering)
         self.style.add_ordering("y", ordering)
-    
-    def addDataModifier(self, modifier_func, name=None):
-        if name:
-            self.modifier_names.append(name)
-        elif name.__name__:
-            self.modifier_names.append(name.__name__)
-        else:
-            assert False, "functions must either be supplied along with a name or be non-anonymous"
-        self.modifiers.append(modifier_func)
-
 
     # Merge adjacent equal states and return merged data.
     # Does not edit data within the trajectory as trajectories may contain >2(+time) variables
