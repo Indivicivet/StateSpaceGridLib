@@ -5,7 +5,6 @@ from matplotlib.colors import ListedColormap
 import numpy as np
 from .Trajectory import Trajectory, Trajectorystyle, check_trajectory_list, ProcessedTrajData
 from .States import *
-import pprint
 
 
 class Gridstyle:
