@@ -2,12 +2,11 @@ import math
 
 
 class Trajectorystyle:
-    def __init__(self, connectionstyle="arc3,rad=0.0", arrowstyle='-|>', ordering = dict(), rotate_xlabels=True):
+    def __init__(self, connectionstyle="arc3,rad=0.0", arrowstyle='-|>', ordering = dict()):
         self.connection_style = connectionstyle
         self.arrow_style = arrowstyle
         self.ordering={k:[x for x in v] for k,v in ordering.items()}
-        self.rotate_xlabels=rotate_xlabels
-    
+
     def add_ordering(self, axis, ordering):
         # make new copy for ordering
         self.ordering[axis] = [i for i in ordering]
@@ -84,6 +83,7 @@ class Trajectory:
             new_y_data = convert_on_ordering(new_y_data, self.style.ordering["y"])
         return loop_nodes, new_x_data, new_y_data, new_time_data
 
+
 def truncate_nan_data(x_data, y_data, t_data):
     nan_present_x = len(x_data) == len(t_data)
     nan_present_y = len(y_data) == len(t_data)
@@ -91,6 +91,7 @@ def truncate_nan_data(x_data, y_data, t_data):
         x_data.pop(-1)
     if nan_present_y:
         y_data.pop(-1)
+
 
 def check_trajectory_list(trajectory_list):
     assert trajectory_list, "A list of trajectories must be supplied to Grid"
@@ -104,6 +105,7 @@ def check_trajectory_list(trajectory_list):
             (trajectory.meta), "trajectory ID {}: metadata fields don't match with others in list".format(trajectory.meta["ID"])
         for i in trajectory.meta.keys():
             assert i in meta_names, "metadata field name {} in trajectory ID {} does not exist in first trajectory".format(i, trajectory.meta["ID"])
+
 
 def convert_on_ordering(data, ordering):
     index = {ordering[i] : i for i in range(len(ordering))}

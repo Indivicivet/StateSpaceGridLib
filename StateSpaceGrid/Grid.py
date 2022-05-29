@@ -9,7 +9,8 @@ from .States import *
 
 class Gridstyle:
     def __init__(self, title="", labelfontsize=14, tickfontsize=14, titlefontsize=14, tick_increment_x = None, tick_increment_y = None,
-                 x_label = None, y_label = None, x_order = None, y_order = None, x_min = None, x_max = None, y_min = None, y_max = None):
+                 x_label = None, y_label = None, x_order = None, y_order = None, x_min = None, x_max = None, y_min = None, y_max = None,
+                 rotate_xlabels=False):
         self.labelfontsize = labelfontsize
         self.tickfontsize = tickfontsize
         self.titlefontsize = titlefontsize
@@ -26,7 +27,7 @@ class Gridstyle:
         self.y_max = y_max
         self.x_minmax_given = (x_min is not None,x_max is not None)
         self.y_minmax_given = (y_min is not None,y_max is not None)
-
+        self.rotate_xlabels=rotate_xlabels
 
 
 class Grid:
@@ -100,7 +101,7 @@ class Grid:
                                                                                                        self.style.y_max + 1, self.style.tick_increment_y)]
         # Set ticks for states
         self.ax.tick_params(left=True, bottom=True, labelleft=True, labelbottom=True)
-        self.ax.tick_params(axis='x', labelsize=self.style.tickfontsize)
+        self.ax.tick_params(axis='x', labelsize=self.style.tickfontsize, rotation=90 if self.style.rotate_xlabels else 0)
         self.ax.tick_params(axis='y', labelsize=self.style.tickfontsize)
         self.ax.xaxis.set_major_locator(ticker.FixedLocator([i for i in range(self.style.x_min, self.style.x_max + 1)]))
         self.ax.xaxis.set_major_formatter(ticker.FixedFormatter(tick_label_x))
