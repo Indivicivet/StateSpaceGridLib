@@ -12,3 +12,7 @@ Grid objects hold trajectory objects and are the interface through which you
 can display the graphs.
 
 A brief test is included to display the code in action.
+
+To install as a library with pip, use
+
+pip install git+https://github.com/maggym00/StateSpaceGridLib
