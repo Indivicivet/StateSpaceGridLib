@@ -13,6 +13,15 @@ class Trajectorystyle:
         self.ordering[axis] = [i for i in ordering]
 
 
+class ProcessedTrajData:
+    def __init__(self, x=[], y=[], t=[], loops={}, nodes=[]):
+        self.x = x
+        self.y = y
+        self.t = t
+        self.loops = set()
+        self.nodes = nodes
+
+
 class Trajectory:
     numTrajectories = 0  # static count of number of trajectories - use as a stand in for ID
 
@@ -25,6 +34,7 @@ class Trajectory:
         assert "ID" in self.meta, "metadata must contain an 'ID' field"
         self.style = style
         truncate_nan_data(self.data_x, self.data_y, self.data_t)
+        self.processed_data = ProcessedTrajData() # To cache processed data
 
     def GetID(self):
         return self.meta["ID"]
@@ -53,24 +63,30 @@ class Trajectory:
 
     # Merge adjacent equal states and return merged data.
     # Does not edit data within the trajectory as trajectories may contain >2(+time) variables
-    def merge_equal_adjacent_states(self):
-        loop_nodes = set()
+    def __merge_equal_adjacent_states(self):
         merge_count = 0
-        new_x_data, new_y_data, new_time_data = [], [], []
         for i in range(len(self.data_x)):
             if i != 0 and (self.data_x[i], self.data_y[i]) == (self.data_x[i - 1], self.data_y[i - 1]):
                 merge_count = merge_count + 1
-                loop_nodes.add(i - merge_count)
+                self.processed_data.loops.add(i - merge_count)
             else:
-                new_x_data.append(self.data_x[i])
-                new_y_data.append(self.data_y[i])
-                new_time_data.append(self.data_t[i])
-        new_time_data.append(self.data_t[-1])
+                self.processed_data.x.append(self.data_x[i])
+                self.processed_data.y.append(self.data_y[i])
+                self.processed_data.t.append(self.data_t[i])
+        self.processed_data.t.append(self.data_t[-1])
         if "x" in self.style.ordering:
-            new_x_data = convert_on_ordering(new_x_data, self.style.ordering["x"])
+            self.processed_data.x = convert_on_ordering(self.processed_data.x, self.style.ordering["x"])
         if "y" in self.style.ordering:
-            new_y_data = convert_on_ordering(new_y_data, self.style.ordering["y"])
-        return loop_nodes, new_x_data, new_y_data, new_time_data
+            self.processed_data.y = convert_on_ordering(self.processed_data.y, self.style.ordering["y"])
+
+    def process_data(self):
+        if self.style.merge_repeated_states:
+            self.__merge_equal_adjacent_states()
+        else:
+            self.processed_data.t = self.data_t
+            self.processed_data.x = self.data_x
+            self.processed_data.y = self.data_y
+        self.processed_data.nodes = [(self.processed_data.t[i + 1] - self.processed_data.t[i]) for i in range(len(self.processed_data.t) - 1)]
 
 
 def truncate_nan_data(x_data, y_data, t_data):

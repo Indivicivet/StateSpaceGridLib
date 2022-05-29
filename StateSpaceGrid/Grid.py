@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 from matplotlib.colors import ListedColormap
 import numpy as np
-from .Trajectory import Trajectory, Trajectorystyle, check_trajectory_list
+from .Trajectory import Trajectory, Trajectorystyle, check_trajectory_list, ProcessedTrajData
 from .States import *
 
 
@@ -29,6 +29,9 @@ class Gridstyle:
         self.y_minmax_given = (y_min is not None,y_max is not None)
         self.rotate_xlabels=rotate_xlabels
 
+class GridCumulativeData:
+    def __init__(self):
+        self.max_duration = 0
 
 class Grid:
     def __init__(self, trajectories, style=Gridstyle()):
@@ -36,39 +39,28 @@ class Grid:
         self.graph = nx.Graph()
         self.ax = plt.gca()
         self.style = style
+        self._processed_data=GridCumulativeData()
         check_trajectory_list(self.trajectory_list)
     
-    def __get_data(self, trajectory):
-        loop_nodes = set()
-        # expect last field to be NaN due to 1 extra time field
-        x_data, y_data, time_data = [], [], []
-        if trajectory.style.merge_repeated_states:
-            loop_nodes, x_data, y_data, time_data = trajectory.merge_equal_adjacent_states()
-        else:
-            time_data = trajectory.data_t
-            x_data = trajectory.data_x
-            y_data = trajectory.data_y
-        return loop_nodes, x_data, y_data, time_data
 
     def __set_background(self, x_min, y_min, x_scale, y_scale, x_max, y_max):
         background_colours = ListedColormap([np.array([220 / 256, 220 / 256, 220 / 256, 1]), np.array([1, 1, 1, 1])])
         background = [[((i + j) % 2) for i in range(int(x_min/x_scale), int(x_max/x_scale)+1)] for j in range(int(y_min/y_scale), int(y_max/y_scale)+1)]
         self.ax.imshow(background, extent=[int(x_min)-0.5*x_scale, int(x_max)+0.5*x_scale, int(y_min)-0.5*y_scale, int(y_max)+0.5*y_scale], cmap=background_colours, interpolation='none')
     
-    def __draw_graph(self, x_data, y_data, time_data, loop_nodes, drawstyle):
+    def __draw_graph(self, trajectory):
         # Create a dictionary to define positions for node numbers
-        pos = {i: (x_data[i], y_data[i]) for i in range(len(x_data))}
+        num_nodes = len(trajectory.processed_data.x)
+        pos = {i: (trajectory.processed_data.x[i], trajectory.processed_data.y[i]) for i in range(num_nodes)}
 
         # List of tuples to define edges between nodes
-        edges = [(i, i + 1) for i in range(len(x_data) - 1)]
-        for loop_node in loop_nodes:
+        edges = [(i, i + 1) for i in range(num_nodes - 1)]
+        for loop_node in trajectory.processed_data.loops:
             edges.append((loop_node, loop_node))
 
-        # Calculate node size based on time data
-        node_sizes = [(time_data[i + 1] - time_data[i]) for i in range(len(time_data) - 1)]
-        node_size_scale_factor = 1000 / max(node_sizes)
-        for i in range(len(node_sizes)):
-            node_sizes[i] = node_size_scale_factor * node_sizes[i]
+        # Calculate node size based on node data
+        node_size_scale_factor = 1000 / self._processed_data.max_duration
+        node_sizes = list(map(lambda n: n*node_size_scale_factor,trajectory.processed_data.nodes))
 
         # Add nodes and edges to graph
         self.graph.add_nodes_from(pos.keys())
@@ -76,9 +68,9 @@ class Grid:
 
         # Draw graphs
         nx.draw_networkx_nodes(self.graph, pos, node_size=node_sizes, node_color='indigo')
-        nx.draw_networkx_edges(self.graph, pos, node_size=node_sizes, nodelist=[i for i in range(len(x_data))],
-                                       edgelist=edges, arrows=True, arrowstyle=drawstyle.arrow_style, node_shape='.',
-                                       arrowsize=10, width=2, connectionstyle=drawstyle.connection_style, )
+        nx.draw_networkx_edges(self.graph, pos, node_size=node_sizes, nodelist=[i for i in range(num_nodes)],
+                                       edgelist=edges, arrows=True, arrowstyle=trajectory.style.arrow_style, node_shape='.',
+                                       arrowsize=10, width=2, connectionstyle=trajectory.style.connection_style, )
 
     def __draw_ticks(self, drawstyle):
         # all of this needs to go in a separate function, called with show()
@@ -138,13 +130,13 @@ class Grid:
         # Set background checkerboard:
         self.__set_background(self.style.x_min, self.style.y_min, x_scale, y_scale, self.style.x_max, self.style.y_max)
 
-    def __add_plot(self, trajectory):
+    def __process(self, trajectory):
         # Get relevant data (and do merging of repeated states if desired)
-        loop_nodes, x_data, y_data, time_data = self.__get_data(trajectory)
+        trajectory.process_data()
 
         # Get min and max values
-        x_min, x_max = calculate_min_max(x_data)
-        y_min, y_max = calculate_min_max(y_data)
+        x_min, x_max = calculate_min_max(trajectory.processed_data.x)
+        y_min, y_max = calculate_min_max(trajectory.processed_data.y)
         if self.style.x_minmax_given[0]:
             x_min = self.style.x_min
         else:
@@ -178,9 +170,10 @@ class Grid:
             self.style.tick_increment_y = y_scale
 
         # If same state is repeated, offset states so they don't sit on top of one another:
-        offset_within_bin(x_data, x_scale, y_data, y_scale)
+        offset_within_bin(trajectory.processed_data.x, x_scale, trajectory.processed_data.y, y_scale)
 
-        self.__draw_graph(x_data, y_data, time_data, loop_nodes, trajectory.style)
+        # used for deciding node sizes
+        self._processed_data.max_duration = max(max(trajectory.processed_data.nodes),self._processed_data.max_duration)
 
     def set_style(self, gridstyle: Gridstyle):
         self.style = gridstyle
@@ -196,7 +189,9 @@ class Grid:
 
     def draw(self, save_as=""):
         for trajectory in self.trajectory_list:
-            self.__add_plot(trajectory)
+            self.__process(trajectory)
+        for trajectory in self.trajectory_list:
+            self.__draw_graph(trajectory)
         self.__draw_background_and_view()
         self.__draw_ticks(self.trajectory_list[0].style)
         self.ax.set_aspect('auto')
@@ -204,7 +199,7 @@ class Grid:
         if save_as:
             self.ax.savefig(save_as)
         else:
-            self.ax.show()
+            plt.show()
 
 
 
