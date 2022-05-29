@@ -38,11 +38,11 @@ class Grid:
         self.style = style
         check_trajectory_list(self.trajectory_list)
     
-    def __get_data(self, trajectory, merge_repeated_states):
+    def __get_data(self, trajectory):
         loop_nodes = set()
         # expect last field to be NaN due to 1 extra time field
         x_data, y_data, time_data = [], [], []
-        if merge_repeated_states:
+        if trajectory.style.merge_repeated_states:
             loop_nodes, x_data, y_data, time_data = trajectory.merge_equal_adjacent_states()
         else:
             time_data = trajectory.data_t
@@ -138,10 +138,9 @@ class Grid:
         # Set background checkerboard:
         self.__set_background(self.style.x_min, self.style.y_min, x_scale, y_scale, self.style.x_max, self.style.y_max)
 
-    def __add_plot(self, trajectory, merge_repeated_states: bool = True):
+    def __add_plot(self, trajectory):
         # Get relevant data (and do merging of repeated states if desired)
-        loop_nodes, x_data, y_data, time_data = self.__get_data(trajectory,
-                                                                merge_repeated_states)
+        loop_nodes, x_data, y_data, time_data = self.__get_data(trajectory)
 
         # Get min and max values
         x_min, x_max = calculate_min_max(x_data)
@@ -195,7 +194,7 @@ class Grid:
         if trajectories:
             check_trajectory_list(self.trajectory_list)
 
-    def draw(self, x_state_increment: int = None, y_state_increment: int = None, merge_repeated_states=True):
+    def draw(self):
         for trajectory in self.trajectory_list:
             self.__add_plot(trajectory)
         self.__draw_background_and_view()

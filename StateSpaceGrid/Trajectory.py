@@ -2,10 +2,11 @@ import math
 
 
 class Trajectorystyle:
-    def __init__(self, connectionstyle="arc3,rad=0.0", arrowstyle='-|>', ordering = dict()):
+    def __init__(self, connectionstyle="arc3,rad=0.0", arrowstyle='-|>', ordering = dict(), merge_repeated_states=True):
         self.connection_style = connectionstyle
         self.arrow_style = arrowstyle
         self.ordering={k:[x for x in v] for k,v in ordering.items()}
+        self.merge_repeated_states = merge_repeated_states
 
     def add_ordering(self, axis, ordering):
         # make new copy for ordering
