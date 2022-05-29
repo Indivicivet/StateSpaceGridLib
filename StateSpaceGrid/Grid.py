@@ -32,6 +32,10 @@ class Gridstyle:
 class GridCumulativeData:
     def __init__(self):
         self.max_duration = 0
+        self.rounded_x_min = 0
+        self.rounded_x_max = 0
+        self.rounded_y_min = 0
+        self.rounded_y_max = 0
 
 class Grid:
     def __init__(self, trajectories, style=Gridstyle()):
@@ -39,9 +43,8 @@ class Grid:
         self.graph = nx.Graph()
         self.ax = plt.gca()
         self.style = style
-        self._processed_data=GridCumulativeData()
+        self._processed_data = GridCumulativeData()
         check_trajectory_list(self.trajectory_list)
-    
 
     def __set_background(self, x_min, y_min, x_scale, y_scale, x_max, y_max):
         background_colours = ListedColormap([np.array([220 / 256, 220 / 256, 220 / 256, 1]), np.array([1, 1, 1, 1])])
@@ -83,21 +86,21 @@ class Grid:
             tick_label_x = self.style.x_order
         else:
             tick_label_x = drawstyle.ordering["x"] if "x" in drawstyle.ordering else [str(i) for i in
-                                                                                 range(self.style.x_min,
-                                                                                       self.style.x_max + 1, self.style.tick_increment_x)]
+                                                                                 range(self._processed_data.rounded_x_min,
+                                                                                       self._processed_data.rounded_x_max + 1, self.style.tick_increment_x)]
         if self.style.y_order:
             tick_label_y = self.style.y_order
         else:
             tick_label_y = drawstyle.ordering["y"] if "y" in drawstyle.ordering else [str(i) for i in
-                                                                                                 range(self.style.y_min,
-                                                                                                       self.style.y_max + 1, self.style.tick_increment_y)]
+                                                                                                 range(self._processed_data.rounded_y_min,
+                                                                                                       self._processed_data.roundedd_y_max + 1, self.style.tick_increment_y)]
         # Set ticks for states
         self.ax.tick_params(left=True, bottom=True, labelleft=True, labelbottom=True)
         self.ax.tick_params(axis='x', labelsize=self.style.tickfontsize, rotation=90 if self.style.rotate_xlabels else 0)
         self.ax.tick_params(axis='y', labelsize=self.style.tickfontsize)
-        self.ax.xaxis.set_major_locator(ticker.FixedLocator([i for i in range(self.style.x_min, self.style.x_max + 1)]))
+        self.ax.xaxis.set_major_locator(ticker.FixedLocator([i for i in range(self._processed_data.rounded_x_min, self._processed_data.rounded_x_max + 1)]))
         self.ax.xaxis.set_major_formatter(ticker.FixedFormatter(tick_label_x))
-        self.ax.yaxis.set_major_locator(ticker.FixedLocator([i for i in range(self.style.y_min, self.style.y_max + 1)]))
+        self.ax.yaxis.set_major_locator(ticker.FixedLocator([i for i in range(self._processed_data.rounded_y_min, self._processed_data.rounded_y_max + 1)]))
         self.ax.yaxis.set_major_formatter(ticker.FixedFormatter(tick_label_y))
 
         # Set axis labels
@@ -112,23 +115,20 @@ class Grid:
         x_scale = calculate_scale(self.style.x_min, self.style.x_max) if self.style.tick_increment_x is None else self.style.tick_increment_x
         y_scale = calculate_scale(self.style.y_min, self.style.y_max) if self.style.tick_increment_y is None else self.style.tick_increment_y
 
-        # round x min and x_max for drawing axes
-        # TODO
-        # we should probably put this stuff in a separate "__calculated_data" struct
-        self.style.x_min -= (self.style.x_min % x_scale)
-        self.style.x_max += (x_scale - ((self.style.x_max % x_scale) if self.style.x_max % x_scale else x_scale))
-        self.style.y_min -= (self.style.y_min % y_scale)
-        self.style.y_max += (y_scale - ((self.style.y_max % y_scale) if self.style.y_max % y_scale else y_scale))
+        self._processed_data.rounded_x_min = self.style.x_min - (self.style.x_min % x_scale)
+        self._processed_data.rounded_x_max = self.style.x_max + (x_scale - ((self.style.x_max % x_scale) if self.style.x_max % x_scale else x_scale))
+        self._processed_data.rounded_y_min = self.style.y_min - (self.style.y_min % y_scale)
+        self._processed_data.rounded_y_max = self.style.y_max + (y_scale - ((self.style.y_max % y_scale) if self.style.y_max % y_scale else y_scale))
 
         x_padding = x_scale / 2
         y_padding = y_scale / 2
 
         # Set view of axes
-        self.ax.set_xlim([self.style.x_min - x_padding, self.style.x_max + x_padding])
-        self.ax.set_ylim([self.style.y_min - y_padding, self.style.y_max + y_padding])
+        self.ax.set_xlim([self._processed_data.rounded_x_min - x_padding, self._processed_data.rounded_x_max + x_padding])
+        self.ax.set_ylim([self._processed_data.rounded_y_min - y_padding, self._processed_data.rounded_y_max + y_padding])
 
         # Set background checkerboard:
-        self.__set_background(self.style.x_min, self.style.y_min, x_scale, y_scale, self.style.x_max, self.style.y_max)
+        self.__set_background(self._processed_data.rounded_x_min, self._processed_data.rounded_y_min, x_scale, y_scale, self._processed_data.rounded_x_max, self._processed_data.rounded_y_max)
 
     def __process(self, trajectory):
         # Get relevant data (and do merging of repeated states if desired)
