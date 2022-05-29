@@ -1,7 +1,6 @@
 StateSpaceGrid is a python library loosely based around replicating the
-functionality of GridWare, a somewhat dated and poorly maintained Java program
-for creating and analysing state space grids for visualising dyadic mutuality 
-in psychology.
+functionality of GridWare, a Java program for creating and analysing
+state space grids for visualising dyadic mutuality in psychology.
 
 The main features of StateSpaceGrid are trajectory objects, grid objects and
 their associated styles.
