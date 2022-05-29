@@ -122,7 +122,7 @@ class Grid:
 
         # round x min and x_max for drawing axes
         # TODO
-        # we should probably put this stuff in a seperate "__calculated_data" struct
+        # we should probably put this stuff in a separate "__calculated_data" struct
         self.style.x_min -= (self.style.x_min % x_scale)
         self.style.x_max += (x_scale - ((self.style.x_max % x_scale) if self.style.x_max % x_scale else x_scale))
         self.style.y_min -= (self.style.y_min % y_scale)
@@ -194,14 +194,19 @@ class Grid:
         if trajectories:
             check_trajectory_list(self.trajectory_list)
 
-    def draw(self):
+    def draw(self, save_as=""):
         for trajectory in self.trajectory_list:
             self.__add_plot(trajectory)
         self.__draw_background_and_view()
         self.__draw_ticks(self.trajectory_list[0].style)
         self.ax.set_aspect('auto')
         plt.tight_layout()
-        plt.show()
+        if save_as:
+            self.ax.savefig(save_as)
+        else:
+            self.ax.show()
+
+
 
 
 
