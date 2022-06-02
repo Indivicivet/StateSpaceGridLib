@@ -138,9 +138,9 @@ class Grid:
         self.ax.tick_params(left=True, bottom=True, labelleft=True, labelbottom=True)
         self.ax.tick_params(axis='x', labelsize=self.style.tickfontsize, rotation=90 if self.style.rotate_xlabels else 0)
         self.ax.tick_params(axis='y', labelsize=self.style.tickfontsize)
-        self.ax.xaxis.set_major_locator(ticker.FixedLocator([i for i in range(self._processed_data.rounded_x_min, self._processed_data.rounded_x_max + 1)]))
+        self.ax.xaxis.set_major_locator(ticker.FixedLocator([i for i in range(self._processed_data.rounded_x_min, self._processed_data.rounded_x_max + 1,self._processed_data.cell_size_x)]))
         self.ax.xaxis.set_major_formatter(ticker.FixedFormatter(tick_label_x))
-        self.ax.yaxis.set_major_locator(ticker.FixedLocator([i for i in range(self._processed_data.rounded_y_min, self._processed_data.rounded_y_max + 1)]))
+        self.ax.yaxis.set_major_locator(ticker.FixedLocator([i for i in range(self._processed_data.rounded_y_min, self._processed_data.rounded_y_max + 1, self._processed_data.cell_size_y)]))
         self.ax.yaxis.set_major_formatter(ticker.FixedFormatter(tick_label_y))
 
         # Set axis labels
@@ -230,7 +230,6 @@ class Grid:
             y_max = y_max if self._processed_data.y_max is None else max(y_max, self._processed_data.y_max)
             self._processed_data.y_max = y_max
 
-
     def set_style(self, gridstyle: Gridstyle):
         self._processed_data.clear()
         self.style = gridstyle
@@ -251,10 +250,10 @@ class Grid:
                 trajectory.processed_data.valid = False
                 self.__process(trajectory)
         self.__draw_background_and_view()
-        self.__draw_ticks(self.trajectory_list[0].style)
         self.__offset_trajectories()
         for trajectory in self.trajectory_list:
             self.__draw_graph(trajectory)
+        self.__draw_ticks(self.trajectory_list[0].style)
         self.ax.set_aspect('auto')
         plt.tight_layout()
         if save_as:
