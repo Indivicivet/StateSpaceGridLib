@@ -1,6 +1,3 @@
-import math
-
-
 class Trajectorystyle:
     def __init__(self, connectionstyle="arc3,rad=0.0", arrowstyle='-|>', ordering = dict(), merge_repeated_states=True):
         self.connection_style = connectionstyle
@@ -19,7 +16,7 @@ class ProcessedTrajData:
         self.x = x
         self.y = y
         self.t = t
-        self.loops = set()
+        self.loops = loops
         self.nodes = nodes # (durations)
         self.offset_x = []
         self.offset_y = []
@@ -40,10 +37,10 @@ class Trajectory:
         truncate_nan_data(self.data_x, self.data_y, self.data_t)
         self.processed_data = ProcessedTrajData() # To cache processed data
 
-    def GetID(self):
+    def getID(self):
         return self.meta["ID"]
 
-    def SetID(self, id_val):
+    def setID(self, id_val):
         self.meta["ID"] = id_val
     
     def getStyle(self):
@@ -64,6 +61,24 @@ class Trajectory:
     def addGlobalOrdering(self, ordering):
         self.style.add_ordering("x", ordering)
         self.style.add_ordering("y", ordering)
+
+    def getDuration(self):
+        return self.data_t[-1] - self.data_t[0]
+
+    def getNumVisits(self):
+        if self.style.merge_repeated_states:
+            return len(self.processed_data.x)
+        else:
+            repeat_count = 0
+            for i in range(1,len(self.data_x)):
+                if (self.data_x[i], self.data_y[i]) == (self.data_x[i - 1], self.data_y[i - 1]):
+                    repeat_count += 1
+            return len(self.data_x) - repeat_count
+
+    def getCellRange(self):
+        return len([1 for x_and_count in self.processed_data.bin_counts.items() for x in x_and_count])
+
+
 
     # Merge adjacent equal states and return merged data.
     # Does not edit data within the trajectory as trajectories may contain >2(+time) variables

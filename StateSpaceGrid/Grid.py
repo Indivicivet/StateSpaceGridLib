@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 from matplotlib.colors import ListedColormap
 import numpy as np
+from statistics import mean
 from .Trajectory import Trajectory, Trajectorystyle, check_trajectory_list, ProcessedTrajData
 from .States import *
 
@@ -263,6 +264,27 @@ class Grid:
         self._processed_data.valid = True
 
     def get_measures(self):
+        if self._processed_data.valid:
+            # majority of processing already done
+            ids, durations, event_numbers, visit_numbers, \
+            cell_ranges, dispersions, missing_events, missing_duration = [],[],[],[],[],[],[],[]
+            measures = GridMeasures()
+
+            for traj in self.trajectory_list:
+                measures.trajectory_ids.append(traj.getID())
+                durations.append(traj.getDuration())
+                event_numbers.append(len(traj.data_x))
+                visit_numbers.append(len(traj.getNumVisits))
+                cell_ranges.append(traj.getCellRange())
+
+            measures.mean_duration = mean(durations)
+            measures.mean_number_of_events = mean(event_numbers)
+            measures.mean_number_of_visits = mean(visit_numbers)
+            measures.mean_cell_range = mean(cell_ranges)
+            measures.overall_cell_range = len([1 for x_and_count in self._processed_data.bin_counts.items() for x in x_and_count])
+            measures.mean_duration_per_event = mean(map(lambda x, y: x/y, event_numbers, durations))
+            measures.mean_duration_per_visit = mean(map(lambda x, y: x/y, visit_numbers, durations))
+            measures.mean_duration_per_cell = mean(map(lambda x, y: x/y, cell_ranges, durations))
         return GridMeasures()
 
 
