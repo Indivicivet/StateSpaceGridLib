@@ -263,29 +263,57 @@ class Grid:
             plt.show()
         self._processed_data.valid = True
 
+    def __calculate_dispersion(self):
+        num_cells_x = int((self._processed_data.x_max - self._processed_data.x_min) / self._processed_data.cell_size_x)
+        num_cells_y = int((self._processed_data.y_max - self._processed_data.y_min) / self._processed_data.cell_size_y)
+        n = num_cells_x * num_cells_y
+        cell_durations = dict()
+        total_duration = 0
+        for traj in self.trajectory_list:
+            for i in range(len(traj.processed_data.nodes)):
+                y = traj.processed_data.y
+                x = traj.processed_data.x
+                duration = traj.processed_data.nodes[i]
+                if y in cell_durations:
+                    cell_durations[y][x] = cell_durations[y].get(x, 0) + duration
+                else:
+                    cell_durations[y] = {x, duration}
+                total_duration += duration
+        sum_d_D = sum([d/total_duration for x_and_d in cell_durations.values() for d in x_and_d])
+        return (n * sum_d_D - 1) / (n-1)
+
+
     def get_measures(self):
-        if self._processed_data.valid:
-            # majority of processing already done
-            ids, durations, event_numbers, visit_numbers, \
-            cell_ranges, dispersions, missing_events, missing_duration = [],[],[],[],[],[],[],[]
-            measures = GridMeasures()
+        if not self._processed_data.valid:
+            # necessary processing
+            for trajectory in self.trajectory_list:
+                trajectory.processed_data.valid = False
+                self.__process(trajectory)
+            self.__draw_background_and_view()
+            self.__offset_trajectories()
+            self._processed_data.valid = True
 
-            for traj in self.trajectory_list:
-                measures.trajectory_ids.append(traj.getID())
-                durations.append(traj.getDuration())
-                event_numbers.append(len(traj.data_x))
-                visit_numbers.append(len(traj.getNumVisits))
-                cell_ranges.append(traj.getCellRange())
+        ids, durations, event_numbers, visit_numbers, \
+            cell_ranges, dispersions, missing_events, missing_duration = [], [], [], [], [], [], [], []
+        measures = GridMeasures()
 
-            measures.mean_duration = mean(durations)
-            measures.mean_number_of_events = mean(event_numbers)
-            measures.mean_number_of_visits = mean(visit_numbers)
-            measures.mean_cell_range = mean(cell_ranges)
-            measures.overall_cell_range = len([1 for x_and_count in self._processed_data.bin_counts.items() for x in x_and_count])
-            measures.mean_duration_per_event = mean(map(lambda x, y: x/y, event_numbers, durations))
-            measures.mean_duration_per_visit = mean(map(lambda x, y: x/y, visit_numbers, durations))
-            measures.mean_duration_per_cell = mean(map(lambda x, y: x/y, cell_ranges, durations))
-        return GridMeasures()
+        for traj in self.trajectory_list:
+            measures.trajectory_ids.append(traj.getID())
+            durations.append(traj.getDuration())
+            event_numbers.append(len(traj.data_x))
+            visit_numbers.append(len(traj.getNumVisits))
+            cell_ranges.append(traj.getCellRange())
+
+        measures.mean_duration = mean(durations)
+        measures.mean_number_of_events = mean(event_numbers)
+        measures.mean_number_of_visits = mean(visit_numbers)
+        measures.mean_cell_range = mean(cell_ranges)
+        measures.overall_cell_range = len([1 for x_and_count in self._processed_data.bin_counts.items() for x in x_and_count])
+        measures.mean_duration_per_event = mean(map(lambda x, y: x/y, event_numbers, durations))
+        measures.mean_duration_per_visit = mean(map(lambda x, y: x/y, visit_numbers, durations))
+        measures.mean_duration_per_cell = mean(map(lambda x, y: x/y, cell_ranges, durations))
+        measures.dispersion = self.__calculate_dispersion()
+        return measures
 
 
 
