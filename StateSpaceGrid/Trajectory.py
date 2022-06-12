@@ -11,7 +11,7 @@ class Trajectorystyle:
 
 
 class ProcessedTrajData:
-    def __init__(self, x=[], y=[], t=[], loops={}, nodes=[]):
+    def __init__(self, x=[], y=[], t=[], loops=set(), nodes=[]):
         valid = False
         self.x = x
         self.y = y
