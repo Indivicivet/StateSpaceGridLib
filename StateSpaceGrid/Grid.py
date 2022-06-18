@@ -9,13 +9,13 @@ from .States import *
 
 
 class Gridstyle:
-    def __init__(self, title="", labelfontsize=14, tickfontsize=14, titlefontsize=14, tick_increment_x=None,
+    def __init__(self, title="", label_font_size=14, tick_font_size=14, title_font_size=14, tick_increment_x=None,
                  tick_increment_y=None,
                  x_label=None, y_label=None, x_order=None, y_order=None, x_min=None, x_max=None, y_min=None, y_max=None,
                  rotate_xlabels=False):
-        self.labelfontsize = labelfontsize
-        self.tickfontsize = tickfontsize
-        self.titlefontsize = titlefontsize
+        self.label_font_size = label_font_size
+        self.tick_font_size = tick_font_size
+        self.title_font_size = title_font_size
         self.title = title
         self.tick_increment_x = tick_increment_x
         self.tick_increment_y = tick_increment_y
@@ -173,11 +173,11 @@ class Grid:
         self.ax.yaxis.set_major_formatter(ticker.FixedFormatter(tick_label_y))
 
         # Set axis labels
-        self.ax.set_xlabel(self.style.x_label, fontsize=self.style.labelfontsize)
-        self.ax.set_ylabel(self.style.y_label, fontsize=self.style.labelfontsize)
+        self.ax.set_xlabel(self.style.x_label, fontsize=self.style.label_font_size)
+        self.ax.set_ylabel(self.style.y_label, fontsize=self.style.label_font_size)
 
         if self.style.title:
-            self.ax.set_title(self.style.title, fontsize=self.style.titlefontsize)
+            self.ax.set_title(self.style.title, fontsize=self.style.title_font_size)
 
     def __offset_trajectories(self):
         # get total bin counts
@@ -302,8 +302,8 @@ class Grid:
         self._processed_data.valid = True
 
     def __calculate_dispersion(self):
-        num_cells_x = int((self._processed_data.x_max - self._processed_data.x_min) / self._processed_data.cell_size_x)
-        num_cells_y = int((self._processed_data.y_max - self._processed_data.y_min) / self._processed_data.cell_size_y)
+        num_cells_x = int((self._processed_data.x_max - self._processed_data.x_min) / self._processed_data.cell_size_x) + 1
+        num_cells_y = int((self._processed_data.y_max - self._processed_data.y_min) / self._processed_data.cell_size_y) + 1
         n = num_cells_x * num_cells_y
         cell_durations = dict()
         total_duration = 0
@@ -331,7 +331,7 @@ class Grid:
             self._processed_data.valid = True
 
         ids, durations, event_numbers, visit_numbers, \
-        cell_ranges, dispersions, missing_events, missing_duration = [], [], [], [], [], [], [], []
+            cell_ranges, dispersions, missing_events, missing_duration = [], [], [], [], [], [], [], []
         measures = GridMeasures()
 
         for traj in self.trajectory_list:
