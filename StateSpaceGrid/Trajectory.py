@@ -11,13 +11,13 @@ class Trajectorystyle:
 
 
 class ProcessedTrajData:
-    def __init__(self, x=[], y=[], t=[], loops=set(), nodes=[]):
+    def __init__(self):
         valid = False
-        self.x = x
-        self.y = y
-        self.t = t
-        self.loops = loops
-        self.nodes = nodes # (durations)
+        self.x = []
+        self.y = []
+        self.t = []
+        self.loops = set()
+        self.nodes = [] # (durations)
         self.offset_x = []
         self.offset_y = []
         self.bin_counts = dict()
