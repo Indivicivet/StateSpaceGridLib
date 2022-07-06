@@ -347,8 +347,8 @@ class Grid:
         measures.mean_cell_range = mean(cell_ranges)
         measures.overall_cell_range = len(
             [1 for x_and_count in self._processed_data.bin_counts.items() for x in x_and_count])
-        measures.mean_duration_per_event = mean(map(lambda x, y: x / y, event_numbers, durations))
-        measures.mean_duration_per_visit = mean(map(lambda x, y: x / y, visit_numbers, durations))
-        measures.mean_duration_per_cell = mean(map(lambda x, y: x / y, cell_ranges, durations))
+        measures.mean_duration_per_event = mean(map(lambda x, y: x / y, durations, event_numbers))
+        measures.mean_duration_per_visit = mean(map(lambda x, y: x / y, durations, visit_numbers))
+        measures.mean_duration_per_cell = mean(map(lambda x, y: x / y, durations, cell_ranges))
         measures.dispersion = self.__calculate_dispersion()
         return measures
