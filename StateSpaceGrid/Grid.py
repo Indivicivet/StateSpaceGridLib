@@ -317,7 +317,7 @@ class Grid:
                 else:
                     cell_durations[y] = {x: duration}
                 total_duration += duration
-        sum_d_D = sum([d / total_duration for x_and_d in cell_durations.values() for d in x_and_d])
+        sum_d_D = sum([pow(d / total_duration,2) for x_and_d in cell_durations.values() for d in x_and_d])
         return (n * sum_d_D - 1) / (n - 1)
 
     def get_measures(self):
