@@ -302,8 +302,8 @@ class Grid:
         self._processed_data.valid = True
 
     def __calculate_dispersion(self):
-        num_cells_x = int((self._processed_data.x_max - self._processed_data.x_min) / self._processed_data.cell_size_x) + 1
-        num_cells_y = int((self._processed_data.y_max - self._processed_data.y_min) / self._processed_data.cell_size_y) + 1
+        num_cells_x = int((self._processed_data.x_max - self._processed_data.x_min) / self._processed_data.cell_size_x) - 1
+        num_cells_y = int((self._processed_data.y_max - self._processed_data.y_min) / self._processed_data.cell_size_y) - 1
         n = num_cells_x * num_cells_y
         cell_durations = dict()
         total_duration = 0
