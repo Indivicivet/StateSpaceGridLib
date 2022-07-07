@@ -4,6 +4,7 @@ import matplotlib.ticker as ticker
 from matplotlib.colors import ListedColormap
 import numpy as np
 from statistics import mean
+import fractions
 from .Trajectory import Trajectory, Trajectorystyle, check_trajectory_list, ProcessedTrajData
 from .States import *
 
@@ -317,8 +318,8 @@ class Grid:
                 else:
                     cell_durations[y] = {x: duration}
                 total_duration += duration
-        sum_d_D = sum([pow(d / total_duration,2) for x_and_d in cell_durations.values() for d in x_and_d.values()])
-        return (n * sum_d_D - 1) / (n - 1)
+        sum_d_D = sum([pow(fractions.Fraction(d, total_duration),2) for x_and_d in cell_durations.values() for d in x_and_d.values()])
+        return fractions.Fraction(n * sum_d_D - 1, n - 1)
 
     def get_measures(self):
         if not self._processed_data.valid:
@@ -350,5 +351,5 @@ class Grid:
         measures.mean_duration_per_event = mean(map(lambda x, y: x / y, durations, event_numbers))
         measures.mean_duration_per_visit = mean(map(lambda x, y: x / y, durations, visit_numbers))
         measures.mean_duration_per_cell = mean(map(lambda x, y: x / y, durations, cell_ranges))
-        measures.dispersion = self.__calculate_dispersion()
+        measures.dispersion = float(self.__calculate_dispersion())
         return measures
