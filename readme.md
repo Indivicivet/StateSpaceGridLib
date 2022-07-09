@@ -1,5 +1,7 @@
-#StateSpaceGridLib
-##Introduction
+# StateSpaceGridLib
+
+## Introduction
+
 StateSpaceGrid is a python library loosely based around replicating the
 functionality of GridWare, a Java program for creating and analysing
 state space grids for visualising dyadic mutuality in psychology.
@@ -19,8 +21,10 @@ To install as a library with pip, use
 
 pip install git+https://github.com/maggym00/StateSpaceGridLib
 
-##Library API Reference
-####Trajectory
+## Library API Reference
+
+#### Trajectory
+
 ```python
 Trajectory(data_x, data_y, data_t, meta=None, style=Trajectorystyle())
 ```
@@ -109,7 +113,7 @@ Trajectory.getNumVisits()
 ```
 Return number of "visits", defined as the number of state transitions plus 1 (the initial starting state) minus the number of transitions to the same state as where the transition is from (ie. `(x1, y1) -> (x2, y2)` where  .
 
-####TrajectoryStyle
+#### TrajectoryStyle
 ```python
 TrajectoryStyle(connectionstyle="arc3,rad=0.0", arrowstyle='-|>', ordering = dict(), merge_repeated_states=True)
 ```
@@ -142,7 +146,7 @@ Sets the ordering for the specified axis.
    
    Eg. `["low", "medium", "high"]`
 
-####Grid
+#### Grid
 ```python
 Grid(trajectories, style=Gridstyle())
 ```
@@ -183,7 +187,7 @@ Draw visualisation of state space grid.
 Grid.get_measures()
 ```
 Calculate cumulative measures from all trajectories provided to the grid and return as a `GridMeasures` object.
-####GridStyle
+#### GridStyle
 ```python
 GridStyle(title="", label_font_size=14, tick_font_size=14, title_font_size=14, tick_increment_x=None, tick_increment_y=None, x_label=None, y_label=None, x_order=None, y_order=None, x_min=None, x_max=None, y_min=None, y_max=None, rotate_xlabels=False)
 ```
@@ -245,7 +249,7 @@ Object containing visualisation customisation and global controls for trajectory
 * `rotate_xlabels`
 
    Rotate x axis tick labels by 90°.
-####GridMeasures
+#### GridMeasures
 ```python
 GridMeasures()    
 ```
