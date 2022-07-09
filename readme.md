@@ -35,7 +35,7 @@ Data in StateSpaceGridLib is organised via Trajectories. These objects take in d
 
 * `data_y`
 
-   A list of state values for the y axis. The length of this list is expected to be the same as for the x axis.
+   A list of state values for the y axis. The length of this list is expected to be the same as for the x data.
 * `data_t`
 
    Time data: a list of length 1 longer than the x or y data, specifying the start time of each event in the data_x/data_y lists as well as the end point of the final event.
