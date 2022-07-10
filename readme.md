@@ -77,7 +77,7 @@ Set `TrajectoryStyle` object stored in `Trajectory.style`.
 Trajectory.addXOrdering(ordering)
 ```
 Set ordering for x measurement scale.
-* 'ordering'
+* `ordering`
 
    A list going from lowest possible measurement value to highest.
    
@@ -87,7 +87,7 @@ Set ordering for x measurement scale.
 Trajectory.addYOrdering(ordering)
 ```
 Set ordering for y measurement scale.
-* 'ordering'
+* `ordering`
 
    A list going from lowest possible measurement value to highest.
    
@@ -97,7 +97,7 @@ Set ordering for y measurement scale.
 Trajectory.addGlobalOrdering(ordering)
 ```
 Set ordering for both y and x measurement scale.
-* 'ordering'
+* `ordering`
 
    A list going from lowest possible measurement value to highest.
    
