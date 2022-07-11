@@ -1,3 +1,6 @@
+from dataclasses import dataclass
+from typing import Optional
+
 import networkx as nx
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
@@ -9,28 +12,29 @@ from .trajectory import Trajectory, TrajectoryStyle, check_trajectory_list, Proc
 from .states import *
 
 
+@dataclass
 class GridStyle:
-    def __init__(self, title="", label_font_size=14, tick_font_size=14, title_font_size=14, tick_increment_x=None,
-                 tick_increment_y=None,
-                 x_label=None, y_label=None, x_order=None, y_order=None, x_min=None, x_max=None, y_min=None, y_max=None,
-                 rotate_xlabels=False):
-        self.label_font_size = label_font_size
-        self.tick_font_size = tick_font_size
-        self.title_font_size = title_font_size
-        self.title = title
-        self.tick_increment_x = tick_increment_x
-        self.tick_increment_y = tick_increment_y
-        self.x_label = x_label
-        self.y_label = y_label
-        self.x_order = x_order
-        self.y_order = y_order
-        self.x_min = x_min
-        self.y_min = y_min
-        self.x_max = x_max
-        self.y_max = y_max
-        self.x_minmax_given = (x_min is not None, x_max is not None)
-        self.y_minmax_given = (y_min is not None, y_max is not None)
-        self.rotate_xlabels = rotate_xlabels
+    title: str = ""
+    label_font_size: int = 14
+    tick_font_size: int = 14
+    title_font_size: int = 14
+    tick_increment_x: Optional[int] = None
+    tick_increment_x: Optional[int] = None
+    x_label: Optional[str] = None
+    y_label: Optional[str] = None
+    x_min: Optional[int] = None  # todo :: are they floats?
+    x_max: Optional[int] = None
+    y_min: Optional[int] = None
+    y_max: Optional[int] = None
+    rotate_x_labels: bool = False
+
+    @property
+    def x_minmax_given(self):
+        return self.x_min is not None, self.x_max is not None
+
+    @property
+    def y_minmax_given(self):
+        return self.y_min is not None, self.y_max is not None
 
 
 class GridCumulativeData:
