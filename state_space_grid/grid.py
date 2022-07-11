@@ -317,9 +317,6 @@ class Grid:
         self._processed_data.clear()
         self.style = grid_style
 
-    def get_style(self):
-        return self.style
-
     def add_trajectory_data(self, *trajectories: Trajectory):
         for trajectory in trajectories:
             self.trajectory_list[trajectory.id] = trajectory
