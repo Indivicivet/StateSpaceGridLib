@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from typing import ClassVar
 
 
 @dataclass
@@ -28,20 +29,26 @@ class ProcessedTrajData:
     bin_counts: dict = field(default_factory=dict)
 
 
+@dataclass
 class Trajectory:
-    numTrajectories = 0  # static count of number of trajectories - use as a stand in for ID
+    data_x: list
+    data_y: list
+    data_t: list
+    meta: dict = field(default_factory=dict)
+    style: TrajectoryStyle = field(default_factory=TrajectoryStyle)
+    id: int = None  # set in __post_init__
 
-    def __init__(self, data_x, data_y, data_t, meta=None, style=TrajectoryStyle()):
-        # todo :: remove nonsense
-        self.numTrajectories = self.numTrajectories+1
-        self.data_x = [x for x in data_x]
-        self.data_y = [y for y in data_y]
-        self.data_t = [t for t in data_t]
-        self.meta = meta if meta else {}
-        self.id = self.numTrajectories  # ???
-        self.style = style
+    # To cache processed data
+    processed_data : ProcessedTrajData = field(default_factory=ProcessedTrajData)
+
+    # static count of number of trajectories - use as a stand in for ID
+    # todo :: unsure if this is daft. probably daft?
+    next_id: ClassVar[int] = 1
+
+    def __post_init__(self):
+        self.id = self.next_id
+        type(self).next_id += 1
         truncate_nan_data(self.data_x, self.data_y, self.data_t)
-        self.processed_data = ProcessedTrajData() # To cache processed data
     
     # Make it easier to add ordering to trajectory variables
     def add_x_ordering(self, ordering):
