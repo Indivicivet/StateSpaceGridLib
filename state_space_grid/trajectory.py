@@ -79,13 +79,16 @@ class Trajectory:
         # todo :: no idea what this was meant to be
         return 2 * len(self.processed_data.bin_counts)  # but probably not this?
 
-    # Merge adjacent equal states and return merged data.
-    # Does not edit data within the trajectory as trajectories may contain >2(+time) variables
     def __merge_equal_adjacent_states(self):
+        """
+        Merge adjacent equal states and return merged data.
+        Does not edit data within the trajectory as trajectories may contain >2(+time) variables
+        """
+        # todo :: bleh
         merge_count = 0
         for i in range(len(self.data_x)):
             if i != 0 and (self.data_x[i], self.data_y[i]) == (self.data_x[i - 1], self.data_y[i - 1]):
-                merge_count = merge_count + 1
+                merge_count += 1
                 self.processed_data.loops.add(i - merge_count)
             else:
                 self.processed_data.x.append(self.data_x[i])
