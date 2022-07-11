@@ -54,34 +54,20 @@ class GridCumulativeData:
     cell_size_y: int = 0
 
 
+@dataclass
 class GridMeasures:
-    def __init__(self):
-        self.trajectory_ids = []
-        self.mean_duration = 0
-        self.mean_number_of_events = 0
-        self.mean_number_of_visits = 0
-        self.mean_cell_range = 0
-        self.overall_cell_range = 0
-        self.mean_duration_per_event = 0
-        self.mean_duration_per_visit = 0
-        self.mean_duration_per_cell = 0
-        self.dispersion = 0
-        self.mean_missing_events = 0
-        self.mean_missing_duration = 0
-
-    def __str__(self):
-        return "\n".join(["trajectory ids: {}".format(", ".join([str(x) for x in self.trajectory_ids])),
-                          "mean duration: {}".format(self.mean_duration),
-                          "mean number of events: {}".format(self.mean_number_of_events),
-                          "mean number of visits: {}".format(self.mean_number_of_visits),
-                          "mean cell range: {}".format(self.mean_cell_range),
-                          "overall cell range: {}".format(self.overall_cell_range),
-                          "mean duration per event: {}".format(self.mean_duration_per_event),
-                          "mean duration per visit: {}".format(self.mean_duration_per_visit),
-                          "mean duration per cell: {}".format(self.mean_duration_per_cell),
-                          "dispersion {}".format(self.dispersion),
-                          "mean missing events {}".format(self.mean_missing_events),
-                          "mean missing duration {}".format(self.mean_missing_duration)])
+    trajectory_ids: list = field(default_factory=lambda: [])
+    mean_duration: float = 0
+    mean_number_of_events: float = 0  # todo float ye?
+    mean_number_of_visits: float = 0
+    mean_cell_range: float = 0
+    overall_cell_range: float = 0
+    mean_duration_per_event: float = 0
+    mean_duration_per_visit: float = 0
+    mean_duration_per_cell: float = 0
+    dispersion: float = 0
+    mean_missing_events: float = 0
+    mean_missing_duration: float = 0
 
 
 class Grid:
