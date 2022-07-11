@@ -318,11 +318,34 @@ class Grid:
         self.style = grid_style
 
     def add_trajectory_data(self, *trajectories: Trajectory):
+        if not trajectories:
+            # todo :: do we really care...?
+            raise ValueError("A list of trajectories must be supplied to Grid")
+
+        # check all trajectories before we add things:
+        meta_names = {column for column in trajectories[0].meta.keys()}
+        for trajectory in trajectories:
+            assert isinstance(trajectory, Trajectory), (
+                "All trajectory data supplied in trajectory list"
+                " must be instances of the trajectory class"
+            )
+            # todo :: possibly go for a more type-agnostic approach here? (see above)
+            assert len(meta_names) == len(trajectory.meta), (
+                f"trajectory ID {trajectory.id}:"
+                " metadata fields don't match with others in list"
+            )
+            for i in trajectory.meta:
+                assert i in meta_names, (
+                    f"metadata field name {i} in trajectory ID {trajectory.id}"
+                    " does not exist in first trajectory"
+                )
+            # todo :: do we also want to check id?
+
+        # todo :: (??)
+        # they look good, so add them:
         for trajectory in trajectories:
             self.trajectory_list[trajectory.id] = trajectory
-        if trajectories:
-            self._processed_data.clear()
-            check_trajectory_list(self.trajectory_list)
+        self._processed_data.clear()
 
     def draw(self, save_as: Optional[str] = None):
         if not self._processed_data.valid:
