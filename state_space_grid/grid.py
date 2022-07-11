@@ -71,11 +71,11 @@ class GridMeasures:
 
 
 class Grid:
-    def __init__(self, trajectories, style=GridStyle()):
-        self.trajectory_list = [i for i in trajectories]
+    def __init__(self, trajectories, style=None):
+        self.trajectory_list = list(trajectories)  # hm?
         self.graph = nx.Graph()
         self.ax = plt.gca()
-        self.style = style
+        self.style = style if style is not None else GridStyle()
         self._processed_data = GridCumulativeData()
         check_trajectory_list(self.trajectory_list)
 
