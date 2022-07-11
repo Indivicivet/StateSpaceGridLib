@@ -1,0 +1,10 @@
+Onset,variable 1,variable 2,variable 3
+0.00,1,2,High
+2.00,2,2,Low
+2.48,2,2,High
+5.32,4,3,Medium
+7.83,3,2,Medium
+9.67,2,4,Low
+11.85,2,2,Low
+12.16,4,2,Low
+14.8
