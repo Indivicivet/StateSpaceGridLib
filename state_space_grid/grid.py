@@ -236,7 +236,7 @@ class Grid:
             + self._processed_data.cell_size_y
             - (
                 self._processed_data.y_max % self._processed_data.cell_size_y
-                if self._processed_data.y_max % self._processed_data.cell_size_
+                if self._processed_data.y_max % self._processed_data.cell_size_y
                 else self._processed_data.cell_size_y
             )
         )
