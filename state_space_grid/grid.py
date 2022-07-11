@@ -143,51 +143,38 @@ class Grid:
 
         # Get tick labels - either numeric or categories
         # todo :: this bit is a bit of a mess
+        rounded_x_points = range(
+            self._processed_data.rounded_x_min,
+            self._processed_data.rounded_x_max + 1,
+            self._processed_data.cell_size_x
+        )
+        rounded_y_points = range(
+            self._processed_data.rounded_y_min,
+            self._processed_data.rounded_y_max + 1,
+            self._processed_data.cell_size_y
+        )
         tick_label_x = (
             self.style.x_order
-            or (
-                draw_style.ordering.get(
-                    "x",
-                    [
-                        str(i)
-                        for i in range(
-                              self._processed_data.rounded_x_min,
-                              self._processed_data.rounded_x_max + 1,
-                              self._processed_data.cell_size_x
-                        )
-                    ],
-                )
-            )
+            or draw_style.ordering.get("x", [str(i) for i in rounded_x_points])
         )
         tick_label_y = (
             self.style.y_order
-            or (
-                draw_style.ordering.get(
-                    "y",
-                    [
-                        str(i)
-                        for i in range(
-                            self._processed_data.rounded_y_min,
-                            self._processed_data.rounded_y_max + 1,
-                            self._processed_data.cell_size_y
-                        )
-                    ],
-                )
-            )
+            or draw_style.ordering.get("y", [str(i) for i in rounded_y_points])
         )
-
         # Set ticks for states
         self.ax.tick_params(left=True, bottom=True, labelleft=True, labelbottom=True)
-        self.ax.tick_params(axis='x', labelsize=self.style.tickfontsize,
-                            rotation=90 if self.style.rotate_xlabels else 0)
-        self.ax.tick_params(axis='y', labelsize=self.style.tickfontsize)
-        self.ax.xaxis.set_major_locator(ticker.FixedLocator([i for i in range(self._processed_data.rounded_x_min,
-                                                                              self._processed_data.rounded_x_max + 1,
-                                                                              self._processed_data.cell_size_x)]))
+        self.ax.tick_params(
+            axis='x',
+            labelsize=self.style.tickfontsize,
+            rotation=90 * self.style.rotate_xlabels,
+        )
+        self.ax.tick_params(
+            axis='y',
+            labelsize=self.style.tickfontsize,
+        )
+        self.ax.xaxis.set_major_locator(ticker.FixedLocator(rounded_x_points))
+        self.ax.yaxis.set_major_locator(ticker.FixedLocator(rounded_y_points))
         self.ax.xaxis.set_major_formatter(ticker.FixedFormatter(tick_label_x))
-        self.ax.yaxis.set_major_locator(ticker.FixedLocator([i for i in range(self._processed_data.rounded_y_min,
-                                                                              self._processed_data.rounded_y_max + 1,
-                                                                              self._processed_data.cell_size_y)]))
         self.ax.yaxis.set_major_formatter(ticker.FixedFormatter(tick_label_y))
 
         # Set axis labels
