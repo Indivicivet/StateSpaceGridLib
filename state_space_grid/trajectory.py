@@ -100,8 +100,11 @@ class Trajectory:
         if "y" in self.style.ordering:
             self.processed_data.y = convert_on_ordering(self.processed_data.y, self.style.ordering["y"])
 
-    # returns if data has already been processed
-    def process_data(self):
+    def process_data(self) -> bool:
+        """
+        processes data(? you'd hope)
+        returns whether data has already been processed
+        """
         # check if already processed
         if self.processed_data.valid:
             return False
@@ -112,15 +115,17 @@ class Trajectory:
             self.processed_data.x = self.data_x
             self.processed_data.y = self.data_y
 
-        for i in range(len(self.processed_data.x)):
-            y = self.processed_data.y[i]
-            x = self.processed_data.x[i]
+        for x, y in zip(self.processed_data.x, self.processed_data.y):
+            # todo :: defaultdict / Counter
             if y in self.processed_data.bin_counts:
                 self.processed_data.bin_counts[y][x] = self.processed_data.bin_counts[y].get(x, 0) + 1
             else:
                 self.processed_data.bin_counts[y] = {x: 1}
 
-        self.processed_data.nodes = [(self.processed_data.t[i + 1] - self.processed_data.t[i]) for i in range(len(self.processed_data.t) - 1)]
+        self.processed_data.nodes = [
+            latter - former
+            for former, latter in zip(self.processed_data.t, self.processed_data[1:])
+        ]
         self.processed_data.valid = True
         return True
 
