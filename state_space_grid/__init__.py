@@ -10,5 +10,5 @@ https://www.queensu.ca/psychology/sites/psycwww/files/uploaded_files/Faculty/Tom
 __version__ = "0.0.1"
 
 
-from StateSpaceGrid.Grid import Grid, Gridstyle
-from StateSpaceGrid.Trajectory import Trajectory, Trajectorystyle
+from state_space_grid.grid import Grid, Gridstyle
+from state_space_grid.trajectory import Trajectory, Trajectorystyle

@@ -1,4 +1,4 @@
-import StateSpaceGrid as ssg
+import state_space_grid as ssg
 import pandas as pd
 import os
 
