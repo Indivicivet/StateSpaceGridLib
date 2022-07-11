@@ -8,8 +8,9 @@ from matplotlib.colors import ListedColormap
 import numpy as np
 from statistics import mean
 import fractions
+
 from .trajectory import Trajectory, TrajectoryStyle, check_trajectory_list, ProcessedTrajData
-from .util import *
+from . import util
 
 
 @dataclass
@@ -197,19 +198,24 @@ class Grid:
         current_bin_counter = {y: {x: 0 for x in v.keys()} for y, v in self._processed_data.bin_counts.items()}
         for trajectory in self.trajectory_list:
             # If same state is repeated, offset states so they don't sit on top of one another:
-            offset_within_bin(trajectory.processed_data.x, self._processed_data.cell_size_x,
-                              trajectory.processed_data.y, self._processed_data.cell_size_y,
-                              self._processed_data.bin_counts, current_bin_counter)
+            util.offset_within_bin(
+                trajectory.processed_data.x,
+                self._processed_data.cell_size_x,
+                trajectory.processed_data.y,
+                self._processed_data.cell_size_y,
+                self._processed_data.bin_counts,
+                current_bin_counter,
+            )
 
     def __draw_background_and_view(self):
         # Make an estimate for scale size of checkerboard grid sizing
         self._processed_data.cell_size_x = (
-            calculate_scale(self._processed_data.x_max - self._processed_data.x_min)
+            util.calculate_scale(self._processed_data.x_max - self._processed_data.x_min)
             if self.style.tick_increment_x is None
             else self.style.tick_increment_x
         )
         self._processed_data.cell_size_y = (
-            calculate_scale(self._processed_data.y_max - self._processed_data.y_min)
+            util.calculate_scale(self._processed_data.y_max - self._processed_data.y_min)
             if self.style.tick_increment_y is None
             else self.style.tick_increment_y
         )
@@ -277,8 +283,8 @@ class Grid:
         )
 
         # Get min and max values
-        x_min, x_max = calculate_min_max(trajectory.processed_data.x)
-        y_min, y_max = calculate_min_max(trajectory.processed_data.y)
+        x_min, x_max = util.calculate_min_max(trajectory.processed_data.x)
+        y_min, y_max = util.calculate_min_max(trajectory.processed_data.y)
 
         if self.style.x_minmax_given[0]:
             x_min = self.style.x_min
