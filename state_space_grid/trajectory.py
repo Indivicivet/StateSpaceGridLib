@@ -1,7 +1,7 @@
-class Trajectorystyle:
-    def __init__(self, connectionstyle="arc3,rad=0.0", arrowstyle='-|>', ordering = dict(), merge_repeated_states=True):
-        self.connection_style = connectionstyle
-        self.arrow_style = arrowstyle
+class TrajectoryStyle:
+    def __init__(self, connection_style="arc3,rad=0.0", arrow_style='-|>', ordering = dict(), merge_repeated_states=True):
+        self.connection_style = connection_style
+        self.arrow_style = arrow_style
         self.ordering={k:[x for x in v] for k,v in ordering.items()}
         self.merge_repeated_states = merge_repeated_states
 
@@ -26,7 +26,7 @@ class ProcessedTrajData:
 class Trajectory:
     numTrajectories = 0  # static count of number of trajectories - use as a stand in for ID
 
-    def __init__(self, data_x, data_y, data_t, meta=None, style=Trajectorystyle()):
+    def __init__(self, data_x, data_y, data_t, meta=None, style=TrajectoryStyle()):
         self.numTrajectories = self.numTrajectories+1
         self.data_x = [x for x in data_x]
         self.data_y = [y for y in data_y]
@@ -46,7 +46,7 @@ class Trajectory:
     def getStyle(self):
         return self.style
     
-    def setStyle(self, style: Trajectorystyle):
+    def setStyle(self, style: TrajectoryStyle):
         self.style=style
     
     # Make it easier to add ordering to trajectory variables

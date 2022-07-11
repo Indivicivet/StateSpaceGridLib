@@ -5,11 +5,11 @@ from matplotlib.colors import ListedColormap
 import numpy as np
 from statistics import mean
 import fractions
-from .trajectory import Trajectory, Trajectorystyle, check_trajectory_list, ProcessedTrajData
+from .trajectory import Trajectory, TrajectoryStyle, check_trajectory_list, ProcessedTrajData
 from .states import *
 
 
-class Gridstyle:
+class GridStyle:
     def __init__(self, title="", label_font_size=14, tick_font_size=14, title_font_size=14, tick_increment_x=None,
                  tick_increment_y=None,
                  x_label=None, y_label=None, x_order=None, y_order=None, x_min=None, x_max=None, y_min=None, y_max=None,
@@ -96,7 +96,7 @@ class GridMeasures:
 
 
 class Grid:
-    def __init__(self, trajectories, style=Gridstyle()):
+    def __init__(self, trajectories, style=GridStyle()):
         self.trajectory_list = [i for i in trajectories]
         self.graph = nx.Graph()
         self.ax = plt.gca()
@@ -270,7 +270,7 @@ class Grid:
             y_max = y_max if self._processed_data.y_max is None else max(y_max, self._processed_data.y_max)
             self._processed_data.y_max = y_max
 
-    def set_style(self, gridstyle: Gridstyle):
+    def set_style(self, gridstyle: GridStyle):
         self._processed_data.clear()
         self.style = gridstyle
 
