@@ -48,7 +48,9 @@ class Trajectory:
     def __post_init__(self):
         self.id = self.next_id
         type(self).next_id += 1
-        truncate_nan_data(self.data_x, self.data_y, self.data_t)
+        for data in [self.x_data, self.y_data]:
+            if len(data) == len(self.t_data):
+                data.pop(-1)  # truncate NaN data (????? todo :: ??)
     
     # Make it easier to add ordering to trajectory variables
     def add_x_ordering(self, ordering):
@@ -128,15 +130,6 @@ class Trajectory:
         ]
         self.processed_data.valid = True
         return True
-
-
-def truncate_nan_data(x_data, y_data, t_data):
-    nan_present_x = len(x_data) == len(t_data)
-    nan_present_y = len(y_data) == len(t_data)
-    if nan_present_x:
-        x_data.pop(-1)
-    if nan_present_y:
-        y_data.pop(-1)
 
 
 def check_trajectory_list(trajectory_list):
