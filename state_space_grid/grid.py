@@ -323,7 +323,13 @@ class Grid:
             raise ValueError("A list of trajectories must be supplied to Grid")
 
         # check all trajectories before we add things:
-        meta_names = {column for column in trajectories[0].meta.keys()}
+        # todo :: uhhhh need to see if this is really the right logic
+        # todo :: or way to structure this
+        meta_names = set(
+            self.trajectory_list[0].meta.keys()
+            if self.trajectory_list
+            else trajectories[0].meta.keys()
+        )
         for trajectory in trajectories:
             assert isinstance(trajectory, Trajectory), (
                 "All trajectory data supplied in trajectory list"
