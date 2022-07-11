@@ -191,6 +191,7 @@ class Grid:
         for trajectory in self.trajectory_list:
             for y, x_and_count in trajectory.processed_data.bin_counts.items():
                 for x, count in x_and_count.items():
+                    # todo :: defaultdict/Counter, and the (y, x) thing
                     if y in self._processed_data.bin_counts:
                         self._processed_data.bin_counts[y][x] = self._processed_data.bin_counts[y].get(x, 0) + count
                     else:
