@@ -1,3 +1,5 @@
+from dataclasses import dataclass, field
+
 class TrajectoryStyle:
     def __init__(self, connection_style="arc3,rad=0.0", arrow_style='-|>', ordering = dict(), merge_repeated_states=True):
         self.connection_style = connection_style
@@ -10,17 +12,18 @@ class TrajectoryStyle:
         self.ordering[axis] = [i for i in ordering]
 
 
+# todo :: is this really the right data layout...? AOS vs SOA I guess
+@dataclass
 class ProcessedTrajData:
-    def __init__(self):
-        valid = False
-        self.x = []
-        self.y = []
-        self.t = []
-        self.loops = set()
-        self.nodes = [] # (durations)
-        self.offset_x = []
-        self.offset_y = []
-        self.bin_counts = dict()
+    valid: bool = False
+    x: list = field(default_factory=list)
+    y: list = field(default_factory=list)
+    t: list = field(default_factory=list)
+    loops: set = field(default_factory=set)
+    nodes: list = field(default_factory=list)
+    offset_x: list = field(default_factory=list)
+    offset_y: list = field(default_factory=list)
+    bin_counts: dict = field(default_factory=dict)
 
 
 class Trajectory:
