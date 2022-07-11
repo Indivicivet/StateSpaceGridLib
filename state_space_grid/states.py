@@ -3,15 +3,16 @@
 import math
 
 
-def calculate_scale(var_min, var_max):
+def calculate_scale(difference):
+    """
+    return desired scale
+    implemented as the biggest power of 10 smaller than the difference
+    """
     scale_factor = 1
-    scale = var_max - var_min
-    if scale_factor < scale:
-        while (scale_factor * 10) < scale:
-            scale_factor = scale_factor * 10
-    if scale_factor > scale:
-        while scale_factor > scale:
-            scale_factor = scale_factor / 10
+    while scale_factor < difference:
+        scale_factor *= 10
+    while scale_factor > difference:
+        scale_factor /= 10
     return scale_factor
 
 
