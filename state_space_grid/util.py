@@ -26,6 +26,7 @@ def calculate_min_max(values):
 
 
 def offset_within_bin(x_data, x_scale, y_data, y_scale, bin_counts, visit_count):
+    """warning: mutates arguments!!"""
     partition_counts = {
         # todo :: type (x, y) -> val is better, yes?
         # but would need to make that kind of change globally
