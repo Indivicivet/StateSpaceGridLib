@@ -80,11 +80,6 @@ class Grid:
         check_trajectory_list(self.trajectory_list)
 
     def __set_background(self, x_min, y_min, x_scale, y_scale, x_max, y_max):
-        background_colours = ListedColormap([
-            # todo :: is this overkill?
-            np.array([220 / 256, 220 / 256, 220 / 256, 1]),
-            np.array([1, 1, 1, 1])
-        ])
         background = [
             # todo :: np plz...
             [
@@ -100,7 +95,10 @@ class Grid:
                 int(y_min) - 0.5 * y_scale,
                 int(y_max) + 0.5 * y_scale
             ],
-            cmap=background_colours,
+            cmap=ListedColormap([
+                [220 / 256, 220 / 256, 220 / 256, 1],
+                [1, 1, 1, 1],
+            ]),
             interpolation='none',
         )
 
