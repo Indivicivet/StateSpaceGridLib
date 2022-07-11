@@ -209,6 +209,7 @@ class Grid:
             )
 
     def __draw_background_and_view(self):
+        # todo :: whole bunch of stuff that is a bit messy here
         # Make an estimate for scale size of checkerboard grid sizing
         self._processed_data.cell_size_x = (
             util.calculate_scale(self._processed_data.x_max - self._processed_data.x_min)
