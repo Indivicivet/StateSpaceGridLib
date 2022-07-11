@@ -135,29 +135,47 @@ class Grid:
             connectionstyle=trajectory.style.connection_style,
         )
 
-    def __draw_ticks(self, drawstyle):
+    def __draw_ticks(self, draw_style):
         # all of this needs to go in a separate function, called with show()
         # we need to store which axis is which column - kick up a fuss if future plots don't match this
         # we also need to store an idea of minimum scale - this is going to fuck us if scales don't match
         # - maybe just tell people if they have scale adjustment problems to specify their own
 
         # Get tick labels - either numeric or categories
-        if self.style.x_order:
-            tick_label_x = self.style.x_order
-        else:
-            tick_label_x = drawstyle.ordering["x"] if "x" in drawstyle.ordering else [str(i) for i in
-                                                                                      range(
-                                                                                          self._processed_data.rounded_x_min,
-                                                                                          self._processed_data.rounded_x_max + 1,
-                                                                                          self._processed_data.cell_size_x)]
-        if self.style.y_order:
-            tick_label_y = self.style.y_order
-        else:
-            tick_label_y = drawstyle.ordering["y"] if "y" in drawstyle.ordering else [str(i) for i in
-                                                                                      range(
-                                                                                          self._processed_data.rounded_y_min,
-                                                                                          self._processed_data.rounded_y_max + 1,
-                                                                                          self._processed_data.cell_size_y)]
+        # todo :: this bit is a bit of a mess
+        tick_label_x = (
+            self.style.x_order
+            or (
+                draw_style.ordering.get(
+                    "x",
+                    [
+                        str(i)
+                        for i in range(
+                              self._processed_data.rounded_x_min,
+                              self._processed_data.rounded_x_max + 1,
+                              self._processed_data.cell_size_x
+                        )
+                    ],
+                )
+            )
+        )
+        tick_label_y = (
+            self.style.y_order
+            or (
+                draw_style.ordering.get(
+                    "y",
+                    [
+                        str(i)
+                        for i in range(
+                            self._processed_data.rounded_y_min,
+                            self._processed_data.rounded_y_max + 1,
+                            self._processed_data.cell_size_y
+                        )
+                    ],
+                )
+            )
+        )
+
         # Set ticks for states
         self.ax.tick_params(left=True, bottom=True, labelleft=True, labelbottom=True)
         self.ax.tick_params(axis='x', labelsize=self.style.tickfontsize,
