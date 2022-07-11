@@ -75,9 +75,9 @@ class Trajectory:
         )
 
     def get_cell_range(self):
-        return len([1 for x_and_count in self.processed_data.bin_counts.items() for x in x_and_count])
-
-
+        # len([1 for x_and_count in self.processed_data.bin_counts.items() for x in x_and_count])
+        # todo :: no idea what this was meant to be
+        return 2 * len(self.processed_data.bin_counts)  # but probably not this?
 
     # Merge adjacent equal states and return merged data.
     # Does not edit data within the trajectory as trajectories may contain >2(+time) variables
