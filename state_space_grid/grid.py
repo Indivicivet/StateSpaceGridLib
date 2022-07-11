@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Optional
 
 import networkx as nx
@@ -37,36 +37,21 @@ class GridStyle:
         return self.y_min is not None, self.y_max is not None
 
 
+@dataclass
 class GridCumulativeData:
-    def __init__(self):
-        self.valid = False
-        self.max_duration = 0
-        self.rounded_x_min = 0
-        self.rounded_x_max = 0
-        self.rounded_y_min = 0
-        self.rounded_y_max = 0
-        self.x_min = None
-        self.y_min = None
-        self.x_max = None
-        self.y_max = None
-        self.bin_counts = dict()
-        self.cell_size_x = 0
-        self.cell_size_y = 0
-
-    def clear(self):
-        self.valid = False
-        self.max_duration = 0
-        self.rounded_x_min = 0
-        self.rounded_x_max = 0
-        self.rounded_y_min = 0
-        self.rounded_y_max = 0
-        self.x_min = None
-        self.y_min = None
-        self.x_max = None
-        self.y_max = None
-        self.bin_counts = []
-        self.cell_size_x = 0
-        self.cell_size_y = 0
+    valid: bool = False
+    max_duration: int = 0
+    rounded_x_min: int = 0
+    rounded_x_max: int = 0
+    rounded_y_min: int = 0
+    rounded_y_max: int = 0
+    x_min: Optional[int] = None
+    y_min: Optional[int] = None
+    x_max: Optional[int] = None
+    y_max: Optional[int] = None
+    bin_counts: dict = field(default_factory=lambda: {})
+    cell_size_x: int = 0
+    cell_size_y: int = 0
 
 
 class GridMeasures:
