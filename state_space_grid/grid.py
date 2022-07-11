@@ -369,6 +369,7 @@ class Grid:
                 else:
                     cell_durations[y] = {x: duration}
                 total_duration += duration
+        # todo :: why fractions? :)
         sum_d_D = sum(
             pow(fractions.Fraction(d, total_duration), 2)
             for x_and_d in cell_durations.values()
