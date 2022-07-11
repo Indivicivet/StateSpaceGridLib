@@ -1,15 +1,17 @@
 from dataclasses import dataclass, field
 
-class TrajectoryStyle:
-    def __init__(self, connection_style="arc3,rad=0.0", arrow_style='-|>', ordering = dict(), merge_repeated_states=True):
-        self.connection_style = connection_style
-        self.arrow_style = arrow_style
-        self.ordering={k:[x for x in v] for k,v in ordering.items()}
-        self.merge_repeated_states = merge_repeated_states
 
+@dataclass
+class TrajectoryStyle:
+    connection_style: str = "arc3,rad=0.0"
+    arrow_style: str = "-|>"
+    ordering: dict = field(default_factory=dict)
+    merge_repeated_states: bool = True
+
+    # todo :: why does this exist
     def add_ordering(self, axis, ordering):
-        # make new copy for ordering
-        self.ordering[axis] = [i for i in ordering]
+        """ make new copy for ordering"""
+        self.ordering[axis] = list(ordering)
 
 
 # todo :: is this really the right data layout...? AOS vs SOA I guess
