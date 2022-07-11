@@ -185,6 +185,7 @@ class Grid:
             self.ax.set_title(self.style.title, fontsize=self.style.title_font_size)
 
     def __offset_trajectories(self):
+        # todo :: later -- need to think about what this actually does
         # get total bin counts
         for trajectory in self.trajectory_list:
             for y, x_and_count in trajectory.processed_data.bin_counts.items():
@@ -202,19 +203,43 @@ class Grid:
 
     def __draw_background_and_view(self):
         # Make an estimate for scale size of checkerboard grid sizing
-        self._processed_data.cell_size_x = calculate_scale(self._processed_data.x_min,
-                                                           self._processed_data.x_max) if self.style.tick_increment_x is None else self.style.tick_increment_x
-        self._processed_data.cell_size_y = calculate_scale(self._processed_data.y_min,
-                                                           self._processed_data.y_max) if self.style.tick_increment_y is None else self.style.tick_increment_y
+        self._processed_data.cell_size_x = (
+            calculate_scale(self._processed_data.x_min, self._processed_data.x_max)
+            if self.style.tick_increment_x is None
+            else self.style.tick_increment_x
+        )
+        self._processed_data.cell_size_y = (
+            calculate_scale(self._processed_data.y_min, self._processed_data.y_max)
+            if self.style.tick_increment_y is None
+            else self.style.tick_increment_y
+        )
 
-        self._processed_data.rounded_x_min = self._processed_data.x_min - (
-                    self._processed_data.x_min % self._processed_data.cell_size_x)
-        self._processed_data.rounded_x_max = self._processed_data.x_max + (self._processed_data.cell_size_x - ((
-                                                                                                                           self._processed_data.x_max % self._processed_data.cell_size_x) if self._processed_data.x_max % self._processed_data.cell_size_x else self._processed_data.cell_size_x))
-        self._processed_data.rounded_y_min = self._processed_data.y_min - (
-                    self._processed_data.y_min % self._processed_data.cell_size_y)
-        self._processed_data.rounded_y_max = self._processed_data.y_max + (self._processed_data.cell_size_y - ((
-                                                                                                                           self._processed_data.y_max % self._processed_data.cell_size_y) if self._processed_data.y_max % self._processed_data.cell_size_y else self._processed_data.cell_size_y))
+        self._processed_data.rounded_x_min = (
+            self._processed_data.x_min
+            - (self._processed_data.x_min % self._processed_data.cell_size_x)
+        )
+        self._processed_data.rounded_x_max = (
+            self._processed_data.x_max
+            + self._processed_data.cell_size_x
+            - (
+               self._processed_data.x_max % self._processed_data.cell_size_x
+               if self._processed_data.x_max % self._processed_data.cell_size_x
+               else self._processed_data.cell_size_x
+            )
+        )
+        self._processed_data.rounded_y_min = (
+            self._processed_data.y_min
+            - (self._processed_data.y_min % self._processed_data.cell_size_y)
+        )
+        self._processed_data.rounded_y_max = (
+            self._processed_data.y_max
+            + self._processed_data.cell_size_y
+            - (
+                self._processed_data.y_max % self._processed_data.cell_size_y
+                if self._processed_data.y_max % self._processed_data.cell_size_
+                else self._processed_data.cell_size_y
+            )
+        )
 
         x_padding = self._processed_data.cell_size_x / 2
         y_padding = self._processed_data.cell_size_y / 2
