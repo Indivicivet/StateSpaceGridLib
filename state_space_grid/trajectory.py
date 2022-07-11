@@ -77,9 +77,8 @@ class Trajectory:
         )
 
     def get_cell_range(self):
-        # len([1 for x_and_count in self.processed_data.bin_counts.items() for x in x_and_count])
-        # todo :: no idea what this was meant to be
-        return 2 * len(self.processed_data.bin_counts)  # but probably not this?
+        # todo :: double check this does as intended
+        return sum(map(len, self.processed_data.bin_counts.values()))
 
     def __merge_equal_adjacent_states(self):
         """
