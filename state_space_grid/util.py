@@ -52,3 +52,4 @@ def offset_within_bin(x_data, x_scale, y_data, y_scale, bin_counts, visit_count)
             x_data[i] = x + direction[0] * x_scale / 4
             y_data[i] = y + direction[1] * y_scale / 4
             visit_count[y][x] += 1
+    # todo :: should really return x_data', y_data', visit_count' eh?
