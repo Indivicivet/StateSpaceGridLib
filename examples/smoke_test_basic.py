@@ -8,6 +8,7 @@ import state_space_grid as ssg
 DATA_PATH = Path(__file__).resolve().parent / "resources" / "ExampleData1.txt"
 
 
+# todo :: sensible name
 def test1():
     data1 = pd.read_csv(DATA_PATH.open())
     traj1 = ssg.Trajectory(
@@ -17,11 +18,12 @@ def test1():
     )
     grid = ssg.Grid(
         [traj1],
-        style=ssg.GridStyle(x_label="variable 1", y_label="variable 2")
+        style=ssg.GridStyle(x_label="variable 1", y_label="variable 2"),
     )
     grid.draw()
 
 
+# todo :: sensible name
 def test2():
     data1 = pd.read_csv(DATA_PATH.open())
     traj1 = ssg.Trajectory(
