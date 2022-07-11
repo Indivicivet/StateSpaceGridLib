@@ -27,12 +27,13 @@ class Trajectory:
     numTrajectories = 0  # static count of number of trajectories - use as a stand in for ID
 
     def __init__(self, data_x, data_y, data_t, meta=None, style=TrajectoryStyle()):
+        # todo :: remove nonsense
         self.numTrajectories = self.numTrajectories+1
         self.data_x = [x for x in data_x]
         self.data_y = [y for y in data_y]
         self.data_t = [t for t in data_t]
-        self.meta = meta if meta else {"ID": self.numTrajectories}
-        assert "ID" in self.meta, "metadata must contain an 'ID' field"
+        self.meta = meta if meta else {}
+        self.id = self.numTrajectories  # ???
         self.style = style
         truncate_nan_data(self.data_x, self.data_y, self.data_t)
         self.processed_data = ProcessedTrajData() # To cache processed data
@@ -129,9 +130,9 @@ def check_trajectory_list(trajectory_list):
     for trajectory in trajectory_list:
         # possibly go for a more type-agnostic approach here? (see above)
         assert len(meta_names) == len \
-            (trajectory.meta), "trajectory ID {}: metadata fields don't match with others in list".format(trajectory.meta["ID"])
+            (trajectory.meta), "trajectory ID {}: metadata fields don't match with others in list".format(trajectory.id)
         for i in trajectory.meta.keys():
-            assert i in meta_names, "metadata field name {} in trajectory ID {} does not exist in first trajectory".format(i, trajectory.meta["ID"])
+            assert i in meta_names, "metadata field name {} in trajectory ID {} does not exist in first trajectory".format(i, trajectory.id)
 
 
 def convert_on_ordering(data, ordering):

@@ -320,7 +320,7 @@ class Grid:
 
     def add_trajectory_data(self, *trajectories: Trajectory):
         for trajectory in trajectories:
-            self.trajectory_list[trajectory.meta["ID"]] = trajectory
+            self.trajectory_list[trajectory.id] = trajectory
         if trajectories:
             self._processed_data.clear()
             check_trajectory_list(self.trajectory_list)
@@ -392,7 +392,7 @@ class Grid:
         measures = GridMeasures()
 
         for traj in self.trajectory_list:
-            measures.trajectory_ids.append(traj.meta["ID"])
+            measures.trajectory_ids.append(traj.id)
             durations.append(traj.get_duration())
             event_numbers.append(len(traj.data_x))
             visit_numbers.append(traj.get_num_visits())
