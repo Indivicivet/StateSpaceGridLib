@@ -265,13 +265,16 @@ class Grid:
         )
 
     def __process(self, trajectory):
-        # Get relevant data (and do merging of repeated states if desired)
+        """Get relevant data (and do merging of repeated states if desired)"""
 
         if not trajectory.process_data():
             return  # early return for cases where trajectory data already processed
 
         # used for deciding node sizes
-        self._processed_data.max_duration = max(max(trajectory.processed_data.nodes), self._processed_data.max_duration)
+        self._processed_data.max_duration = max(
+            max(trajectory.processed_data.nodes),
+            self._processed_data.max_duration,
+        )
 
         # Get min and max values
         x_min, x_max = calculate_min_max(trajectory.processed_data.x)
@@ -308,9 +311,9 @@ class Grid:
             y_max = y_max if self._processed_data.y_max is None else max(y_max, self._processed_data.y_max)
             self._processed_data.y_max = y_max
 
-    def set_style(self, gridstyle: GridStyle):
+    def set_style(self, grid_style: GridStyle):
         self._processed_data.clear()
-        self.style = gridstyle
+        self.style = grid_style
 
     def get_style(self):
         return self.style
@@ -322,7 +325,7 @@ class Grid:
             self._processed_data.clear()
             check_trajectory_list(self.trajectory_list)
 
-    def draw(self, save_as=""):
+    def draw(self, save_as: Optional[str] = None):
         if not self._processed_data.valid:
             for trajectory in self.trajectory_list:
                 trajectory.processed_data.valid = False
@@ -334,29 +337,43 @@ class Grid:
         self.__draw_ticks(self.trajectory_list[0].style)
         self.ax.set_aspect('auto')
         plt.tight_layout()
-        if save_as:
+        if save_as is not None:
             self.ax.savefig(save_as)
         else:
             plt.show()
         self._processed_data.valid = True
 
     def __calculate_dispersion(self):
-        num_cells_x = int((self._processed_data.x_max - self._processed_data.x_min) / self._processed_data.cell_size_x) + 1
-        num_cells_y = int((self._processed_data.y_max - self._processed_data.y_min) / self._processed_data.cell_size_y) + 1
-        n = num_cells_x * num_cells_y
-        cell_durations = dict()
+        n = (
+            int(
+                (self._processed_data.x_max - self._processed_data.x_min)
+                / self._processed_data.cell_size_x
+            ) + 1
+        ) * (
+            int(
+                (self._processed_data.y_max - self._processed_data.y_min)
+                / self._processed_data.cell_size_y
+            ) + 1
+        )
+        cell_durations = {}
         total_duration = 0
         for traj in self.trajectory_list:
-            for i in range(len(traj.processed_data.nodes)):
-                y = traj.processed_data.y[i]
-                x = traj.processed_data.x[i]
-                duration = traj.processed_data.nodes[i]
+            for duration, x, y in zip(
+                traj.processed_data.nodes,
+                traj.processed_data.x,
+                traj.processed_data.y,
+            ):
+                # todo :: defaultdict
                 if y in cell_durations:
                     cell_durations[y][x] = cell_durations[y].get(x, 0) + duration
                 else:
                     cell_durations[y] = {x: duration}
                 total_duration += duration
-        sum_d_D = sum([pow(fractions.Fraction(d, total_duration),2) for x_and_d in cell_durations.values() for d in x_and_d.values()])
+        sum_d_D = sum(
+            pow(fractions.Fraction(d, total_duration), 2)
+            for x_and_d in cell_durations.values()
+            for d in x_and_d.values()
+        )
         return fractions.Fraction(n * sum_d_D - 1, n - 1)
 
     def get_measures(self):
