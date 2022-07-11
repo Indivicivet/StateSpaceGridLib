@@ -245,15 +245,24 @@ class Grid:
         y_padding = self._processed_data.cell_size_y / 2
 
         # Set view of axes
-        self.ax.set_xlim(
-            [self._processed_data.rounded_x_min - x_padding, self._processed_data.rounded_x_max + x_padding])
-        self.ax.set_ylim(
-            [self._processed_data.rounded_y_min - y_padding, self._processed_data.rounded_y_max + y_padding])
+        self.ax.set_xlim([
+            self._processed_data.rounded_x_min - x_padding,
+            self._processed_data.rounded_x_max + x_padding,
+        ])
+        self.ax.set_ylim([
+            self._processed_data.rounded_y_min - y_padding,
+            self._processed_data.rounded_y_max + y_padding,
+        ])
 
         # Set background checkerboard:
-        self.__set_background(self._processed_data.rounded_x_min, self._processed_data.rounded_y_min,
-                              self._processed_data.cell_size_x, self._processed_data.cell_size_y,
-                              self._processed_data.rounded_x_max, self._processed_data.rounded_y_max)
+        self.__set_background(
+            self._processed_data.rounded_x_min,
+            self._processed_data.rounded_y_min,
+            self._processed_data.cell_size_x,
+            self._processed_data.cell_size_y,
+            self._processed_data.rounded_x_max,
+            self._processed_data.rounded_y_max,
+        )
 
     def __process(self, trajectory):
         # Get relevant data (and do merging of repeated states if desired)
