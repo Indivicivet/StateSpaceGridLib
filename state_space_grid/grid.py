@@ -337,10 +337,10 @@ class Grid:
 
         for traj in self.trajectory_list:
             measures.trajectory_ids.append(traj.meta["ID"])
-            durations.append(traj.getDuration())
+            durations.append(traj.get_duration())
             event_numbers.append(len(traj.data_x))
-            visit_numbers.append(traj.getNumVisits())
-            cell_ranges.append(traj.getCellRange())
+            visit_numbers.append(traj.get_num_visits())
+            cell_ranges.append(traj.get_cell_range())
 
         measures.mean_duration = mean(durations)
         measures.mean_number_of_events = mean(event_numbers)

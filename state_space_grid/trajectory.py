@@ -38,22 +38,22 @@ class Trajectory:
         self.processed_data = ProcessedTrajData() # To cache processed data
     
     # Make it easier to add ordering to trajectory variables
-    def addXOrdering(self, ordering):
+    def add_x_ordering(self, ordering):
         self.style.add_ordering("x", ordering)
         
     # Make it easier to add ordering to trajectory variables
-    def addYOrdering(self, ordering):
+    def add_y_ordering(self, ordering):
         self.style.add_ordering("y", ordering)
         
     # Make it easier to add ordering to trajectory variables
-    def addGlobalOrdering(self, ordering):
+    def add_global_ordering(self, ordering):
         self.style.add_ordering("x", ordering)
         self.style.add_ordering("y", ordering)
 
-    def getDuration(self):
+    def get_duration(self):
         return self.data_t[-1] - self.data_t[0]
 
-    def getNumVisits(self):
+    def get_num_visits(self):
         if self.style.merge_repeated_states:
             return len(self.processed_data.x)
         else:
@@ -63,7 +63,7 @@ class Trajectory:
                     repeat_count += 1
             return len(self.data_x) - repeat_count
 
-    def getCellRange(self):
+    def get_cell_range(self):
         return len([1 for x_and_count in self.processed_data.bin_counts.items() for x in x_and_count])
 
 

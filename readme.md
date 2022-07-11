@@ -49,8 +49,9 @@ Data in StateSpaceGridLib is organised via Trajectories. These objects take in d
    A `TrajectoryStyle` object containing settings for visualisation of `Trajectories` as well as any information about ordering of non-numeric measurement scales (or unconventionally ordered numerical ones).
 
    A `TrajectoryStyle` object intended for the `Trajectory` object.
+
 ```python
-Trajectory.addXOrdering(ordering)
+Trajectory.add_x_ordering(ordering)
 ```
 Set ordering for x measurement scale.
 * `ordering`
@@ -58,9 +59,9 @@ Set ordering for x measurement scale.
    A list going from lowest possible measurement value to highest.
    
    Eg. `["low", "medium", "high"]`
-   
+
 ```python
-Trajectory.addYOrdering(ordering)
+Trajectory.add_y_ordering(ordering)
 ```
 Set ordering for y measurement scale.
 * `ordering`
@@ -70,7 +71,7 @@ Set ordering for y measurement scale.
    Eg. `["low", "medium", "high"]`
 
 ```python
-Trajectory.addGlobalOrdering(ordering)
+Trajectory.add_global_ordering(ordering)
 ```
 Set ordering for both y and x measurement scale.
 * `ordering`
@@ -80,12 +81,12 @@ Set ordering for both y and x measurement scale.
    Eg. `["low", "medium", "high"]`
 
 ```python
-Trajectory.getDuration()
+Trajectory.get_duration()
 ```
 Return duration of trajectory (ie. `data_t[-1] - data_t[0]`)
 
 ```python
-Trajectory.getNumVisits()
+Trajectory.get_num_visits()
 ```
 Return number of "visits", defined as the number of state transitions plus 1 (the initial starting state) minus the number of transitions to the same state as where the transition is from (ie. `(x1, y1) -> (x2, y2)` where  .
 
