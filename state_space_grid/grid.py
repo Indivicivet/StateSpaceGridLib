@@ -336,7 +336,7 @@ class Grid:
         measures = GridMeasures()
 
         for traj in self.trajectory_list:
-            measures.trajectory_ids.append(traj.getID())
+            measures.trajectory_ids.append(traj.meta["ID"])
             durations.append(traj.getDuration())
             event_numbers.append(len(traj.data_x))
             visit_numbers.append(traj.getNumVisits())

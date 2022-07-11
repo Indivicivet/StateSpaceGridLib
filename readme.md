@@ -48,30 +48,6 @@ Data in StateSpaceGridLib is organised via Trajectories. These objects take in d
 
    A `TrajectoryStyle` object containing settings for visualisation of `Trajectories` as well as any information about ordering of non-numeric measurement scales (or unconventionally ordered numerical ones).
 
-```python
-Trajectory.getID()
-```
-Get ID value stored in `Trajectory.meta` dictionary.
-
-```python
-Trajectory.setID(id)
-```
-Set ID value stored in `Trajectory.meta` dictionary.
-* `id`
-
-   An ID value for the trajectory
-
-```python
-Trajectory.getStyle()
-```
-Get `TrajectoryStyle` object stored in `Trajectory.style`.
-
-```python
-Trajectory.setStyle(style)
-```
-Set `TrajectoryStyle` object stored in `Trajectory.style`.
-* `style`
-
    A `TrajectoryStyle` object intended for the `Trajectory` object.
 ```python
 Trajectory.addXOrdering(ordering)

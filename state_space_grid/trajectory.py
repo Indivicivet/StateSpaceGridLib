@@ -36,18 +36,6 @@ class Trajectory:
         self.style = style
         truncate_nan_data(self.data_x, self.data_y, self.data_t)
         self.processed_data = ProcessedTrajData() # To cache processed data
-
-    def getID(self):
-        return self.meta["ID"]
-
-    def setID(self, id_val):
-        self.meta["ID"] = id_val
-    
-    def getStyle(self):
-        return self.style
-    
-    def setStyle(self, style: TrajectoryStyle):
-        self.style=style
     
     # Make it easier to add ordering to trajectory variables
     def addXOrdering(self, ordering):
