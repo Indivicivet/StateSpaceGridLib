@@ -80,15 +80,14 @@ class Grid:
         check_trajectory_list(self.trajectory_list)
 
     def __set_background(self, x_min, y_min, x_scale, y_scale, x_max, y_max):
-        background = [
-            # todo :: np plz...
-            [
-                ((i + j) % 2)
-                for i in range(int(x_min / x_scale), int(x_max / x_scale) + 1)
-            ]
-            for j in range(int(y_min / y_scale), int(y_max / y_scale) + 1)]
+        jj, ii = np.mgrid_[
+            int(y_min / y_scale):int(y_max / y_scale) + 1,
+            int(x_min / x_scale):int(x_max / x_scale) + 1
+        ]
         self.ax.imshow(
-            background,
+            # checkerboard
+            # todo :: maybe i messed it up
+            (jj + ii) % 2,
             extent=[
                 int(x_min) - 0.5 * x_scale,
                 int(x_max) + 0.5 * x_scale,
