@@ -5,7 +5,7 @@ import pandas as pd
 import state_space_grid as ssg
 
 
-DATA_PATH = Path(__file__).resolve().parent.parent / "resources" / "ExampleData1.txt"
+DATA_PATH = Path(__file__).resolve().parent / "resources" / "ExampleData1.txt"
 
 
 def test1():
