@@ -288,35 +288,29 @@ class Grid:
         x_min, x_max = util.calculate_min_max(trajectory.processed_data.x)
         y_min, y_max = util.calculate_min_max(trajectory.processed_data.y)
 
+        # todo :: ?? unsure about what some of the following defaulting wants to do.
         if self.style.x_minmax_given[0]:
-            x_min = self.style.x_min
             if self._processed_data.x_min is None:
-                self._processed_data.x_min = x_min
-        else:
-            # if x_min not given, we should keep track of this
-            x_min = x_min if self._processed_data.x_min is None else min(x_min, self._processed_data.x_min)
+                self._processed_data.x_min = self.style.x_min
+        elif self._processed_data.x_min is None or x_min < self._processed_data.x_min:
             self._processed_data.x_min = x_min
+
         if self.style.x_minmax_given[1]:
-            x_max = self.style.x_max
             if self._processed_data.x_max is None:
-                self._processed_data.x_max = x_max
-        else:
-            x_max = x_max if self._processed_data.x_max is None else max(x_max, self._processed_data.x_max)
+                self._processed_data.x_max = self.style.x_max
+        elif self._processed_data.x_max is None or x_max > self._processed_data.x_max:
             self._processed_data.x_max = x_max
+
         if self.style.y_minmax_given[0]:
-            y_min = self.style.y_min
             if self._processed_data.y_min is None:
-                self._processed_data.y_min = y_min
-        else:
-            # if y_min not given, we should keep track of this
-            y_min = y_min if self._processed_data.y_min is None else min(y_min, self._processed_data.y_min)
+                self._processed_data.y_min = self.style.y_min
+        elif self._processed_data.y_min is None or y_min < self._processed_data.y_min:
             self._processed_data.y_min = y_min
+
         if self.style.y_minmax_given[1]:
-            y_max = self.style.y_max
             if self._processed_data.y_max is None:
-                self._processed_data.y_max = y_max
-        else:
-            y_max = y_max if self._processed_data.y_max is None else max(y_max, self._processed_data.y_max)
+                self._processed_data.y_max = self.style.y_max
+        elif self._processed_data.y_max is None or y_max > self._processed_data.y_max:
             self._processed_data.y_max = y_max
 
     def set_style(self, grid_style: GridStyle):
