@@ -387,25 +387,30 @@ class Grid:
             self.__offset_trajectories()
             self._processed_data.valid = True
 
-        ids, durations, event_numbers, visit_numbers, \
-            cell_ranges, dispersions, missing_events, missing_duration = [], [], [], [], [], [], [], []
-        measures = GridMeasures()
+        durations = [traj.get_duration() for traj in self.trajectory_list]
+        event_numbers = [len(traj.data_x) for traj in self.trajectory_list]
+        visit_numbers = [traj.get_num_visits() for traj in self.trajectory_list]
+        cell_ranges = [traj.get_cell_range() for traj in self.trajectory_list]
 
-        for traj in self.trajectory_list:
-            measures.trajectory_ids.append(traj.id)
-            durations.append(traj.get_duration())
-            event_numbers.append(len(traj.data_x))
-            visit_numbers.append(traj.get_num_visits())
-            cell_ranges.append(traj.get_cell_range())
-
-        measures.mean_duration = mean(durations)
-        measures.mean_number_of_events = mean(event_numbers)
-        measures.mean_number_of_visits = mean(visit_numbers)
-        measures.mean_cell_range = mean(cell_ranges)
-        measures.overall_cell_range = len(
-            [1 for x_and_count in self._processed_data.bin_counts.items() for x in x_and_count])
-        measures.mean_duration_per_event = mean(map(lambda x, y: x / y, durations, event_numbers))
-        measures.mean_duration_per_visit = mean(map(lambda x, y: x / y, durations, visit_numbers))
-        measures.mean_duration_per_cell = mean(map(lambda x, y: x / y, durations, cell_ranges))
-        measures.dispersion = float(self.__calculate_dispersion())
-        return measures
+        # todo :: hmmmmmmMMMMM
+        return GridMeasures(
+            trajectory_ids=[traj.id for traj in self.trajectory_list],
+            mean_duration=mean(durations),
+            mean_number_of_events=mean(event_numbers),
+            mean_number_of_visits=mean(visit_numbers),
+            mean_cell_range=mean(cell_ranges),
+            overall_cell_range=sum(
+                len(x_and_count)
+                for x_and_count in self._processed_data.bin_counts.items()
+            ),
+            mean_duration_per_event=mean(
+                map(lambda x, y: x / y, durations, event_numbers)
+            ),
+            mean_duration_per_visit=mean(
+                map(lambda x, y: x / y, durations, visit_numbers)
+            ),
+            mean_duration_per_cell=mean(
+                map(lambda x, y: x / y, durations, cell_ranges)
+            ),
+            dispersion=float(self.__calculate_dispersion()),
+        )
