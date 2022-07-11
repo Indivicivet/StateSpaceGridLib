@@ -69,12 +69,9 @@ class Trajectory:
     def get_num_visits(self):
         if self.style.merge_repeated_states:
             return len(self.processed_data.x)
-        return (
-            len(self.data_x)
-            - sum(
-                x0 == x1 and y0 == y1  # discount consecutive repeats
-                for x0, x1, y0, y1 in zip(self.data_x, self.data_x[1:], self.data_y, self.data_y[1:])
-            )
+        return 1 + sum(
+            x0 != x1 or y0 != y1  # discount consecutive repeats
+            for x0, x1, y0, y1 in zip(self.data_x, self.data_x[1:], self.data_y, self.data_y[1:])
         )
 
     def get_cell_range(self):
