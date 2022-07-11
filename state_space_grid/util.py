@@ -1,4 +1,6 @@
-# A number of utility functions acting on data that ideally don't want to appear in the grid interface
+"""
+A number of utility functions acting on data that ideally don't want to appear in the grid interface
+"""
 
 import math
 

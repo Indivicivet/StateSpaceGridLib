@@ -9,7 +9,7 @@ import numpy as np
 from statistics import mean
 import fractions
 from .trajectory import Trajectory, TrajectoryStyle, check_trajectory_list, ProcessedTrajData
-from .states import *
+from .util import *
 
 
 @dataclass
