@@ -102,28 +102,38 @@ class Grid:
         )
 
     def __draw_graph(self, trajectory):
-        # Create a dictionary to define positions for node numbers
-        num_nodes = len(trajectory.processed_data.x)
-        pos = {i: (trajectory.processed_data.x[i], trajectory.processed_data.y[i]) for i in range(num_nodes)}
+        node_number_positions = dict(enumerate(zip(trajectory.processed_data.x, trajectory.processed_data.y)))
 
         # List of tuples to define edges between nodes
-        edges = [(i, i + 1) for i in range(num_nodes - 1)]
-        for loop_node in trajectory.processed_data.loops:
-            edges.append((loop_node, loop_node))
+        edges = (
+            [(i, i + 1) for i in range(len(trajectory.processed_data.x) - 1)]
+            + [(loop_node, loop_node) for loop_node in trajectory.processed_data.loops]
+        )
 
-        # Calculate node size based on node data
-        node_size_scale_factor = 1000 / self._processed_data.max_duration
-        node_sizes = list(map(lambda n: n * node_size_scale_factor, trajectory.processed_data.nodes))
+        node_sizes = list(  # todo :: maybe redundant list()
+            (1000 / self._processed_data.max_duration)
+            * np.array(trajectory.processed_data.nodes)
+        )
 
         # Add nodes and edges to graph
-        self.graph.add_nodes_from(pos.keys())
+        self.graph.add_nodes_from(node_number_positions.keys())
         self.graph.add_edges_from(edges)
 
         # Draw graphs
-        nx.draw_networkx_nodes(self.graph, pos, node_size=node_sizes, node_color='indigo')
-        nx.draw_networkx_edges(self.graph, pos, node_size=node_sizes, nodelist=[i for i in range(num_nodes)],
-                               edgelist=edges, arrows=True, arrowstyle=trajectory.style.arrow_style, node_shape='.',
-                               arrowsize=10, width=2, connectionstyle=trajectory.style.connection_style, )
+        nx.draw_networkx_nodes(self.graph, node_number_positions, node_size=node_sizes, node_color='indigo')
+        nx.draw_networkx_edges(
+            self.graph,
+            node_number_positions,
+            node_size=node_sizes,
+            nodelist=list(range(len(trajectory.processed_data.x))),
+            edgelist=edges,
+            arrows=True,
+            arrowstyle=trajectory.style.arrow_style,
+            node_shape='.',
+            arrowsize=10,
+            width=2,
+            connectionstyle=trajectory.style.connection_style,
+        )
 
     def __draw_ticks(self, drawstyle):
         # all of this needs to go in a separate function, called with show()
