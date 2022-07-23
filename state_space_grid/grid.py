@@ -92,7 +92,6 @@ class Grid:
         ]
         self.ax.imshow(
             # checkerboard
-            # todo :: maybe i messed it up
             (jj + ii) % 2,
             extent=[
                 int(x_min) - 0.5 * x_scale,
