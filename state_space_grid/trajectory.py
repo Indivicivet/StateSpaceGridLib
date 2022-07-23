@@ -55,19 +55,6 @@ class Trajectory:
         type(self).next_id += 1
         # todo :: removed some "pop NaNs from the end" code here
         # that seemed useless; check nothing bad happened
-    
-    # Make it easier to add ordering to trajectory variables
-    def add_x_ordering(self, ordering):
-        self.style.add_ordering("x", ordering)
-        
-    # Make it easier to add ordering to trajectory variables
-    def add_y_ordering(self, ordering):
-        self.style.add_ordering("y", ordering)
-        
-    # Make it easier to add ordering to trajectory variables
-    def add_global_ordering(self, ordering):
-        self.style.add_ordering("x", ordering)
-        self.style.add_ordering("y", ordering)
 
     def durations(self):
         # todo :: store this instead?
