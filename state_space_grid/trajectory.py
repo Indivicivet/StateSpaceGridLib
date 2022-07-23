@@ -48,8 +48,8 @@ class Trajectory:
     def __post_init__(self):
         self.id = self.next_id
         type(self).next_id += 1
-        for data in [self.x_data, self.y_data]:
-            if len(data) == len(self.t_data):
+        for data in [self.data_x, self.data_y]:
+            if len(data) == len(self.data_t):
                 data.pop(-1)  # truncate NaN data (????? todo :: ??)
     
     # Make it easier to add ordering to trajectory variables
@@ -125,7 +125,7 @@ class Trajectory:
 
         self.processed_data.nodes = [
             latter - former
-            for former, latter in zip(self.processed_data.t, self.processed_data[1:])
+            for former, latter in zip(self.processed_data.t, self.processed_data.t[1:])
         ]
         self.processed_data.valid = True
         return True

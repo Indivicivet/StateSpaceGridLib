@@ -20,7 +20,7 @@ class GridStyle:
     tick_font_size: int = 14
     title_font_size: int = 14
     tick_increment_x: Optional[int] = None
-    tick_increment_x: Optional[int] = None
+    tick_increment_y: Optional[int] = None
     x_label: Optional[str] = None
     y_label: Optional[str] = None
     x_min: Optional[int] = None  # todo :: are they floats?
@@ -78,10 +78,9 @@ class Grid:
         self.ax = plt.gca()
         self.style = style if style is not None else GridStyle()
         self._processed_data = GridCumulativeData()
-        check_trajectory_list(self.trajectory_list)
 
     def __set_background(self, x_min, y_min, x_scale, y_scale, x_max, y_max):
-        jj, ii = np.mgrid_[
+        jj, ii = np.mgrid[
             int(y_min / y_scale):int(y_max / y_scale) + 1,
             int(x_min / x_scale):int(x_max / x_scale) + 1
         ]
