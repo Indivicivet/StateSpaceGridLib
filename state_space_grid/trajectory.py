@@ -53,9 +53,8 @@ class Trajectory:
     def __post_init__(self):
         self.id = self.next_id
         type(self).next_id += 1
-        for data in [self.data_x, self.data_y]:
-            if len(data) == len(self.data_t):
-                data.pop(-1)  # truncate NaN data (????? todo :: ??)
+        # todo :: removed some "pop NaNs from the end" code here
+        # that seemed useless; check nothing bad happened
     
     # Make it easier to add ordering to trajectory variables
     def add_x_ordering(self, ordering):
