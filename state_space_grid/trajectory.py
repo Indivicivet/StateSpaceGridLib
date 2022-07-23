@@ -135,7 +135,11 @@ class Trajectory:
         return True
 
     @classmethod
-    def from_legacy_trj(cls, filename):
+    def from_legacy_trj(
+        cls,
+        filename,
+        params=(1, 2),
+    ):
         """For legacy .trj files. Stay away, they're ew!"""
         warnings.warn(
             "This is just provided for testing against specific"
@@ -151,8 +155,8 @@ class Trajectory:
                 if len(line) < 3:
                     break
                 onset.append(float(line[0]))
-                v1.append(int(line[1]))
-                v2.append(int(line[2]))
+                v1.append(int(line[params[0]]))
+                v2.append(int(line[params[1]]))
         return cls(v1, v2, onset)
 
 
