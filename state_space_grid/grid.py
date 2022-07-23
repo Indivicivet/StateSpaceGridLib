@@ -1,6 +1,6 @@
 from collections import Counter
 from dataclasses import dataclass, field
-from typing import Optional, Union
+from typing import Optional, Union, List, Any
 from numbers import Number
 
 import networkx as nx
@@ -75,13 +75,15 @@ class GridMeasures:
     mean_missing_duration: float = 0
 
 
+@dataclass
 class Grid:
-    def __init__(self, trajectories, style=None):
-        self.trajectory_list = list(trajectories)  # hm?
-        self.graph = nx.Graph()
-        self.ax = plt.gca()
-        self.style = style if style is not None else GridStyle()
-        self._processed_data = GridCumulativeData()
+    trajectory_list: List[Trajectory]
+    style: GridStyle = field(default_factory=GridStyle)
+    graph: nx.Graph = field(default_factory=nx.Graph)
+    ax: Any = field(default_factory=plt.gca)
+    _processed_data: GridCumulativeData = field(
+        default_factory=GridCumulativeData
+    )
 
     def __set_background(self, x_min, y_min, x_scale, y_scale, x_max, y_max):
         jj, ii = np.mgrid[
