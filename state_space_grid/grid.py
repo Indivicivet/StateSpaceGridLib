@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import Optional, Union
+from numbers import Number
 
 import networkx as nx
 import matplotlib.pyplot as plt
@@ -9,7 +10,7 @@ import numpy as np
 from statistics import mean
 import fractions
 
-from .trajectory import Trajectory, TrajectoryStyle, ProcessedTrajData
+from .trajectory import Trajectory
 from . import util
 
 
@@ -27,6 +28,8 @@ class GridStyle:
     x_max: Optional[int] = None
     y_min: Optional[int] = None
     y_max: Optional[int] = None
+    x_order: list[Union[str, Number]] = field(default_factory=list)
+    y_order: list[Union[str, Number]] = field(default_factory=list)
     rotate_x_labels: bool = False
 
     @property
@@ -144,14 +147,14 @@ class Grid:
         # Get tick labels - either numeric or categories
         # todo :: this bit is a bit of a mess
         rounded_x_points = range(
-            self._processed_data.rounded_x_min,
-            self._processed_data.rounded_x_max + 1,
-            self._processed_data.cell_size_x
+            int(self._processed_data.rounded_x_min),
+            int(self._processed_data.rounded_x_max + 1),
+            int(self._processed_data.cell_size_x),
         )
         rounded_y_points = range(
-            self._processed_data.rounded_y_min,
-            self._processed_data.rounded_y_max + 1,
-            self._processed_data.cell_size_y
+            int(self._processed_data.rounded_y_min),
+            int(self._processed_data.rounded_y_max + 1),
+            int(self._processed_data.cell_size_y),
         )
         tick_label_x = (
             self.style.x_order
@@ -165,12 +168,12 @@ class Grid:
         self.ax.tick_params(left=True, bottom=True, labelleft=True, labelbottom=True)
         self.ax.tick_params(
             axis='x',
-            labelsize=self.style.tickfontsize,
-            rotation=90 * self.style.rotate_xlabels,
+            labelsize=self.style.tick_font_size,
+            rotation=90 * self.style.rotate_x_labels,
         )
         self.ax.tick_params(
             axis='y',
-            labelsize=self.style.tickfontsize,
+            labelsize=self.style.tick_font_size,
         )
         self.ax.xaxis.set_major_locator(ticker.FixedLocator(rounded_x_points))
         self.ax.yaxis.set_major_locator(ticker.FixedLocator(rounded_y_points))
