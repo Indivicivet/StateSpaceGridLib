@@ -129,10 +129,9 @@ class Trajectory:
             self.processed_data.x = self.data_x
             self.processed_data.y = self.data_y
 
-        self.processed_data.bin_counts = Counter()
-        for x, y in zip(self.processed_data.x, self.processed_data.y):
-            # todo :: can probably just Counter this
-            self.processed_data.bin_counts[(x, y)] += 1
+        self.processed_data.bin_counts = Counter(
+            zip(self.processed_data.x, self.processed_data.y)
+        )
 
         # todo :: ???
         self.processed_data.nodes = self.durations()
