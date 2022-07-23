@@ -202,8 +202,9 @@ class Grid:
             for (x, y) in self._processed_data.bin_counts
         }
         for trajectory in self.trajectory_list:
-            # If same state is repeated, offset states so they don't sit on top of one another:
-            util.offset_within_bin(
+            # If same state is repeated, offset states
+            # so they don't sit on top of one another:
+            offs_x, offs_y = util.offset_within_bin(
                 trajectory.processed_data.x,
                 self._processed_data.cell_size_x,
                 trajectory.processed_data.y,
@@ -211,6 +212,8 @@ class Grid:
                 self._processed_data.bin_counts,
                 current_bin_counter,
             )
+            trajectory.processed_data.offset_x = offs_x
+            trajectory.processed_data.offset_y = offs_y
 
     def __draw_background_and_view(self):
         # todo :: whole bunch of stuff that is a bit messy here
