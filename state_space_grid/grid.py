@@ -401,11 +401,11 @@ class Grid:
                 total_duration += duration
         # todo :: why fractions? :)
         sum_d_D = sum(
-            pow(fractions.Fraction(d, total_duration), 2)
+            (d / total_duration) ** 2
             for x_and_d in cell_durations.values()
             for d in x_and_d.values()
         )
-        return fractions.Fraction(n * sum_d_D - 1, n - 1)
+        return (n * sum_d_D - 1) / (n - 1)
 
     def get_measures(self):
         if not self._processed_data.valid:
