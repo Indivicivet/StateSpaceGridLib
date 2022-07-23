@@ -158,5 +158,4 @@ class Trajectory:
 
 
 def convert_on_ordering(data, ordering):
-    index = {ordering[i] : i for i in range(len(ordering))}
-    return [index[x] for x in data]
+    return [ordering.index(x) for x in data]
