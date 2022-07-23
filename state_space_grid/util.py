@@ -28,29 +28,24 @@ def calculate_min_max(values):
 def offset_within_bin(x_data, x_scale, y_data, y_scale, bin_counts, visit_count):
     """warning: mutates arguments!!"""
     partition_counts = {
-        # todo :: type (x, y) -> val is better, yes?
-        # but would need to make that kind of change globally
-        y: {
-            x: (1 << (counts - 1).bit_length())
-            for x, counts in x_and_counts.items()
-        }
-        for y, x_and_counts in bin_counts.items()
+        (x, y): 1 << (count - 1).bit_length()
+        for (x, y), count in bin_counts.items()
     }
     for i, (x, y) in enumerate(zip(x_data, y_data)):
-        if partition_counts[y][x] > 1:
+        if partition_counts[(x, y)] > 1:
             # todo :: numpy
             direction = (-1, 1)  # todo :: ????
-            angle = 2 * math.pi / partition_counts[y][x]
+            angle = 2 * math.pi / partition_counts[(x, y)]
             rotation = (
                 (math.cos(angle), -math.sin(angle)),
                 (math.sin(angle), math.cos(angle)),
             )
-            for rotation_number in range(visit_count[y][x]):
+            for rotation_number in range(visit_count[(x, y)]):
                 direction = (
                     direction[0]*rotation[0][0] + direction[1]*rotation[0][1],
                     direction[0]*rotation[1][0] + direction[1]*rotation[1][1],
                 )
             x_data[i] = x + direction[0] * x_scale / 4
             y_data[i] = y + direction[1] * y_scale / 4
-            visit_count[y][x] += 1
+            visit_count[(x, y)] += 1
     # todo :: should really return x_data', y_data', visit_count' eh?

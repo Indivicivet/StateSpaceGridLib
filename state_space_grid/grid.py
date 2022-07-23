@@ -191,15 +191,15 @@ class Grid:
     def __offset_trajectories(self):
         # todo :: later -- need to think about what this actually does
         # get total bin counts
+        self._processed_data.bin_counts = Counter()
+        # todo :: maybe this can just be a sum?
         for trajectory in self.trajectory_list:
-            for y, x_and_count in trajectory.processed_data.bin_counts.items():
-                for x, count in x_and_count.items():
-                    # todo :: defaultdict/Counter, and the (y, x) thing
-                    if y in self._processed_data.bin_counts:
-                        self._processed_data.bin_counts[y][x] = self._processed_data.bin_counts[y].get(x, 0) + count
-                    else:
-                        self._processed_data.bin_counts[y] = {x: count}
-        current_bin_counter = {y: {x: 0 for x in v.keys()} for y, v in self._processed_data.bin_counts.items()}
+            for (x, y), count in trajectory.processed_data.bin_counts.items():
+                self._processed_data.bin_counts[(x, y)] += count
+        current_bin_counter = {
+            (x, y): 0
+            for (x, y) in self._processed_data.bin_counts
+        }
         for trajectory in self.trajectory_list:
             # If same state is repeated, offset states so they don't sit on top of one another:
             util.offset_within_bin(

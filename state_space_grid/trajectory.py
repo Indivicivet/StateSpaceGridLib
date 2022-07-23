@@ -1,5 +1,6 @@
 import csv
 import warnings
+from collections import Counter
 from dataclasses import dataclass, field
 from itertools import zip_longest
 from typing import ClassVar
@@ -29,7 +30,7 @@ class ProcessedTrajData:
     nodes: list = field(default_factory=list)
     offset_x: list = field(default_factory=list)
     offset_y: list = field(default_factory=list)
-    bin_counts: dict = field(default_factory=dict)
+    bin_counts: Counter = field(default_factory=Counter)
 
 
 @dataclass
@@ -90,7 +91,7 @@ class Trajectory:
 
     def get_cell_range(self):
         # todo :: double check this does as intended
-        return sum(map(len, self.processed_data.bin_counts.values()))
+        return self.processed_data.bin_counts.total()
 
     def __merge_equal_adjacent_states(self):
         """
@@ -128,12 +129,10 @@ class Trajectory:
             self.processed_data.x = self.data_x
             self.processed_data.y = self.data_y
 
+        self.processed_data.bin_counts = Counter()
         for x, y in zip(self.processed_data.x, self.processed_data.y):
-            # todo :: defaultdict / Counter
-            if y in self.processed_data.bin_counts:
-                self.processed_data.bin_counts[y][x] = self.processed_data.bin_counts[y].get(x, 0) + 1
-            else:
-                self.processed_data.bin_counts[y] = {x: 1}
+            # todo :: can probably just Counter this
+            self.processed_data.bin_counts[(x, y)] += 1
 
         # todo :: ???
         self.processed_data.nodes = self.durations()
