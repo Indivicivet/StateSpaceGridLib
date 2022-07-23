@@ -37,6 +37,7 @@ class Trajectory:
     data_x: list
     data_y: list
     data_t: list
+    # todo :: data_t (onsets) should be replaced by durations
     meta: dict = field(default_factory=dict)
     style: TrajectoryStyle = field(default_factory=TrajectoryStyle)
     id: int = None  # set in __post_init__
