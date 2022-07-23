@@ -316,7 +316,7 @@ class Grid:
             self._processed_data.y_max = y_max
 
     def set_style(self, grid_style: GridStyle):
-        self._processed_data.clear()
+        self._processed_data = GridCumulativeData()  # clear
         self.style = grid_style
 
     def add_trajectory_data(self, *trajectories: Trajectory):
@@ -353,7 +353,7 @@ class Grid:
         # they look good, so add them:
         for trajectory in trajectories:
             self.trajectory_list[trajectory.id] = trajectory
-        self._processed_data.clear()
+        self._processed_data = GridCumulativeData()  # clear
 
     def draw(self, save_as: Optional[str] = None):
         if not self._processed_data.valid:
