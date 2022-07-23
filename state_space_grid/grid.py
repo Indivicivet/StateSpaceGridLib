@@ -1,3 +1,4 @@
+from collections import Counter
 from dataclasses import dataclass, field
 from typing import Optional, Union
 from numbers import Number
@@ -374,7 +375,7 @@ class Grid:
         self._processed_data.valid = True
 
     def __calculate_dispersion(self):
-        n = (
+        total_cells = (
             int(
                 (self._processed_data.x_max - self._processed_data.x_min)
                 / self._processed_data.cell_size_x
@@ -384,29 +385,21 @@ class Grid:
                 (self._processed_data.y_max - self._processed_data.y_min)
                 / self._processed_data.cell_size_y
             ) + 1
-        )
-        cell_durations = {}
-        total_duration = 0
+        )  # todo
+        cell_durations = Counter()
         for traj in self.trajectory_list:
             for duration, x, y in zip(
                 traj.processed_data.nodes,
                 traj.processed_data.x,
                 traj.processed_data.y,
             ):
-                # todo :: defaultdict
-                if y in cell_durations:
-                    cell_durations[y][x] = cell_durations[y].get(x, 0) + duration
-                else:
-                    cell_durations[y] = {x: duration}
-                total_duration += duration
-        # todo :: for some reason maybe we wanted Fraction()s here...?
-        # check if things are fine
-        sum_d_D = sum(
-            (d / total_duration) ** 2
-            for x_and_d in cell_durations.values()
-            for d in x_and_d.values()
-        )
-        return (n * sum_d_D - 1) / (n - 1)
+                cell_durations[(x, y)] += duration
+        durations = cell_durations.values()
+        return (
+           total_cells * sum(x ** 2 for x in durations)
+           / sum(durations) ** 2
+           - 1
+        ) / (total_cells - 1)
 
     def get_measures(self):
         if not self._processed_data.valid:
