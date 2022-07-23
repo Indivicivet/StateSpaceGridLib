@@ -1,5 +1,7 @@
+from collections import Counter
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import Optional, Union, List, Any
+from numbers import Number
 
 import networkx as nx
 import matplotlib.pyplot as plt
@@ -9,7 +11,7 @@ import numpy as np
 from statistics import mean
 import fractions
 
-from .trajectory import Trajectory, TrajectoryStyle, check_trajectory_list, ProcessedTrajData
+from .trajectory import Trajectory
 from . import util
 
 
@@ -20,13 +22,15 @@ class GridStyle:
     tick_font_size: int = 14
     title_font_size: int = 14
     tick_increment_x: Optional[int] = None
-    tick_increment_x: Optional[int] = None
+    tick_increment_y: Optional[int] = None
     x_label: Optional[str] = None
     y_label: Optional[str] = None
     x_min: Optional[int] = None  # todo :: are they floats?
     x_max: Optional[int] = None
     y_min: Optional[int] = None
     y_max: Optional[int] = None
+    x_order: list[Union[str, Number]] = field(default_factory=list)
+    y_order: list[Union[str, Number]] = field(default_factory=list)
     rotate_x_labels: bool = False
 
     @property
@@ -71,23 +75,23 @@ class GridMeasures:
     mean_missing_duration: float = 0
 
 
+@dataclass
 class Grid:
-    def __init__(self, trajectories, style=None):
-        self.trajectory_list = list(trajectories)  # hm?
-        self.graph = nx.Graph()
-        self.ax = plt.gca()
-        self.style = style if style is not None else GridStyle()
-        self._processed_data = GridCumulativeData()
-        check_trajectory_list(self.trajectory_list)
+    trajectory_list: List[Trajectory]
+    style: GridStyle = field(default_factory=GridStyle)
+    graph: nx.Graph = field(default_factory=nx.Graph)
+    ax: Any = field(default_factory=plt.gca)
+    _processed_data: GridCumulativeData = field(
+        default_factory=GridCumulativeData
+    )
 
     def __set_background(self, x_min, y_min, x_scale, y_scale, x_max, y_max):
-        jj, ii = np.mgrid_[
+        jj, ii = np.mgrid[
             int(y_min / y_scale):int(y_max / y_scale) + 1,
             int(x_min / x_scale):int(x_max / x_scale) + 1
         ]
         self.ax.imshow(
             # checkerboard
-            # todo :: maybe i messed it up
             (jj + ii) % 2,
             extent=[
                 int(x_min) - 0.5 * x_scale,
@@ -145,14 +149,14 @@ class Grid:
         # Get tick labels - either numeric or categories
         # todo :: this bit is a bit of a mess
         rounded_x_points = range(
-            self._processed_data.rounded_x_min,
-            self._processed_data.rounded_x_max + 1,
-            self._processed_data.cell_size_x
+            int(self._processed_data.rounded_x_min),
+            int(self._processed_data.rounded_x_max + 1),
+            int(self._processed_data.cell_size_x),
         )
         rounded_y_points = range(
-            self._processed_data.rounded_y_min,
-            self._processed_data.rounded_y_max + 1,
-            self._processed_data.cell_size_y
+            int(self._processed_data.rounded_y_min),
+            int(self._processed_data.rounded_y_max + 1),
+            int(self._processed_data.cell_size_y),
         )
         tick_label_x = (
             self.style.x_order
@@ -166,12 +170,12 @@ class Grid:
         self.ax.tick_params(left=True, bottom=True, labelleft=True, labelbottom=True)
         self.ax.tick_params(
             axis='x',
-            labelsize=self.style.tickfontsize,
-            rotation=90 * self.style.rotate_xlabels,
+            labelsize=self.style.tick_font_size,
+            rotation=90 * self.style.rotate_x_labels,
         )
         self.ax.tick_params(
             axis='y',
-            labelsize=self.style.tickfontsize,
+            labelsize=self.style.tick_font_size,
         )
         self.ax.xaxis.set_major_locator(ticker.FixedLocator(rounded_x_points))
         self.ax.yaxis.set_major_locator(ticker.FixedLocator(rounded_y_points))
@@ -188,18 +192,19 @@ class Grid:
     def __offset_trajectories(self):
         # todo :: later -- need to think about what this actually does
         # get total bin counts
+        self._processed_data.bin_counts = Counter()
+        # todo :: maybe this can just be a sum?
         for trajectory in self.trajectory_list:
-            for y, x_and_count in trajectory.processed_data.bin_counts.items():
-                for x, count in x_and_count.items():
-                    # todo :: defaultdict/Counter, and the (y, x) thing
-                    if y in self._processed_data.bin_counts:
-                        self._processed_data.bin_counts[y][x] = self._processed_data.bin_counts[y].get(x, 0) + count
-                    else:
-                        self._processed_data.bin_counts[y] = {x: count}
-        current_bin_counter = {y: {x: 0 for x in v.keys()} for y, v in self._processed_data.bin_counts.items()}
+            for (x, y), count in trajectory.processed_data.bin_counts.items():
+                self._processed_data.bin_counts[(x, y)] += count
+        current_bin_counter = {
+            (x, y): 0
+            for (x, y) in self._processed_data.bin_counts
+        }
         for trajectory in self.trajectory_list:
-            # If same state is repeated, offset states so they don't sit on top of one another:
-            util.offset_within_bin(
+            # If same state is repeated, offset states
+            # so they don't sit on top of one another:
+            offs_x, offs_y = util.offset_within_bin(
                 trajectory.processed_data.x,
                 self._processed_data.cell_size_x,
                 trajectory.processed_data.y,
@@ -207,6 +212,8 @@ class Grid:
                 self._processed_data.bin_counts,
                 current_bin_counter,
             )
+            trajectory.processed_data.offset_x = offs_x
+            trajectory.processed_data.offset_y = offs_y
 
     def __draw_background_and_view(self):
         # todo :: whole bunch of stuff that is a bit messy here
@@ -314,7 +321,7 @@ class Grid:
             self._processed_data.y_max = y_max
 
     def set_style(self, grid_style: GridStyle):
-        self._processed_data.clear()
+        self._processed_data = GridCumulativeData()  # clear
         self.style = grid_style
 
     def add_trajectory_data(self, *trajectories: Trajectory):
@@ -351,7 +358,7 @@ class Grid:
         # they look good, so add them:
         for trajectory in trajectories:
             self.trajectory_list[trajectory.id] = trajectory
-        self._processed_data.clear()
+        self._processed_data = GridCumulativeData()  # clear
 
     def draw(self, save_as: Optional[str] = None):
         if not self._processed_data.valid:
@@ -372,7 +379,7 @@ class Grid:
         self._processed_data.valid = True
 
     def __calculate_dispersion(self):
-        n = (
+        total_cells = (
             int(
                 (self._processed_data.x_max - self._processed_data.x_min)
                 / self._processed_data.cell_size_x
@@ -382,28 +389,21 @@ class Grid:
                 (self._processed_data.y_max - self._processed_data.y_min)
                 / self._processed_data.cell_size_y
             ) + 1
-        )
-        cell_durations = {}
-        total_duration = 0
+        )  # todo
+        cell_durations = Counter()
         for traj in self.trajectory_list:
             for duration, x, y in zip(
                 traj.processed_data.nodes,
                 traj.processed_data.x,
                 traj.processed_data.y,
             ):
-                # todo :: defaultdict
-                if y in cell_durations:
-                    cell_durations[y][x] = cell_durations[y].get(x, 0) + duration
-                else:
-                    cell_durations[y] = {x: duration}
-                total_duration += duration
-        # todo :: why fractions? :)
-        sum_d_D = sum(
-            pow(fractions.Fraction(d, total_duration), 2)
-            for x_and_d in cell_durations.values()
-            for d in x_and_d.values()
-        )
-        return fractions.Fraction(n * sum_d_D - 1, n - 1)
+                cell_durations[(x, y)] += duration
+        durations = cell_durations.values()
+        return (
+           total_cells * sum(x ** 2 for x in durations)
+           / sum(durations) ** 2
+           - 1
+        ) / (total_cells - 1)
 
     def get_measures(self):
         if not self._processed_data.valid:
