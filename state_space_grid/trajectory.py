@@ -87,7 +87,10 @@ class Trajectory:
         # todo :: bleh
         merge_count = 0
         for i in range(len(self.data_x)):
-            if i != 0 and (self.data_x[i], self.data_y[i]) == (self.data_x[i - 1], self.data_y[i - 1]):
+            if i != 0 and (
+                (self.data_x[i], self.data_y[i])
+                == (self.data_x[i - 1], self.data_y[i - 1])
+            ):
                 merge_count += 1
                 self.processed_data.loops.add(i - merge_count)
             else:
@@ -96,9 +99,13 @@ class Trajectory:
                 self.processed_data.t.append(self.data_t[i])
         self.processed_data.t.append(self.data_t[-1])
         if "x" in self.style.ordering:
-            self.processed_data.x = convert_on_ordering(self.processed_data.x, self.style.ordering["x"])
+            self.processed_data.x = convert_on_ordering(
+                self.processed_data.x, self.style.ordering["x"]
+            )
         if "y" in self.style.ordering:
-            self.processed_data.y = convert_on_ordering(self.processed_data.y, self.style.ordering["y"])
+            self.processed_data.y = convert_on_ordering(
+                self.processed_data.y, self.style.ordering["y"]
+            )
 
     def process_data(self) -> bool:
         """
