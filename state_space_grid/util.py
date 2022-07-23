@@ -26,19 +26,31 @@ def calculate_min_max(values):
 
 
 def offset_within_bin(x_data, x_scale, y_data, y_scale, bin_counts, visit_count):
-
-    partition_counts = {y: {x: (1 << (counts-1).bit_length()) for x, counts in x_and_counts.items()} for y, x_and_counts in bin_counts.items()}
-    for i in range(len(x_data)):
-        x, y = x_data[i], y_data[i]
-        partitions = partition_counts[y][x]
-        if partitions > 1:
-            direction = (-1, 1)
-            rotation = ((math.cos(2*math.pi/partitions), -1*math.sin(2*math.pi/partitions)),
-                        (math.sin(2*math.pi/partitions), math.cos(2*math.pi/partitions)))
+    """warning: mutates arguments!!"""
+    partition_counts = {
+        # todo :: type (x, y) -> val is better, yes?
+        # but would need to make that kind of change globally
+        y: {
+            x: (1 << (counts - 1).bit_length())
+            for x, counts in x_and_counts.items()
+        }
+        for y, x_and_counts in bin_counts.items()
+    }
+    for i, (x, y) in enumerate(zip(x_data, y_data)):
+        if partition_counts[y][x] > 1:
+            # todo :: numpy
+            direction = (-1, 1)  # todo :: ????
+            angle = 2 * math.pi / partition_counts[y][x]
+            rotation = (
+                (math.cos(angle), -math.sin(angle)),
+                (math.sin(angle), math.cos(angle)),
+            )
             for rotation_number in range(visit_count[y][x]):
-                direction = (direction[0]*rotation[0][0] + direction[1]*rotation[0][1],
-                             direction[0]*rotation[1][0] + direction[1]*rotation[1][1])
-            x_data[i] = x+(direction[0]*x_scale/4)
-            y_data[i] = y+(direction[1]*y_scale/4)
+                direction = (
+                    direction[0]*rotation[0][0] + direction[1]*rotation[0][1],
+                    direction[0]*rotation[1][0] + direction[1]*rotation[1][1],
+                )
+            x_data[i] = x + direction[0] * x_scale / 4
+            y_data[i] = y + direction[1] * y_scale / 4
             visit_count[y][x] += 1
-
+    # todo :: should really return x_data', y_data', visit_count' eh?

@@ -131,30 +131,6 @@ class Trajectory:
         return True
 
 
-# todo :: what is this for? why is it here? find out
-def check_trajectory_list(trajectory_list):
-    assert trajectory_list, "A list of trajectories must be supplied to Grid"
-    for trajectory in trajectory_list:
-        assert isinstance(trajectory, Trajectory), (
-            "All trajectory data supplied in trajectory list"
-            " must be instances of the trajectory class"
-        )
-
-    meta_names = {column for column in trajectory_list[0].meta.keys()}
-    for trajectory in trajectory_list:
-        # possibly go for a more type-agnostic approach here? (see above)
-        assert len(meta_names) == len(trajectory.meta), (
-            f"trajectory ID {trajectory.id}:"
-            " metadata fields don't match with others in list"
-        )
-        for i in trajectory.meta:
-            assert i in meta_names, (
-                f"metadata field name {i} in trajectory ID {trajectory.id}"
-                " does not exist in first trajectory"
-            )
-        # todo :: do we also want to check id?
-
-
 def convert_on_ordering(data, ordering):
     index = {ordering[i] : i for i in range(len(ordering))}
     return [index[x] for x in data]

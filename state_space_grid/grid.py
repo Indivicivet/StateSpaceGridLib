@@ -191,6 +191,7 @@ class Grid:
         for trajectory in self.trajectory_list:
             for y, x_and_count in trajectory.processed_data.bin_counts.items():
                 for x, count in x_and_count.items():
+                    # todo :: defaultdict/Counter, and the (y, x) thing
                     if y in self._processed_data.bin_counts:
                         self._processed_data.bin_counts[y][x] = self._processed_data.bin_counts[y].get(x, 0) + count
                     else:
@@ -208,6 +209,7 @@ class Grid:
             )
 
     def __draw_background_and_view(self):
+        # todo :: whole bunch of stuff that is a bit messy here
         # Make an estimate for scale size of checkerboard grid sizing
         self._processed_data.cell_size_x = (
             util.calculate_scale(self._processed_data.x_max - self._processed_data.x_min)
@@ -286,50 +288,70 @@ class Grid:
         x_min, x_max = util.calculate_min_max(trajectory.processed_data.x)
         y_min, y_max = util.calculate_min_max(trajectory.processed_data.y)
 
+        # todo :: ?? unsure about what some of the following defaulting wants to do.
         if self.style.x_minmax_given[0]:
-            x_min = self.style.x_min
             if self._processed_data.x_min is None:
-                self._processed_data.x_min = x_min
-        else:
-            # if x_min not given, we should keep track of this
-            x_min = x_min if self._processed_data.x_min is None else min(x_min, self._processed_data.x_min)
+                self._processed_data.x_min = self.style.x_min
+        elif self._processed_data.x_min is None or x_min < self._processed_data.x_min:
             self._processed_data.x_min = x_min
+
         if self.style.x_minmax_given[1]:
-            x_max = self.style.x_max
             if self._processed_data.x_max is None:
-                self._processed_data.x_max = x_max
-        else:
-            x_max = x_max if self._processed_data.x_max is None else max(x_max, self._processed_data.x_max)
+                self._processed_data.x_max = self.style.x_max
+        elif self._processed_data.x_max is None or x_max > self._processed_data.x_max:
             self._processed_data.x_max = x_max
+
         if self.style.y_minmax_given[0]:
-            y_min = self.style.y_min
             if self._processed_data.y_min is None:
-                self._processed_data.y_min = y_min
-        else:
-            # if y_min not given, we should keep track of this
-            y_min = y_min if self._processed_data.y_min is None else min(y_min, self._processed_data.y_min)
+                self._processed_data.y_min = self.style.y_min
+        elif self._processed_data.y_min is None or y_min < self._processed_data.y_min:
             self._processed_data.y_min = y_min
+
         if self.style.y_minmax_given[1]:
-            y_max = self.style.y_max
             if self._processed_data.y_max is None:
-                self._processed_data.y_max = y_max
-        else:
-            y_max = y_max if self._processed_data.y_max is None else max(y_max, self._processed_data.y_max)
+                self._processed_data.y_max = self.style.y_max
+        elif self._processed_data.y_max is None or y_max > self._processed_data.y_max:
             self._processed_data.y_max = y_max
 
     def set_style(self, grid_style: GridStyle):
         self._processed_data.clear()
         self.style = grid_style
 
-    def get_style(self):
-        return self.style
-
     def add_trajectory_data(self, *trajectories: Trajectory):
+        if not trajectories:
+            # todo :: do we really care...?
+            raise ValueError("A list of trajectories must be supplied to Grid")
+
+        # check all trajectories before we add things:
+        # todo :: uhhhh need to see if this is really the right logic
+        # todo :: or way to structure this
+        meta_names = set(
+            self.trajectory_list[0].meta.keys()
+            if self.trajectory_list
+            else trajectories[0].meta.keys()
+        )
+        for trajectory in trajectories:
+            assert isinstance(trajectory, Trajectory), (
+                "All trajectory data supplied in trajectory list"
+                " must be instances of the trajectory class"
+            )
+            # todo :: possibly go for a more type-agnostic approach here? (see above)
+            assert len(meta_names) == len(trajectory.meta), (
+                f"trajectory ID {trajectory.id}:"
+                " metadata fields don't match with others in list"
+            )
+            for i in trajectory.meta:
+                assert i in meta_names, (
+                    f"metadata field name {i} in trajectory ID {trajectory.id}"
+                    " does not exist in first trajectory"
+                )
+            # todo :: do we also want to check id?
+
+        # todo :: (??)
+        # they look good, so add them:
         for trajectory in trajectories:
             self.trajectory_list[trajectory.id] = trajectory
-        if trajectories:
-            self._processed_data.clear()
-            check_trajectory_list(self.trajectory_list)
+        self._processed_data.clear()
 
     def draw(self, save_as: Optional[str] = None):
         if not self._processed_data.valid:
