@@ -1,29 +1,28 @@
-# A number of utility functions acting on data that ideally don't want to appear in the grid interface
+"""
+A number of utility functions acting on data that ideally don't want to appear in the grid interface
+"""
 
 import math
 
 
-def calculate_scale(var_min, var_max):
+def calculate_scale(difference):
+    """
+    return desired scale
+    implemented as the biggest power of 10 smaller than the difference
+    """
     scale_factor = 1
-    scale = var_max - var_min
-    if scale_factor < scale:
-        while (scale_factor * 10) < scale:
-            scale_factor = scale_factor * 10
-    if scale_factor > scale:
-        while scale_factor > scale:
-            scale_factor = scale_factor / 10
+    while scale_factor < difference:
+        scale_factor *= 10
+    while scale_factor > difference:
+        scale_factor /= 10
     return scale_factor
 
 
-def calculate_min_max(vars):
-    var_min, var_max = 0, 0
-    # assume categorical = string, ordinal = numeric
-    if type(vars[0]) == str:
-        var_max = len(vars)
-    else:
-        var_min = int(min(vars))
-        var_max = int(max(vars)) + (1 if int(max(vars)) < max(vars) else 0)
-    return var_min, var_max
+def calculate_min_max(values):
+    """assumes categorical = string, ordinal = numeric"""
+    if isinstance(values[0], str):
+        return 0, len(values)
+    return int(min(values)), math.ceil(max(values))
 
 
 def offset_within_bin(x_data, x_scale, y_data, y_scale, bin_counts, visit_count):
