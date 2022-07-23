@@ -1,4 +1,7 @@
+import csv
+import warnings
 from dataclasses import dataclass, field
+from itertools import zip_longest
 from typing import ClassVar
 
 
@@ -129,6 +132,27 @@ class Trajectory:
         ]
         self.processed_data.valid = True
         return True
+
+    @classmethod
+    def from_legacy_trj(cls, filename):
+        """For legacy .trj files. Stay away, they're ew!"""
+        warnings.warn(
+            "This is just provided for testing against specific"
+            " legacy behaviour. trj files are ew, be careful!"
+        )
+        onset = []
+        v1 = []
+        v2 = []
+        with open(filename) as f:
+            for line in csv.reader(f, delimiter="\t"):
+                if line[0] == "Onset":
+                    continue
+                if len(line) < 3:
+                    break
+                onset.append(float(line[0]))
+                v1.append(int(line[1]))
+                v2.append(int(line[2]))
+        return cls(v1, v2, onset)
 
 
 def convert_on_ordering(data, ordering):
