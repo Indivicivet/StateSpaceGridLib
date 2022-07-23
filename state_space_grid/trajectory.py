@@ -99,13 +99,15 @@ class Trajectory:
                 self.processed_data.t.append(self.data_t[i])
         self.processed_data.t.append(self.data_t[-1])
         if "x" in self.style.ordering:
-            self.processed_data.x = convert_on_ordering(
-                self.processed_data.x, self.style.ordering["x"]
-            )
+            self.processed_data.x = [
+                self.style.ordering["x"].index(val)
+                for val in self.processed_data.x
+            ]
         if "y" in self.style.ordering:
-            self.processed_data.y = convert_on_ordering(
-                self.processed_data.y, self.style.ordering["y"]
-            )
+            self.processed_data.y = [
+                self.style.ordering["y"].index(val)
+                for val in self.processed_data.y
+            ]
 
     def process_data(self) -> bool:
         """
@@ -156,6 +158,3 @@ class Trajectory:
                 v2.append(int(line[params[1]]))
         return cls(v1, v2, onset)
 
-
-def convert_on_ordering(data, ordering):
-    return [ordering.index(x) for x in data]
