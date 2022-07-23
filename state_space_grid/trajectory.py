@@ -43,7 +43,7 @@ class Trajectory:
     id: int = None  # set in __post_init__
 
     # To cache processed data
-    processed_data : ProcessedTrajData = field(default_factory=ProcessedTrajData)
+    processed_data: ProcessedTrajData = field(default_factory=ProcessedTrajData)
 
     # static count of number of trajectories - use as a stand in for ID
     # todo :: unsure if this is daft. probably daft?
@@ -68,6 +68,14 @@ class Trajectory:
     def add_global_ordering(self, ordering):
         self.style.add_ordering("x", ordering)
         self.style.add_ordering("y", ordering)
+
+    def durations(self):
+        # todo :: store this instead?
+        return [
+            t2 - t1 for t1, t2 in zip(
+                self.processed_data.t, self.processed_data.t[1:]
+            )
+        ]
 
     def get_duration(self):
         return self.data_t[-1] - self.data_t[0]
@@ -127,10 +135,8 @@ class Trajectory:
             else:
                 self.processed_data.bin_counts[y] = {x: 1}
 
-        self.processed_data.nodes = [
-            latter - former
-            for former, latter in zip(self.processed_data.t, self.processed_data.t[1:])
-        ]
+        # todo :: ???
+        self.processed_data.nodes = self.durations()
         self.processed_data.valid = True
         return True
 
