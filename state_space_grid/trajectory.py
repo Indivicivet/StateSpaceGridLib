@@ -10,7 +10,6 @@ from typing import ClassVar
 class TrajectoryStyle:
     connection_style: str = "arc3,rad=0.0"
     arrow_style: str = "-|>"
-    ordering: dict = field(default_factory=dict)
     merge_repeated_states: bool = True
 
     # todo :: why does this exist
@@ -79,7 +78,7 @@ class Trajectory:
         # todo :: double check this does as intended
         return self.processed_data.bin_counts.total()
 
-    def __merge_equal_adjacent_states(self):
+    def __merge_equal_adjacent_states(self, x_ordering: list = None, y_ordering: list = None):
         """
         Merge adjacent equal states and return merged data.
         Does not edit data within the trajectory as trajectories may contain >2(+time) variables
@@ -98,18 +97,18 @@ class Trajectory:
                 self.processed_data.y.append(self.data_y[i])
                 self.processed_data.t.append(self.data_t[i])
         self.processed_data.t.append(self.data_t[-1])
-        if "x" in self.style.ordering:
+        if x_ordering is not None:
             self.processed_data.x = [
-                self.style.ordering["x"].index(val)
+                x_ordering.index(val)
                 for val in self.processed_data.x
             ]
-        if "y" in self.style.ordering:
+        if y_ordering is not None:
             self.processed_data.y = [
-                self.style.ordering["y"].index(val)
+                y_ordering.index(val)
                 for val in self.processed_data.y
             ]
 
-    def process_data(self) -> bool:
+    def process_data(self, x_ordering: list = None, y_ordering: list = None) -> bool:
         """
         processes data(? you'd hope)
         returns whether data has already been processed
@@ -118,7 +117,7 @@ class Trajectory:
         if self.processed_data.valid:
             return False
         if self.style.merge_repeated_states:
-            self.__merge_equal_adjacent_states()
+            self.__merge_equal_adjacent_states(x_ordering, y_ordering)
         else:
             self.processed_data.t = self.data_t
             self.processed_data.x = self.data_x

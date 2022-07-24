@@ -282,7 +282,7 @@ class Grid:
     def __process(self, trajectory):
         """Get relevant data (and do merging of repeated states if desired)"""
 
-        if not trajectory.process_data():
+        if not trajectory.process_data(self.style.x_order, self.style.y_order):
             return  # early return for cases where trajectory data already processed
 
         # used for deciding node sizes
