@@ -12,12 +12,6 @@ class TrajectoryStyle:
     arrow_style: str = "-|>"
     merge_repeated_states: bool = True
 
-    # todo :: why does this exist
-    def add_ordering(self, axis, ordering):
-        """ make new copy for ordering"""
-        self.ordering[axis] = list(ordering)
-
-
 # todo :: is this really the right data layout...? AOS vs SOA I guess
 @dataclass
 class ProcessedTrajData:
