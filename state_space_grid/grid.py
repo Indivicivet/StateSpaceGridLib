@@ -120,7 +120,7 @@ class Grid:
             mean_cell_range=mean(cell_ranges),
             overall_cell_range=sum(
                 len(x_and_count)
-                for x_and_count in bin_counts.items()
+                for x_and_count in bin_counts.values()
             ),
             mean_duration_per_event=mean(
                 map(lambda x, y: x / y, trajectory_durations, event_numbers)

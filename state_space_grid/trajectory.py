@@ -69,7 +69,7 @@ class Trajectory:
         v2 = []
         with open(filename) as f:
             for line in csv.reader(f, delimiter="\t"):
-                if line[0] == "Onset":
+                if line[0] == "Onset" or line[0] == "ONSET":
                     continue
                 if len(line) < 3:
                     break
