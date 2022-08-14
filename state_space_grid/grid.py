@@ -118,9 +118,7 @@ class Grid:
             mean_number_of_events=mean(event_numbers),
             mean_number_of_visits=mean(visit_numbers),
             mean_cell_range=mean(cell_ranges),
-            overall_cell_range=sum(
-                len(x_and_count)
-                for x_and_count in bin_counts.values()
+            overall_cell_range=sum(1 for x_and_count in bin_counts.values()
             ),
             mean_duration_per_event=mean(
                 map(lambda x, y: x / y, trajectory_durations, event_numbers)
@@ -147,7 +145,7 @@ def calculate_dispersion(trajectories, x_max, x_min, y_max, y_min, cell_size_x, 
         ):
             cell_durations[(x, y)] += duration
     durations = cell_durations.values()
-    return (total_cells * sum(x ** 2 for x in durations) / sum(durations) ** 2 - 1) / (total_cells - 1)
+    return 1 - (total_cells * sum(x ** 2 for x in durations) / sum(durations) ** 2 - 1) / (total_cells - 1)
 
 
 def calculate_extra_stuff(style, x_min, x_max, y_min, y_max):
