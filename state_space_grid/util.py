@@ -55,5 +55,10 @@ def offset_within_bin(
             offset_x.append(x + direction[0] * x_scale / 4)
             offset_y.append(y + direction[1] * y_scale / 4)
             visit_count[(x, y)] += 1
+        else:
+            offset_x.append(x)
+            offset_y.append(y)
+            visit_count[(x, y)] += 1
+
     return offset_x, offset_y
     # todo :: should really return x_data', y_data', visit_count' also eh?

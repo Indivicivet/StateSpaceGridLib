@@ -9,7 +9,6 @@ import matplotlib.ticker as ticker
 from matplotlib.colors import ListedColormap
 import numpy as np
 from statistics import mean
-import fractions
 
 from .trajectory import Trajectory
 from . import util
@@ -29,8 +28,8 @@ class GridStyle:
     x_max: Optional[int] = None
     y_min: Optional[int] = None
     y_max: Optional[int] = None
-    x_order: list[Union[str, Number]] = field(default_factory=list)
-    y_order: list[Union[str, Number]] = field(default_factory=list)
+    x_order: List[Union[str, Number]] = field(default_factory=list)
+    y_order: List[Union[str, Number]] = field(default_factory=list)
     rotate_x_labels: bool = False
 
     @property
@@ -40,23 +39,6 @@ class GridStyle:
     @property
     def y_minmax_given(self):
         return self.y_min is not None, self.y_max is not None
-
-
-@dataclass
-class GridCumulativeData:
-    valid: bool = False
-    max_duration: int = 0
-    rounded_x_min: int = 0
-    rounded_x_max: int = 0
-    rounded_y_min: int = 0
-    rounded_y_max: int = 0
-    x_min: Optional[int] = None
-    y_min: Optional[int] = None
-    x_max: Optional[int] = None
-    y_max: Optional[int] = None
-    bin_counts: dict = field(default_factory=lambda: {})
-    cell_size_x: int = 0
-    cell_size_y: int = 0
 
 
 @dataclass
@@ -79,366 +61,324 @@ class GridMeasures:
 class Grid:
     trajectory_list: List[Trajectory]
     style: GridStyle = field(default_factory=GridStyle)
-    graph: nx.Graph = field(default_factory=nx.Graph)
-    ax: Any = field(default_factory=plt.gca)
-    _processed_data: GridCumulativeData = field(
-        default_factory=GridCumulativeData
-    )
-
-    def __set_background(self, x_min, y_min, x_scale, y_scale, x_max, y_max):
-        jj, ii = np.mgrid[
-            int(y_min / y_scale):int(y_max / y_scale) + 1,
-            int(x_min / x_scale):int(x_max / x_scale) + 1
-        ]
-        self.ax.imshow(
-            # checkerboard
-            (jj + ii) % 2,
-            extent=[
-                int(x_min) - 0.5 * x_scale,
-                int(x_max) + 0.5 * x_scale,
-                int(y_min) - 0.5 * y_scale,
-                int(y_max) + 0.5 * y_scale
-            ],
-            cmap=ListedColormap([
-                [220 / 256, 220 / 256, 220 / 256, 1],
-                [1, 1, 1, 1],
-            ]),
-            interpolation='none',
-        )
-
-    def __draw_graph(self, trajectory):
-        node_number_positions = dict(enumerate(zip(trajectory.processed_data.x, trajectory.processed_data.y)))
-
-        # List of tuples to define edges between nodes
-        edges = (
-            [(i, i + 1) for i in range(len(trajectory.processed_data.x) - 1)]
-            + [(loop_node, loop_node) for loop_node in trajectory.processed_data.loops]
-        )
-
-        node_sizes = list(  # todo :: maybe redundant list()
-            (1000 / self._processed_data.max_duration)
-            * np.array(trajectory.processed_data.nodes)
-        )
-
-        # Add nodes and edges to graph
-        self.graph.add_nodes_from(node_number_positions.keys())
-        self.graph.add_edges_from(edges)
-
-        # Draw graphs
-        nx.draw_networkx_nodes(self.graph, node_number_positions, node_size=node_sizes, node_color='indigo')
-        nx.draw_networkx_edges(
-            self.graph,
-            node_number_positions,
-            node_size=node_sizes,
-            nodelist=list(range(len(trajectory.processed_data.x))),
-            edgelist=edges,
-            arrows=True,
-            arrowstyle=trajectory.style.arrow_style,
-            node_shape='.',
-            arrowsize=10,
-            width=2,
-            connectionstyle=trajectory.style.connection_style,
-        )
-
-    def __draw_ticks(self, draw_style):
-        # all of this needs to go in a separate function, called with show()
-        # we need to store which axis is which column - kick up a fuss if future plots don't match this
-        # we also need to store an idea of minimum scale - this is going to fuck us if scales don't match
-        # - maybe just tell people if they have scale adjustment problems to specify their own
-
-        # Get tick labels - either numeric or categories
-        # todo :: this bit is a bit of a mess
-        rounded_x_points = range(
-            int(self._processed_data.rounded_x_min),
-            int(self._processed_data.rounded_x_max + 1),
-            int(self._processed_data.cell_size_x),
-        )
-        rounded_y_points = range(
-            int(self._processed_data.rounded_y_min),
-            int(self._processed_data.rounded_y_max + 1),
-            int(self._processed_data.cell_size_y),
-        )
-        tick_label_x = (
-            self.style.x_order
-            or draw_style.ordering.get("x", [str(i) for i in rounded_x_points])
-        )
-        tick_label_y = (
-            self.style.y_order
-            or draw_style.ordering.get("y", [str(i) for i in rounded_y_points])
-        )
-        # Set ticks for states
-        self.ax.tick_params(left=True, bottom=True, labelleft=True, labelbottom=True)
-        self.ax.tick_params(
-            axis='x',
-            labelsize=self.style.tick_font_size,
-            rotation=90 * self.style.rotate_x_labels,
-        )
-        self.ax.tick_params(
-            axis='y',
-            labelsize=self.style.tick_font_size,
-        )
-        self.ax.xaxis.set_major_locator(ticker.FixedLocator(rounded_x_points))
-        self.ax.yaxis.set_major_locator(ticker.FixedLocator(rounded_y_points))
-        self.ax.xaxis.set_major_formatter(ticker.FixedFormatter(tick_label_x))
-        self.ax.yaxis.set_major_formatter(ticker.FixedFormatter(tick_label_y))
-
-        # Set axis labels
-        self.ax.set_xlabel(self.style.x_label, fontsize=self.style.label_font_size)
-        self.ax.set_ylabel(self.style.y_label, fontsize=self.style.label_font_size)
-
-        if self.style.title:
-            self.ax.set_title(self.style.title, fontsize=self.style.title_font_size)
-
-    def __offset_trajectories(self):
-        # todo :: later -- need to think about what this actually does
-        # get total bin counts
-        self._processed_data.bin_counts = Counter()
-        # todo :: maybe this can just be a sum?
-        for trajectory in self.trajectory_list:
-            for (x, y), count in trajectory.processed_data.bin_counts.items():
-                self._processed_data.bin_counts[(x, y)] += count
-        current_bin_counter = {
-            (x, y): 0
-            for (x, y) in self._processed_data.bin_counts
-        }
-        for trajectory in self.trajectory_list:
-            # If same state is repeated, offset states
-            # so they don't sit on top of one another:
-            offs_x, offs_y = util.offset_within_bin(
-                trajectory.processed_data.x,
-                self._processed_data.cell_size_x,
-                trajectory.processed_data.y,
-                self._processed_data.cell_size_y,
-                self._processed_data.bin_counts,
-                current_bin_counter,
-            )
-            trajectory.processed_data.offset_x = offs_x
-            trajectory.processed_data.offset_y = offs_y
-
-    def __draw_background_and_view(self):
-        # todo :: whole bunch of stuff that is a bit messy here
-        # Make an estimate for scale size of checkerboard grid sizing
-        self._processed_data.cell_size_x = (
-            util.calculate_scale(self._processed_data.x_max - self._processed_data.x_min)
-            if self.style.tick_increment_x is None
-            else self.style.tick_increment_x
-        )
-        self._processed_data.cell_size_y = (
-            util.calculate_scale(self._processed_data.y_max - self._processed_data.y_min)
-            if self.style.tick_increment_y is None
-            else self.style.tick_increment_y
-        )
-
-        self._processed_data.rounded_x_min = (
-            self._processed_data.x_min
-            - (self._processed_data.x_min % self._processed_data.cell_size_x)
-        )
-        self._processed_data.rounded_x_max = (
-            self._processed_data.x_max
-            + self._processed_data.cell_size_x
-            - (
-               self._processed_data.x_max % self._processed_data.cell_size_x
-               if self._processed_data.x_max % self._processed_data.cell_size_x
-               else self._processed_data.cell_size_x
-            )
-        )
-        self._processed_data.rounded_y_min = (
-            self._processed_data.y_min
-            - (self._processed_data.y_min % self._processed_data.cell_size_y)
-        )
-        self._processed_data.rounded_y_max = (
-            self._processed_data.y_max
-            + self._processed_data.cell_size_y
-            - (
-                self._processed_data.y_max % self._processed_data.cell_size_y
-                if self._processed_data.y_max % self._processed_data.cell_size_y
-                else self._processed_data.cell_size_y
-            )
-        )
-
-        x_padding = self._processed_data.cell_size_x / 2
-        y_padding = self._processed_data.cell_size_y / 2
-
-        # Set view of axes
-        self.ax.set_xlim([
-            self._processed_data.rounded_x_min - x_padding,
-            self._processed_data.rounded_x_max + x_padding,
-        ])
-        self.ax.set_ylim([
-            self._processed_data.rounded_y_min - y_padding,
-            self._processed_data.rounded_y_max + y_padding,
-        ])
-
-        # Set background checkerboard:
-        self.__set_background(
-            self._processed_data.rounded_x_min,
-            self._processed_data.rounded_y_min,
-            self._processed_data.cell_size_x,
-            self._processed_data.cell_size_y,
-            self._processed_data.rounded_x_max,
-            self._processed_data.rounded_y_max,
-        )
-
-    def __process(self, trajectory):
-        """Get relevant data (and do merging of repeated states if desired)"""
-
-        if not trajectory.process_data(self.style.x_order, self.style.y_order):
-            return  # early return for cases where trajectory data already processed
-
-        # used for deciding node sizes
-        self._processed_data.max_duration = max(
-            max(trajectory.processed_data.nodes),
-            self._processed_data.max_duration,
-        )
-
-        # Get min and max values
-        x_min, x_max = util.calculate_min_max(trajectory.processed_data.x)
-        y_min, y_max = util.calculate_min_max(trajectory.processed_data.y)
-
-        # todo :: ?? unsure about what some of the following defaulting wants to do.
-        if self.style.x_minmax_given[0]:
-            if self._processed_data.x_min is None:
-                self._processed_data.x_min = self.style.x_min
-        elif self._processed_data.x_min is None or x_min < self._processed_data.x_min:
-            self._processed_data.x_min = x_min
-
-        if self.style.x_minmax_given[1]:
-            if self._processed_data.x_max is None:
-                self._processed_data.x_max = self.style.x_max
-        elif self._processed_data.x_max is None or x_max > self._processed_data.x_max:
-            self._processed_data.x_max = x_max
-
-        if self.style.y_minmax_given[0]:
-            if self._processed_data.y_min is None:
-                self._processed_data.y_min = self.style.y_min
-        elif self._processed_data.y_min is None or y_min < self._processed_data.y_min:
-            self._processed_data.y_min = y_min
-
-        if self.style.y_minmax_given[1]:
-            if self._processed_data.y_max is None:
-                self._processed_data.y_max = self.style.y_max
-        elif self._processed_data.y_max is None or y_max > self._processed_data.y_max:
-            self._processed_data.y_max = y_max
-
-    def set_style(self, grid_style: GridStyle):
-        self._processed_data = GridCumulativeData()  # clear
-        self.style = grid_style
-
-    def add_trajectory_data(self, *trajectories: Trajectory):
-        if not trajectories:
-            # todo :: do we really care...?
-            raise ValueError("A list of trajectories must be supplied to Grid")
-
-        # check all trajectories before we add things:
-        # todo :: uhhhh need to see if this is really the right logic
-        # todo :: or way to structure this
-        meta_names = set(
-            self.trajectory_list[0].meta.keys()
-            if self.trajectory_list
-            else trajectories[0].meta.keys()
-        )
-        for trajectory in trajectories:
-            assert isinstance(trajectory, Trajectory), (
-                "All trajectory data supplied in trajectory list"
-                " must be instances of the trajectory class"
-            )
-            # todo :: possibly go for a more type-agnostic approach here? (see above)
-            assert len(meta_names) == len(trajectory.meta), (
-                f"trajectory ID {trajectory.id}:"
-                " metadata fields don't match with others in list"
-            )
-            for i in trajectory.meta:
-                assert i in meta_names, (
-                    f"metadata field name {i} in trajectory ID {trajectory.id}"
-                    " does not exist in first trajectory"
-                )
-            # todo :: do we also want to check id?
-
-        # todo :: (??)
-        # they look good, so add them:
-        for trajectory in trajectories:
-            self.trajectory_list[trajectory.id] = trajectory
-        self._processed_data = GridCumulativeData()  # clear
 
     def draw(self, save_as: Optional[str] = None):
-        if not self._processed_data.valid:
-            for trajectory in self.trajectory_list:
-                trajectory.processed_data.valid = False
-                self.__process(trajectory)
-        self.__draw_background_and_view()
-        self.__offset_trajectories()
+        graph = nx.Graph()
+        ax = plt.gca()
+        max_duration = 0
+        x_min, y_min = self.trajectory_list[0].data_x[0], self.trajectory_list[0].data_y[0]
+        x_max, y_max = self.trajectory_list[0].data_x[0], self.trajectory_list[0].data_y[0]
+        loops_list = []
+
         for trajectory in self.trajectory_list:
-            self.__draw_graph(trajectory)
-        self.__draw_ticks(self.trajectory_list[0].style)
-        self.ax.set_aspect('auto')
+            max_duration, x_min, y_min, x_max, y_max, loops = process(self.style, trajectory, max_duration,
+                                                                      x_min, x_max, y_min, y_max)
+            loops_list.append(loops)
+
+        cell_size_x, cell_size_y, rounded_x_min, rounded_y_min, rounded_x_max, rounded_y_max \
+            = calculate_extra_stuff(self.style, x_min, x_max, y_min, y_max)
+
+        draw_background_and_view(ax, cell_size_x, cell_size_y,
+                                 rounded_x_min, rounded_x_max, rounded_y_min, rounded_y_max)
+        offset = offset_trajectories(self.trajectory_list, self.style, cell_size_x, cell_size_y)
+
+        for offset_trajectory, loops in zip(offset, loops_list):
+            draw_graph(offset_trajectory, loops, self.style, graph, max_duration)
+
+        draw_ticks(self.style, ax, rounded_x_min, rounded_x_max, rounded_y_min, rounded_y_max, cell_size_x, cell_size_y)
+        ax.set_aspect('auto')
         plt.tight_layout()
+
         if save_as is not None:
-            self.ax.savefig(save_as)
+            ax.savefig(save_as)
         else:
             plt.show()
-        self._processed_data.valid = True
-
-    def __calculate_dispersion(self):
-        total_cells = (
-            int(
-                (self._processed_data.x_max - self._processed_data.x_min)
-                / self._processed_data.cell_size_x
-            ) + 1
-        ) * (
-            int(
-                (self._processed_data.y_max - self._processed_data.y_min)
-                / self._processed_data.cell_size_y
-            ) + 1
-        )  # todo
-        cell_durations = Counter()
-        for traj in self.trajectory_list:
-            for duration, x, y in zip(
-                traj.processed_data.nodes,
-                traj.processed_data.x,
-                traj.processed_data.y,
-            ):
-                cell_durations[(x, y)] += duration
-        durations = cell_durations.values()
-        return (
-           total_cells * sum(x ** 2 for x in durations)
-           / sum(durations) ** 2
-           - 1
-        ) / (total_cells - 1)
 
     def get_measures(self):
-        if not self._processed_data.valid:
-            # necessary processing
-            for trajectory in self.trajectory_list:
-                trajectory.processed_data.valid = False
-                self.__process(trajectory)
-            self.__draw_background_and_view()
-            self.__offset_trajectories()
-            self._processed_data.valid = True
+        max_duration = 0
+        x_min, y_min = self.trajectory_list[0].data_x[0], self.trajectory_list[0].data_y[0]
+        x_max, y_max = self.trajectory_list[0].data_x[0], self.trajectory_list[0].data_y[0]
+        for trajectory in self.trajectory_list:
+            max_duration, x_min, y_min, x_max, y_max, _ = process(self.style, trajectory, max_duration,
+                                                               x_min, x_max, y_min, y_max)
 
-        durations = [traj.get_duration() for traj in self.trajectory_list]
-        event_numbers = [len(traj.data_x) for traj in self.trajectory_list]
-        visit_numbers = [traj.get_num_visits() for traj in self.trajectory_list]
-        cell_ranges = [traj.get_cell_range() for traj in self.trajectory_list]
+        cell_size_x, cell_size_y, rounded_x_min, rounded_y_min, rounded_x_max, rounded_y_max \
+            = calculate_extra_stuff(self.style, x_min, x_max, y_min, y_max)
+
+        trajectory_durations = [traj.data_t[-1] - traj.data_t[0] for traj in self.trajectory_list]
+        event_numbers = [len(trajectory.data_x) for trajectory in self.trajectory_list]
+        visit_numbers = [trajectory.get_num_visits() for trajectory in self.trajectory_list]
+        cell_ranges = [trajectory.get_cell_range() for trajectory in self.trajectory_list]
+        bin_counts = get_bin_counts(self.trajectory_list, self.style.x_order, self.style.y_order)
 
         # todo :: hmmmmmmMMMMM
         return GridMeasures(
-            trajectory_ids=[traj.id for traj in self.trajectory_list],
-            mean_duration=mean(durations),
+            trajectory_ids=[trajectory.id for trajectory in self.trajectory_list],
+            mean_duration=mean(trajectory_durations),
             mean_number_of_events=mean(event_numbers),
             mean_number_of_visits=mean(visit_numbers),
             mean_cell_range=mean(cell_ranges),
             overall_cell_range=sum(
                 len(x_and_count)
-                for x_and_count in self._processed_data.bin_counts.items()
+                for x_and_count in bin_counts.items()
             ),
             mean_duration_per_event=mean(
-                map(lambda x, y: x / y, durations, event_numbers)
+                map(lambda x, y: x / y, trajectory_durations, event_numbers)
             ),
             mean_duration_per_visit=mean(
-                map(lambda x, y: x / y, durations, visit_numbers)
+                map(lambda x, y: x / y, trajectory_durations, visit_numbers)
             ),
             mean_duration_per_cell=mean(
-                map(lambda x, y: x / y, durations, cell_ranges)
+                map(lambda x, y: x / y, trajectory_durations, cell_ranges)
             ),
-            dispersion=float(self.__calculate_dispersion()),
+            dispersion=float(
+                calculate_dispersion(self.trajectory_list, x_max, x_min, y_max, y_min, cell_size_x, cell_size_y))
         )
+
+
+def calculate_dispersion(trajectories, x_max, x_min, y_max, y_min, cell_size_x, cell_size_y):
+    total_cells = (int((x_max - x_min) / cell_size_x) + 1) * (int((y_max - y_min) / cell_size_y) + 1)
+    cell_durations = Counter()
+    for trajectory in trajectories:
+        for duration, x, y in zip(
+                (t2 - t1 for t1, t2 in zip(trajectory.data_t, trajectory.data_t[1:])),
+                trajectory.data_x,
+                trajectory.data_y
+        ):
+            cell_durations[(x, y)] += duration
+    durations = cell_durations.values()
+    return (total_cells * sum(x ** 2 for x in durations) / sum(durations) ** 2 - 1) / (total_cells - 1)
+
+
+def calculate_extra_stuff(style, x_min, x_max, y_min, y_max):
+    cell_size_x = (
+        util.calculate_scale(x_max - x_min)
+        if style.tick_increment_x is None
+        else style.tick_increment_x
+    )
+    cell_size_y = (
+        util.calculate_scale(y_max - y_min)
+        if style.tick_increment_y is None
+        else style.tick_increment_y
+    )
+    rounded_x_min = x_min - (x_min % cell_size_x)
+    rounded_x_max = (x_max + cell_size_x
+                     - (x_max % cell_size_x
+                        if x_max % cell_size_x
+                        else cell_size_x
+                        )
+                     )
+
+    rounded_y_min = y_min - (y_min % cell_size_y)
+    rounded_y_max = (y_max + cell_size_y
+                     - (y_max % cell_size_y
+                        if y_max % cell_size_y
+                        else cell_size_y
+                        )
+                     )
+    return cell_size_x, cell_size_y, rounded_x_min, rounded_y_min, rounded_x_max, rounded_y_max
+
+
+def process(grid_style: GridStyle, trajectory: Trajectory, max_duration: float,
+            x_min: int, x_max: int, y_min: int, y_max: int):
+    """Get relevant data (and do merging of repeated states if desired)"""
+
+    x_data, y_data, t_data, loops = trajectory.get_states(grid_style.x_order, grid_style.y_order)
+    durations = (t2 - t1 for t1, t2 in zip(t_data, t_data[1:]))
+
+    # Get min and max values
+    temp_x_min, temp_x_max = util.calculate_min_max(x_data)
+    temp_y_min, temp_y_max = util.calculate_min_max(y_data)
+
+    if grid_style.x_minmax_given[0]:
+        x_min = grid_style.x_min
+    if grid_style.x_minmax_given[1]:
+        x_max = grid_style.x_max
+
+    if grid_style.x_minmax_given[0]:
+        y_min = grid_style.y_min
+    if grid_style.x_minmax_given[1]:
+        y_max = grid_style.y_max
+
+    return (max(max(durations), max_duration),
+            int(min(x_min, temp_x_min)), int(min(y_min, temp_y_min)),
+            int(max(x_max, temp_x_max)), int(max(y_max, temp_y_max)),
+            loops)
+
+
+def get_bin_counts(trajectories, x_ordering: list = None, y_ordering: list = None):
+    bin_counts = Counter()
+    for trajectory in trajectories:
+        x_data = [x_ordering.index(val) for val in trajectory.data_x] if x_ordering else trajectory.data_x
+        y_data = [y_ordering.index(val) for val in trajectory.data_y] if y_ordering else trajectory.data_y
+        for x, y in zip(x_data, y_data):
+            bin_counts[(x, y)] += 1
+    return bin_counts
+
+
+def offset_trajectories(trajectories, grid_style, cell_size_x, cell_size_y):
+    # todo :: later -- need to think about what this actually does
+    # get total bin counts
+    bin_counts = Counter()
+    current_bin_counter = Counter()
+    new_trajectories = []
+    for trajectory in trajectories:
+        x_data, y_data, t_data, loops = trajectory.get_states(grid_style.x_order, grid_style.y_order)
+        for x, y in zip(x_data, y_data):
+            bin_counts[(x, y)] += 1
+
+    for trajectory in trajectories:
+        # If same state is repeated, offset states
+        # so they don't sit on top of one another:
+        x_data, y_data, t_data, loops = trajectory.get_states(grid_style.x_order, grid_style.y_order)
+        offs_x, offs_y = util.offset_within_bin(
+            x_data,
+            cell_size_x,
+            y_data,
+            cell_size_y,
+            bin_counts,
+            current_bin_counter,
+        )
+        new_trajectories.append(Trajectory(offs_x, offs_y, t_data, trajectory.meta, trajectory.style))
+    return new_trajectories
+
+
+def draw_background_and_view(ax, cell_size_x, cell_size_y, rounded_x_min, rounded_x_max, rounded_y_min, rounded_y_max):
+    # todo :: whole bunch of stuff that is a bit messy here
+    # Make an estimate for scale size of checkerboard grid sizing
+
+    x_padding = cell_size_x / 2
+    y_padding = cell_size_y / 2
+
+    # Set view of axes
+    ax.set_xlim([
+        rounded_x_min - x_padding,
+        rounded_x_max + x_padding,
+    ])
+    ax.set_ylim([
+        rounded_y_min - y_padding,
+        rounded_y_max + y_padding,
+    ])
+
+    # Set background checkerboard:
+    set_background(
+        rounded_x_min,
+        rounded_y_min,
+        cell_size_x,
+        cell_size_y,
+        rounded_x_max,
+        rounded_y_max,
+        ax,
+    )
+
+
+def draw_ticks(grid_style, ax,
+               rounded_x_min, rounded_x_max, rounded_y_min, rounded_y_max,
+               cell_size_x, cell_size_y):
+    # all of this needs to go in a separate function, called with show()
+    # we need to store which axis is which column - kick up a fuss if future plots don't match this
+    # we also need to store an idea of minimum scale - this is going to fuck us if scales don't match
+    # - maybe just tell people if they have scale adjustment problems to specify their own
+
+    # Get tick labels - either numeric or categories
+    # todo :: this bit is a bit of a mess
+    rounded_x_points = range(
+        int(rounded_x_min),
+        int(rounded_x_max + 1),
+        int(cell_size_x),
+    )
+    rounded_y_points = range(
+        int(rounded_y_min),
+        int(rounded_y_max + 1),
+        int(cell_size_y),
+    )
+    tick_label_x = (
+            grid_style.x_order
+            or [str(i) for i in rounded_x_points]
+    )
+    tick_label_y = (
+            grid_style.y_order
+            or [str(i) for i in rounded_y_points]
+    )
+    # Set ticks for states
+    ax.tick_params(left=True, bottom=True, labelleft=True, labelbottom=True)
+    ax.tick_params(
+        axis='x',
+        labelsize=grid_style.tick_font_size,
+        rotation=90 * grid_style.rotate_x_labels,
+    )
+    ax.tick_params(
+        axis='y',
+        labelsize=grid_style.tick_font_size,
+    )
+    ax.xaxis.set_major_locator(ticker.FixedLocator(rounded_x_points))
+    ax.yaxis.set_major_locator(ticker.FixedLocator(rounded_y_points))
+    ax.xaxis.set_major_formatter(ticker.FixedFormatter(tick_label_x))
+    ax.yaxis.set_major_formatter(ticker.FixedFormatter(tick_label_y))
+
+    # Set axis labels
+    ax.set_xlabel(grid_style.x_label, fontsize=grid_style.label_font_size)
+    ax.set_ylabel(grid_style.y_label, fontsize=grid_style.label_font_size)
+
+    if grid_style.title:
+        ax.set_title(grid_style.title, fontsize=grid_style.title_font_size)
+
+
+def draw_graph(trajectory, loops, grid_style, graph, max_duration):
+    x_data, y_data, t_data, _ = trajectory.get_states(grid_style.x_order, grid_style.y_order)
+    node_number_positions = dict(enumerate(zip(x_data, y_data)))
+
+    # List of tuples to define edges between nodes
+    edges = (
+            [(i, i + 1) for i in range(len(x_data) - 1)]
+            + [(loop_node, loop_node) for loop_node in loops]
+    )
+
+    durations = list(t2 - t1 for t1, t2 in zip(t_data, t_data[1:]))
+
+    node_sizes = list(  # todo :: maybe redundant list()
+        (1000 / max_duration)
+        * np.array(durations)
+    )
+
+    # Add nodes and edges to graph
+    graph.add_nodes_from(node_number_positions.keys())
+    graph.add_edges_from(edges)
+
+    # Draw graphs
+    nx.draw_networkx_nodes(graph, node_number_positions, node_size=node_sizes, node_color='indigo')
+    nx.draw_networkx_edges(
+        graph,
+        node_number_positions,
+        node_size=node_sizes,
+        nodelist=list(range(len(x_data))),
+        edgelist=edges,
+        arrows=True,
+        arrowstyle=trajectory.style.arrow_style,
+        node_shape='.',
+        arrowsize=10,
+        width=2,
+        connectionstyle=trajectory.style.connection_style,
+    )
+
+
+def set_background(x_min, y_min, x_scale, y_scale, x_max, y_max, ax):
+    jj, ii = np.mgrid[
+             int(y_min / y_scale):int(y_max / y_scale) + 1,
+             int(x_min / x_scale):int(x_max / x_scale) + 1
+             ]
+    ax.imshow(
+        # checkerboard
+        (jj + ii) % 2,
+        extent=[
+            int(x_min) - 0.5 * x_scale,
+            int(x_max) + 0.5 * x_scale,
+            int(y_min) - 0.5 * y_scale,
+            int(y_max) + 0.5 * y_scale
+        ],
+        cmap=ListedColormap([
+            [220 / 256, 220 / 256, 220 / 256, 1],
+            [1, 1, 1, 1],
+        ]),
+        interpolation='none',
+    )
