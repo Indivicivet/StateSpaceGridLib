@@ -213,6 +213,7 @@ def calculate_extra_stuff(style, x_min, x_max, y_min, y_max):
         cell_size_y,
         x_min - (x_min % cell_size_x),
         y_min - (y_min % cell_size_y),
+        # todo :: what is this surely there's builtins
         x_max + cell_size_x - (
             x_max % cell_size_x
             if x_max % cell_size_x
