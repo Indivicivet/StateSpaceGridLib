@@ -9,7 +9,7 @@ DATA_PATH = Path(__file__).resolve().parent / "resources" / "ExampleData1.txt"
 
 
 # todo :: sensible name
-def test1():
+def test_1():
     data1 = pd.read_csv(DATA_PATH.open())
     traj1 = ssg.Trajectory(
         data1["variable 1"].dropna().tolist(),
@@ -24,7 +24,7 @@ def test1():
 
 
 # todo :: sensible name
-def test2():
+def test_2():
     data1 = pd.read_csv(DATA_PATH.open())
     traj1 = ssg.Trajectory(
         data1["variable 1"].dropna().tolist(),
@@ -50,4 +50,4 @@ def test2():
 
 
 if __name__ == '__main__':
-    test2()
+    test_2()
