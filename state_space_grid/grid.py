@@ -154,15 +154,13 @@ class Grid:
             mean_duration_per_cell=mean(
                 map(lambda x, y: x / y, trajectory_durations, cell_ranges)
             ),
-            dispersion=float(
-                mean(
-                    calculate_dispersion(
-                        [trajectory], x_max, x_min, y_max, y_min,
-                        cell_size_x, cell_size_y
-                    )
-                    for trajectory in self.trajectory_list
+            dispersion=mean(
+                calculate_dispersion(
+                    [trajectory], x_max, x_min, y_max, y_min,
+                    cell_size_x, cell_size_y
                 )
-            )
+                for trajectory in self.trajectory_list
+            ),
         )
 
 
