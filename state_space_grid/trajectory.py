@@ -84,16 +84,22 @@ class Trajectory:
         return cls(v1, v2, onset)
 
 
-def merge_equal_adjacent_states(x_data, y_data, t_data, x_ordering = None, y_ordering = None):
+def merge_equal_adjacent_states(
+    x_data,
+    y_data,
+    t_data,
+    x_ordering=None,
+    y_ordering=None,
+):
     """
     Merge adjacent equal states and return merged data.
-    Does not edit data within the trajectory as trajectories may contain >2(+time) variables
+    Does not edit data within the trajectory as trajectories may
+    contain >2(+time) variables
     """
     x_merged = [x_data[0]]
     y_merged = [y_data[0]]
     t_merged = [t_data[0]]
     loops = set()
-
     for x, x_1, y, y_1, t in zip(
             x_data,
             x_data[1:],
@@ -108,10 +114,8 @@ def merge_equal_adjacent_states(x_data, y_data, t_data, x_ordering = None, y_ord
             y_merged.append(y_1)
             t_merged.append(t)
     t_merged.append(t_data[-1])
-
     if x_ordering:
         x_merged = [x_ordering.index(val) for val in x_merged]
     if y_ordering:
         y_merged = [y_ordering.index(val) for val in y_merged]
-
     return x_merged, y_merged, t_merged, loops
