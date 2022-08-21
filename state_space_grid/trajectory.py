@@ -31,8 +31,10 @@ class Trajectory:
             self.id = self.next_id
         type(self).next_id += 1
         # todo :: removed some "pop NaNs from the end" code here
-        assert(len(self.data_x) == (len(self.data_t) - 1) and len(self.data_y) == (len(self.data_t) - 1),
-               "Time data should be of length 1 longer than x and y data")
+        assert (
+            len(self.data_x) == (len(self.data_t) - 1) and len(self.data_y) == (len(self.data_t) - 1)
+        ), \
+            "Time data should be of length 1 longer than x and y data"
 
     # return number of cell transitions plus 1
     def get_num_visits(self) -> int:
