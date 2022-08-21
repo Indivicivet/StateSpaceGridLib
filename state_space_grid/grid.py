@@ -251,14 +251,14 @@ def offset_trajectories(trajectories, grid_style, cell_size_x, cell_size_y):
     current_bin_counter = Counter()
     new_trajectories = []
     for trajectory in trajectories:
-        x_data, y_data, t_data, loops = trajectory.get_states(grid_style.x_order, grid_style.y_order)
+        x_data, y_data, t_data, _ = trajectory.get_states(grid_style.x_order, grid_style.y_order)
         for x, y in zip(x_data, y_data):
             bin_counts[(x, y)] += 1
 
     for trajectory in trajectories:
         # If same state is repeated, offset states
         # so they don't sit on top of one another:
-        x_data, y_data, t_data, loops = trajectory.get_states(grid_style.x_order, grid_style.y_order)
+        x_data, y_data, t_data, _ = trajectory.get_states(grid_style.x_order, grid_style.y_order)
         new_trajectories.append(
             Trajectory(
                 *util.offset_within_bin(
