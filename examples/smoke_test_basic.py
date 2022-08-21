@@ -12,9 +12,9 @@ DATA_PATH = Path(__file__).resolve().parent / "resources" / "ExampleData1.txt"
 def test1():
     data1 = pd.read_csv(DATA_PATH.open())
     traj1 = ssg.Trajectory(
-        data1["variable 1"].tolist(),
-        data1["variable 2"].tolist(),
-        data1["Onset"].tolist(),
+        data1["variable 1"].dropna().tolist(),
+        data1["variable 2"].dropna().tolist(),
+        data1["Onset"].dropna().tolist(),
     )
     grid = ssg.Grid(
         [traj1],
