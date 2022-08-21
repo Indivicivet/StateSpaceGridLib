@@ -94,13 +94,12 @@ def merge_equal_adjacent_states(x_data, y_data, t_data, x_ordering = None, y_ord
     t_merged = [t_data[0]]
     loops = set()
 
-    for x, x_1, y, y_1, t, i in zip(
+    for x, x_1, y, y_1, t in zip(
             x_data,
             x_data[1:],
             y_data,
             y_data[1:],
             t_data[1:],
-            range(len(x_data))
     ):
         if (x, y) == (x_1, y_1):
             loops.add(len(x_merged) - 1)
