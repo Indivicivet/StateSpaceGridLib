@@ -179,6 +179,16 @@ def calculate_dispersion(trajectories, x_max, x_min, y_max, y_min, cell_size_x, 
 
 
 def calculate_extra_stuff(style, x_min, x_max, y_min, y_max):
+    """returns:
+    (
+        cell width,
+        cell height,
+        rounded x min,
+        rounded y min,
+        rounded x max,
+        rounded y max,
+    )
+    """
     cell_size_x = (
         util.calculate_scale(x_max - x_min)
         if style.tick_increment_x is None
