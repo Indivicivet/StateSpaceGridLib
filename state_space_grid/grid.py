@@ -67,7 +67,8 @@ class Grid:
         ax = plt.gca()
         max_duration = 0
         x_min, y_min = self.trajectory_list[0].data_x[0], self.trajectory_list[0].data_y[0]
-        x_max, y_max = self.trajectory_list[0].data_x[0], self.trajectory_list[0].data_y[0]
+        x_max = x_min
+        y_max = y_min
         loops_list = []
 
         for trajectory in self.trajectory_list:
@@ -97,7 +98,8 @@ class Grid:
     def get_measures(self):
         max_duration = 0
         x_min, y_min = self.trajectory_list[0].data_x[0], self.trajectory_list[0].data_y[0]
-        x_max, y_max = self.trajectory_list[0].data_x[0], self.trajectory_list[0].data_y[0]
+        x_max = x_min
+        y_max = y_min
         for trajectory in self.trajectory_list:
             max_duration, x_min, y_min, x_max, y_max, _ = process(self.style, trajectory, max_duration,
                                                                x_min, x_max, y_min, y_max)
