@@ -71,8 +71,15 @@ class Grid:
         y_max = y_min
         loops_list = []
         for trajectory in self.trajectory_list:
-            max_duration, x_min, y_min, x_max, y_max, loops = process(self.style, trajectory, max_duration,
-                                                               x_min, x_max, y_min, y_max)
+            max_duration, x_min, y_min, x_max, y_max, loops = process(
+                self.style,
+                trajectory,
+                max_duration,
+                x_min,
+                x_max,
+                y_min,
+                y_max,
+            )
             loops_list.append(loops)
         return max_duration, x_min, y_min, x_max, y_max, loops_list
 
