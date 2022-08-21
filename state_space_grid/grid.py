@@ -165,6 +165,9 @@ class Grid:
 
 
 def calculate_dispersion(trajectories, x_max, x_min, y_max, y_min, cell_size_x, cell_size_y):
+    # todo :: it's very dodgy that we need to do arithmetic
+    # and convert to integers etc here...
+    # consider passing in as more sensible values
     total_cells = (int((x_max - x_min) / cell_size_x) + 1) * (int((y_max - y_min) / cell_size_y) + 1)
     cell_durations = Counter(
         t2 - t1
