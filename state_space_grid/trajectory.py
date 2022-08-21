@@ -48,7 +48,7 @@ class Trajectory:
 
     # return number of unique cells visited
     def get_cell_range(self) -> int:
-        return len({(x,y) for x, y in zip(self.data_x, self.data_y)})
+        return len(set(zip(self.data_x, self.data_y)))
 
     # return formatted state data
     def get_states(self, x_ordering: list = None, y_ordering: list = None):
