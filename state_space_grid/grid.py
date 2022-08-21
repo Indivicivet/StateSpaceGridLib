@@ -92,8 +92,15 @@ class Grid:
         cell_size_x, cell_size_y, rounded_x_min, rounded_y_min, rounded_x_max, rounded_y_max \
             = calculate_extra_stuff(self.style, x_min, x_max, y_min, y_max)
 
-        draw_background_and_view(ax, cell_size_x, cell_size_y,
-                                 rounded_x_min, rounded_x_max, rounded_y_min, rounded_y_max)
+        draw_background_and_view(
+            ax,
+            cell_size_x,
+            cell_size_y,
+            rounded_x_min,
+            rounded_x_max,
+            rounded_y_min,
+            rounded_y_max,
+        )
         offset = offset_trajectories(self.trajectory_list, self.style, cell_size_x, cell_size_y)
 
         for offset_trajectory, loops in zip(offset, loops_list):
