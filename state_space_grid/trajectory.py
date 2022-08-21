@@ -49,10 +49,9 @@ class Trajectory:
     def get_states(self, x_ordering: list = None, y_ordering: list = None):
         if self.style.merge_repeated_states:
             return merge_equal_adjacent_states(self.data_x, self.data_y, self.data_t, x_ordering, y_ordering)
-        else:
-            x_data = [x_ordering.index(val) for val in self.data_x] if x_ordering else self.data_x
-            y_data = [y_ordering.index(val) for val in self.data_y] if y_ordering else self.data_y
-            return x_data, y_data, self.data_t, set()
+        x_data = [x_ordering.index(val) for val in self.data_x] if x_ordering else self.data_x
+        y_data = [y_ordering.index(val) for val in self.data_y] if y_ordering else self.data_y
+        return x_data, y_data, self.data_t, set()
 
     # construct trajectory from legacy trj file
     @classmethod
