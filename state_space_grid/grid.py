@@ -215,7 +215,7 @@ def process(
     x_max: int,
     y_min: int,
     y_max: int,
-):
+) -> tuple[float, int, int, int, int, set]:
     """Get relevant data (and do merging of repeated states if desired)"""
 
     x_data, y_data, t_data, loops = trajectory.get_states(grid_style.x_order, grid_style.y_order)
