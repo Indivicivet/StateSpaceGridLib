@@ -164,7 +164,10 @@ class Grid:
         )
 
 
-def calculate_dispersion(trajectories, total_cells):
+def calculate_dispersion(
+    trajectories: list[Trajectory],
+    total_cells: int,
+) -> float:
     cell_durations = Counter(
         t2 - t1
         for trajectory in trajectories
