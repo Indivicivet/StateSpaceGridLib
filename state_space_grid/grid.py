@@ -2,13 +2,13 @@ from collections import Counter
 from dataclasses import dataclass, field
 from typing import Optional, Union, List, Any
 from numbers import Number
+from statistics import mean
 
 import networkx as nx
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 from matplotlib.colors import ListedColormap
 import numpy as np
-from statistics import mean
 
 from .trajectory import Trajectory
 from . import util
