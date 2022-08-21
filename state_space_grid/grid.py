@@ -221,6 +221,7 @@ def process(
     x_data, y_data, t_data, loops = trajectory.get_states(grid_style.x_order, grid_style.y_order)
 
     # Get min and max values
+    # todo :: this is probably silly...
     temp_x_min, temp_x_max = util.calculate_min_max(x_data)
     temp_y_min, temp_y_max = util.calculate_min_max(y_data)
 
