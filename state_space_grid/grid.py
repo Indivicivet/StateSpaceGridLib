@@ -189,22 +189,22 @@ def calculate_extra_stuff(style, x_min, x_max, y_min, y_max):
         if style.tick_increment_y is None
         else style.tick_increment_y
     )
-    rounded_x_min = x_min - (x_min % cell_size_x)
-    rounded_x_max = (x_max + cell_size_x
-                     - (x_max % cell_size_x
-                        if x_max % cell_size_x
-                        else cell_size_x
-                        )
-                     )
-
-    rounded_y_min = y_min - (y_min % cell_size_y)
-    rounded_y_max = (y_max + cell_size_y
-                     - (y_max % cell_size_y
-                        if y_max % cell_size_y
-                        else cell_size_y
-                        )
-                     )
-    return cell_size_x, cell_size_y, rounded_x_min, rounded_y_min, rounded_x_max, rounded_y_max
+    return (
+        cell_size_x,
+        cell_size_y,
+        x_min - (x_min % cell_size_x),
+        y_min - (y_min % cell_size_y),
+        x_max + cell_size_x - (
+            x_max % cell_size_x
+            if x_max % cell_size_x
+            else cell_size_x
+        ),
+        y_max + cell_size_y - (
+            y_max % cell_size_y
+            if y_max % cell_size_y
+            else cell_size_y
+        ),
+    )
 
 
 def process(
