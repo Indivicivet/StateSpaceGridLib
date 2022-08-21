@@ -219,7 +219,6 @@ def process(
     """Get relevant data (and do merging of repeated states if desired)"""
 
     x_data, y_data, t_data, loops = trajectory.get_states(grid_style.x_order, grid_style.y_order)
-    durations = (t2 - t1 for t1, t2 in zip(t_data, t_data[1:]))
 
     # Get min and max values
     temp_x_min, temp_x_max = util.calculate_min_max(x_data)
@@ -236,7 +235,7 @@ def process(
         y_max = grid_style.y_max
 
     return (
-        max(*durations, max_duration),
+        max(*(t2 - t1 for t1, t2 in zip(t_data, t_data[1:])), max_duration),
         int(min(x_min, temp_x_min)),
         int(min(y_min, temp_y_min)),
         int(max(x_max, temp_x_max)),
