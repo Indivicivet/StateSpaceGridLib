@@ -106,7 +106,16 @@ class Grid:
         for offset_trajectory, loops in zip(offset, loops_list):
             draw_graph(offset_trajectory, loops, self.style, graph, max_duration)
 
-        draw_ticks(self.style, ax, rounded_x_min, rounded_x_max, rounded_y_min, rounded_y_max, cell_size_x, cell_size_y)
+        draw_ticks(
+            self.style,
+            ax,
+            rounded_x_min,
+            rounded_x_max,
+            rounded_y_min,
+            rounded_y_max,
+            cell_size_x,
+            cell_size_y,
+        )
         ax.set_aspect('auto')
         plt.tight_layout()
 
