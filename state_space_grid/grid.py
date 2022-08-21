@@ -168,10 +168,10 @@ def calculate_dispersion(trajectories, x_max, x_min, y_max, y_min, cell_size_x, 
     total_cells = (int((x_max - x_min) / cell_size_x) + 1) * (int((y_max - y_min) / cell_size_y) + 1)
     cell_durations = Counter()
     for trajectory in trajectories:
-        for duration, x, y in zip(
-                (t2 - t1 for t1, t2 in zip(trajectory.data_t, trajectory.data_t[1:])),
-                trajectory.data_x,
-                trajectory.data_y
+        for x, y, duration in zip(
+            trajectory.data_x,
+            trajectory.data_y,
+            (t2 - t1 for t1, t2 in zip(trajectory.data_t, trajectory.data_t[1:])),
         ):
             cell_durations[(x, y)] += duration
     durations = cell_durations.values()
