@@ -3,7 +3,7 @@ import warnings
 from collections import Counter
 from dataclasses import dataclass, field
 from itertools import zip_longest
-from typing import ClassVar
+from typing import ClassVar, Optional
 
 
 @dataclass
@@ -51,7 +51,11 @@ class Trajectory:
         return len(set(zip(self.data_x, self.data_y)))
 
     # return formatted state data
-    def get_states(self, x_ordering: list = None, y_ordering: list = None):
+    def get_states(
+        self,
+        x_ordering: Optional[list]= None,
+        y_ordering: Optional[list] = None
+    ) -> tuple[list, list, list, set]:
         if self.style.merge_repeated_states:
             return merge_equal_adjacent_states(self.data_x, self.data_y, self.data_t, x_ordering, y_ordering)
         x_data = [x_ordering.index(val) for val in self.data_x] if x_ordering else self.data_x
