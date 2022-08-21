@@ -56,9 +56,9 @@ class Trajectory:
     # construct trajectory from legacy trj file
     @classmethod
     def from_legacy_trj(
-            cls,
-            filename,
-            params=(1, 2),
+        cls,
+        filename,
+        params=(1, 2),
     ):
         """For legacy .trj files. Stay away, they're ew!"""
         warnings.warn(
