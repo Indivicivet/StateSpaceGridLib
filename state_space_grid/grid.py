@@ -176,8 +176,13 @@ def calculate_dispersion(trajectories, x_max, x_min, y_max, y_min, cell_size_x, 
             trajectory.data_t[1:],
         )
     )
-    durations = cell_durations.values()
-    return 1 - (total_cells * sum(x ** 2 for x in durations) / sum(durations) ** 2 - 1) / (total_cells - 1)
+    return 1 - (
+        (
+            total_cells * sum(x ** 2 for x in cell_durations.values())
+            / cell_durations.total() ** 2
+        )
+        - 1
+    ) / (total_cells - 1)
 
 
 def calculate_extra_stuff(style, x_min, x_max, y_min, y_max):
