@@ -34,7 +34,10 @@ class Trajectory:
         assert (
             len(self.data_x) == (len(self.data_t) - 1)
             and len(self.data_y) == (len(self.data_t) - 1)
-        ), "Time data should be of length 1 longer than x and y data"
+        ), (
+            "Time data should be of length 1 longer than x and y data"
+            f", but got lengths {len(self.data_x)=} {len(self.data_y)=} {len(self.data_t)=}"
+        )
 
     # return number of cell transitions plus 1
     def get_num_visits(self) -> int:
