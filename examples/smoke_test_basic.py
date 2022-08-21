@@ -27,9 +27,9 @@ def test1():
 def test2():
     data1 = pd.read_csv(DATA_PATH.open())
     traj1 = ssg.Trajectory(
-        data1["variable 1"].tolist(),
-        data1["variable 2"].tolist(),
-        data1["Onset"].tolist(),
+        data1["variable 1"].dropna().tolist(),
+        data1["variable 2"].dropna().tolist(),
+        data1["Onset"].dropna().tolist(),
     )
     # traj1.add_y_ordering(["Low", "Medium", "High"])
     grid = ssg.Grid(
