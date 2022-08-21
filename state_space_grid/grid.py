@@ -392,9 +392,9 @@ def draw_graph(trajectory, loops, grid_style, graph, max_duration):
 
 def set_background(x_min, y_min, x_scale, y_scale, x_max, y_max, ax):
     jj, ii = np.mgrid[
-             int(y_min / y_scale):int(y_max / y_scale) + 1,
-             int(x_min / x_scale):int(x_max / x_scale) + 1
-             ]
+         int(y_min / y_scale):int(y_max / y_scale) + 1,
+         int(x_min / x_scale):int(x_max / x_scale) + 1,
+     ]
     ax.imshow(
         # checkerboard
         (jj + ii) % 2,
