@@ -62,21 +62,25 @@ class Grid:
     trajectory_list: List[Trajectory]
     style: GridStyle = field(default_factory=GridStyle)
 
-    def draw(self, save_as: Optional[str] = None):
-        graph = nx.Graph()
-        ax = plt.gca()
-
+    def shared_all_trajectory_process(self):
+        # todo :: sensible name :)
         max_duration = 0
         x_min = self.trajectory_list[0].data_x[0]
         y_min = self.trajectory_list[0].data_y[0]
         x_max = x_min
         y_max = y_min
         loops_list = []
-
         for trajectory in self.trajectory_list:
             max_duration, x_min, y_min, x_max, y_max, loops = process(self.style, trajectory, max_duration,
-                                                                      x_min, x_max, y_min, y_max)
+                                                               x_min, x_max, y_min, y_max)
             loops_list.append(loops)
+        return max_duration, x_min, y_min, x_max, y_max, loops_list
+
+    def draw(self, save_as: Optional[str] = None):
+        graph = nx.Graph()
+        ax = plt.gca()
+
+        max_duration, x_min, y_min, x_max, y_max, loops_list = self.shared_all_trajectory_process()
 
         cell_size_x, cell_size_y, rounded_x_min, rounded_y_min, rounded_x_max, rounded_y_max \
             = calculate_extra_stuff(self.style, x_min, x_max, y_min, y_max)
@@ -98,14 +102,7 @@ class Grid:
             plt.show()
 
     def get_measures(self):
-        max_duration = 0
-        x_min = self.trajectory_list[0].data_x[0]
-        y_min = self.trajectory_list[0].data_y[0]
-        x_max = x_min
-        y_max = y_min
-        for trajectory in self.trajectory_list:
-            max_duration, x_min, y_min, x_max, y_max, _ = process(self.style, trajectory, max_duration,
-                                                               x_min, x_max, y_min, y_max)
+        max_duration, x_min, y_min, x_max, y_max, _ = self.shared_all_trajectory_process()
 
         cell_size_x, cell_size_y, rounded_x_min, rounded_y_min, rounded_x_max, rounded_y_max \
             = calculate_extra_stuff(self.style, x_min, x_max, y_min, y_max)
