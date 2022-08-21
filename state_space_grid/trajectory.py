@@ -5,11 +5,13 @@ from dataclasses import dataclass, field
 from itertools import zip_longest
 from typing import ClassVar
 
+
 @dataclass
 class TrajectoryStyle:
     connection_style: str = "arc3,rad=0.0"
     arrow_style: str = "-|>"
     merge_repeated_states: bool = True
+
 
 @dataclass
 class Trajectory:
@@ -81,6 +83,7 @@ class Trajectory:
                 v2.append(int(line[params[1]]))
         return cls(v1, v2, onset)
 
+
 def merge_equal_adjacent_states(x_data, y_data, t_data, x_ordering = None, y_ordering = None):
     """
     Merge adjacent equal states and return merged data.
@@ -113,5 +116,3 @@ def merge_equal_adjacent_states(x_data, y_data, t_data, x_ordering = None, y_ord
         y_merged = [y_ordering.index(val) for val in y_merged]
 
     return x_merged, y_merged, t_merged, loops
-
-
