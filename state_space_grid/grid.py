@@ -267,6 +267,7 @@ def process(
 
 def get_bin_counts(trajectories, x_ordering: list = None, y_ordering: list = None):
     def maybe_reorder(data, ordering: Optional[list] = None):
+        # todo :: this breaks when ordering is Falsey (but not none) - investigate
         if not ordering:
             return data
         return [ordering.index(val) for val in data]
