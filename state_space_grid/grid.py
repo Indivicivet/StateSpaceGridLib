@@ -228,10 +228,14 @@ def process(grid_style: GridStyle, trajectory: Trajectory, max_duration: float,
     if grid_style.x_minmax_given[1]:
         y_max = grid_style.y_max
 
-    return (max(max(durations), max_duration),
-            int(min(x_min, temp_x_min)), int(min(y_min, temp_y_min)),
-            int(max(x_max, temp_x_max)), int(max(y_max, temp_y_max)),
-            loops)
+    return (
+        max(*durations, max_duration),
+        int(min(x_min, temp_x_min)),
+        int(min(y_min, temp_y_min)),
+        int(max(x_max, temp_x_max)),
+        int(max(y_max, temp_y_max)),
+        loops,
+    )
 
 
 def get_bin_counts(trajectories, x_ordering: list = None, y_ordering: list = None):
