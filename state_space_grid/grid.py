@@ -405,8 +405,8 @@ def set_background(x_min, y_min, x_scale, y_scale, x_max, y_max, ax):
             int(y_max) + 0.5 * y_scale
         ],
         cmap=ListedColormap([
-            [220 / 256, 220 / 256, 220 / 256, 1],
-            [1, 1, 1, 1],
+            [220 / 256] * 3,
+            [1] * 3,
         ]),
         interpolation='none',
     )
