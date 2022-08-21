@@ -65,8 +65,10 @@ class Grid:
     def draw(self, save_as: Optional[str] = None):
         graph = nx.Graph()
         ax = plt.gca()
+
         max_duration = 0
-        x_min, y_min = self.trajectory_list[0].data_x[0], self.trajectory_list[0].data_y[0]
+        x_min = self.trajectory_list[0].data_x[0]
+        y_min = self.trajectory_list[0].data_y[0]
         x_max = x_min
         y_max = y_min
         loops_list = []
@@ -97,7 +99,8 @@ class Grid:
 
     def get_measures(self):
         max_duration = 0
-        x_min, y_min = self.trajectory_list[0].data_x[0], self.trajectory_list[0].data_y[0]
+        x_min = self.trajectory_list[0].data_x[0]
+        y_min = self.trajectory_list[0].data_y[0]
         x_max = x_min
         y_max = y_min
         for trajectory in self.trajectory_list:
