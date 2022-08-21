@@ -70,7 +70,7 @@ class Trajectory:
         v2 = []
         with open(filename) as f:
             for line in csv.reader(f, delimiter="\t"):
-                if line[0] == "Onset" or line[0] == "ONSET":
+                if line[0].lower() == "onset":
                     continue
                 if len(line) == 1:
                     onset.append(float(line[0]))
