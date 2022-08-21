@@ -271,7 +271,15 @@ def offset_trajectories(trajectories, grid_style, cell_size_x, cell_size_y):
     return new_trajectories
 
 
-def draw_background_and_view(ax, cell_size_x, cell_size_y, rounded_x_min, rounded_x_max, rounded_y_min, rounded_y_max):
+def draw_background_and_view(
+    ax,
+    cell_size_x,
+    cell_size_y,
+    rounded_x_min,
+    rounded_x_max,
+    rounded_y_min,
+    rounded_y_max,
+):
     # todo :: whole bunch of stuff that is a bit messy here
     # Make an estimate for scale size of checkerboard grid sizing
 
