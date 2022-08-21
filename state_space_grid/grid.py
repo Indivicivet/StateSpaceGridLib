@@ -207,8 +207,15 @@ def calculate_extra_stuff(style, x_min, x_max, y_min, y_max):
     return cell_size_x, cell_size_y, rounded_x_min, rounded_y_min, rounded_x_max, rounded_y_max
 
 
-def process(grid_style: GridStyle, trajectory: Trajectory, max_duration: float,
-            x_min: int, x_max: int, y_min: int, y_max: int):
+def process(
+    grid_style: GridStyle,
+    trajectory: Trajectory,
+    max_duration: float,
+    x_min: int,
+    x_max: int,
+    y_min: int,
+    y_max: int,
+):
     """Get relevant data (and do merging of repeated states if desired)"""
 
     x_data, y_data, t_data, loops = trajectory.get_states(grid_style.x_order, grid_style.y_order)
