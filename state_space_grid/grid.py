@@ -266,12 +266,17 @@ def process(
 
 
 def get_bin_counts(trajectories, x_ordering: list = None, y_ordering: list = None):
+    def maybe_reorder(data, ordering: Optional[list] = None):
+        if not ordering:
+            return data
+        return [ordering.index(val) for val in data]
+
     bin_counts = Counter()
     for trajectory in trajectories:
         bin_counts += Counter(
             zip(
-                [x_ordering.index(val) for val in trajectory.data_x] if x_ordering else trajectory.data_x,
-                [y_ordering.index(val) for val in trajectory.data_y] if y_ordering else trajectory.data_y,
+                maybe_reorder(trajectory.data_x, x_ordering),
+                maybe_reorder(trajectory.data_y, y_ordering),
             )
         )
     return bin_counts
