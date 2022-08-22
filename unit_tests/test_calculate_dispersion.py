@@ -15,6 +15,22 @@ def test_calculate_dispersion_single_point(x0, y0, t1, grid_points):
     assert result == 0
 
 
+@pytest.mark.parametrize("n_times", [2, 3, 4, 5])
+def test_calculate_dispersion_uniform_distribution(n_times):
+    """
+    I think that dispersion is 0 if each cell is only hit once?
+    -------
+
+    """
+    traj = trajectory.Trajectory(
+        data_x=list(range(n_times)),
+        data_y=list(range(n_times)),
+        data_t=list(range(n_times + 1)),
+    )
+    result = grid.calculate_dispersion([traj], n_times + 1)
+    assert result == 0
+
+
 def test_calculate_dispersion_two_points():
     traj = trajectory.Trajectory(
         data_x=[1, 5],
