@@ -131,7 +131,7 @@ class Trajectory:
             + [(loop_node, loop_node) for loop_node in loops]
         )
 
-        durations = list(t2 - t1 for t1, t2 in zip(t_data, t_data[1:]))
+        durations = [t2 - t1 for t1, t2 in zip(t_data, t_data[1:])]
 
         node_sizes = (1000 / max_duration) * np.array(durations)
 
