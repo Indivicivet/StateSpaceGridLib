@@ -168,13 +168,14 @@ class Grid:
         ])
 
         # Set background checkerboard:
-        jj, ii = np.mgrid[
-                 int(rounded_y_min / cell_size_y):int(rounded_y_max / cell_size_y) + 1,
-                 int(rounded_x_min / cell_size_x):int(rounded_x_max / cell_size_x) + 1,
-                 ]
         ax.imshow(
             # checkerboard
-            (jj + ii) % 2,
+            sum(
+                np.mgrid[
+                    int(rounded_y_min / cell_size_y):int(rounded_y_max / cell_size_y) + 1,
+                    int(rounded_x_min / cell_size_x):int(rounded_x_max / cell_size_x) + 1,
+                ]
+            ) % 2,
             extent=[
                 int(rounded_x_min) - 0.5 * cell_size_x,
                 int(rounded_x_max) + 0.5 * cell_size_x,
