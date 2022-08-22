@@ -57,7 +57,7 @@ class Trajectory:
     # return formatted state data
     def get_states(
         self,
-        x_ordering: Optional[list]= None,
+        x_ordering: Optional[list] = None,
         y_ordering: Optional[list] = None,
         merge_repeated_states: bool = True,
     ) -> Tuple[list, list, list, set]:
