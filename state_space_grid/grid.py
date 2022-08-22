@@ -165,6 +165,8 @@ class Grid:
         graph = nx.Graph()
         ax = plt.gca()
 
+        # todo :: seems like some weirdness in what we're actually getting out here
+        # probably should refactor return values etc (separate functions?)
         max_duration, x_min, y_min, x_max, y_max, loops_list = self.shared_all_trajectory_process()
 
         cell_size_x, cell_size_y, rounded_x_min, rounded_y_min, rounded_x_max, rounded_y_max \
