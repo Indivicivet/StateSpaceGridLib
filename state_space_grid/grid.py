@@ -35,6 +35,7 @@ class GridStyle:
 
 @dataclass
 class GridMeasures:
+    # todo :: all of these fields probably want to be methods
     trajectory_ids: list = field(default_factory=lambda: [])
     mean_duration: float = 0
     mean_number_of_events: float = 0  # todo float ye?
