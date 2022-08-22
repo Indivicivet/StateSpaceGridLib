@@ -41,6 +41,7 @@ def test_ExampleData1_measures():
     assert measures.mean_number_of_events == 8
     assert measures.mean_number_of_visits == 7
     assert measures.mean_cell_range == 6
+    assert measures.overall_cell_range == 6
     assert measures.mean_duration_per_event == 1.85
     assert abs(measures.mean_duration_per_visit - 2.1142857 < 1e-3)
     assert abs(measures.mean_duration_per_cell - 2.46666 < 1e-3)
