@@ -8,6 +8,17 @@ from state_space_grid import grid, trajectory
 DATA_PATH = Path(__file__).resolve().parent.parent / "examples" / "resources" / "ExampleData1.txt"
 
 
+# todo :: the following used to exist, is there any sensible way to test it? :)
+"""
+style = grid.GridStyle(
+    title="test 2",
+    x_label="variable 1",
+    y_label="variable 2",
+    title_font_size=30,
+),
+"""
+
+
 # todo :: sensible name
 def test_2():
     data1 = pd.read_csv(DATA_PATH.open())
@@ -19,12 +30,6 @@ def test_2():
     # traj1.add_y_ordering(["Low", "Medium", "High"])
     my_grid = grid.Grid(
         [traj1],
-        style=grid.GridStyle(
-            title="test 2",
-            x_label="variable 1",
-            y_label ="variable 2",
-            title_font_size=30,
-        ),
         quantization=grid.GridQuantization(
             x_max=4,
             x_min=1,
