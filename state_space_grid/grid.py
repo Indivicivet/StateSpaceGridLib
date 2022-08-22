@@ -348,6 +348,13 @@ def offset_trajectories(
     x_order=None,
     y_order=None,
 ) -> list[Trajectory]:
+    """
+    perturbs (quantized?) trajectory x and y values
+    to not overlap, by mapping overlapping values to angular
+    spaced points within a circle in each cell
+
+    amount to perturb by is based on cell_size_x and cell_size_y
+    """
     # todo :: later -- need to think about what this actually does
     # get total bin counts
     new_trajectories = []
