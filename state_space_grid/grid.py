@@ -331,6 +331,7 @@ def offset_trajectories(
     )
     current_bin_counter = Counter()
     for trajectory in trajectories:
+        # todo :: I imagine there's a cleaner way to do this...
         # If same state is repeated, offset states
         # so they don't sit on top of one another:
         x_data, y_data, t_data, _ = trajectory.get_states(grid_style.x_order, grid_style.y_order)
