@@ -298,6 +298,8 @@ class Grid:
         for trajectory in self.trajectory_list:
             bin_counts += Counter(
                 zip(
+                    # todo :: should factor out uses of .style that affect computation,
+                    # as opposed to uses that only affect rendering
                     maybe_reorder(trajectory.data_x, self.style.x_order),
                     maybe_reorder(trajectory.data_y, self.style.y_order),
                 )
