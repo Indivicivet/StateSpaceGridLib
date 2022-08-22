@@ -130,10 +130,7 @@ class Trajectory:
             [(i, i + 1) for i in range(len(x_data) - 1)]
             + [(loop_node, loop_node) for loop_node in loops]
         )
-
-        durations = [t2 - t1 for t1, t2 in zip(t_data, t_data[1:])]
-
-        node_sizes = (1000 / max_duration) * np.array(durations)
+        node_sizes = (1000 / max_duration) * np.array([t2 - t1 for t1, t2 in zip(t_data, t_data[1:])])
 
         # Add nodes and edges to graph
         graph.add_nodes_from(node_number_positions.keys())
