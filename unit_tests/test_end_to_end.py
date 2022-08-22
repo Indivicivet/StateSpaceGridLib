@@ -24,11 +24,13 @@ def test_2():
             x_label="variable 1",
             y_label ="variable 2",
             title_font_size=30,
+        ),
+        quantization=grid.GridQuantization(
             x_max=4,
             x_min=1,
             y_max=4,
             y_min=1,
-        ),
+        )
     )
     measures = my_grid.get_measures()
     assert measures.mean_duration == 14.8

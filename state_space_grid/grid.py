@@ -22,20 +22,25 @@ class GridStyle:
     tick_font_size: int = 14
     title_font_size: int = 14
     # todo :: with so many optionals maybe this is a mess :)
-    # todo :: the following tick_increment/labels are unused, do we want to support?
-    tick_increment_x: Optional[int] = None
-    tick_increment_y: Optional[int] = None
+    # todo :: the following labels are unused, do we want to support?
     x_label: Optional[str] = None
     y_label: Optional[str] = None
+    rotate_x_labels: bool = False
+
+
+# todo :: is this ideal class name? maybe.
+@dataclass
+class GridQuantization:
+    tick_increment_x: Optional[int] = None
+    tick_increment_y: Optional[int] = None
+    # todo :: consider axis-values type for str, Number
+    x_order: Optional[List[Union[str, Number]]] = None
+    y_order: Optional[List[Union[str, Number]]] = None
     # todo :: the following x/y_min/max are unused, do we want to support?
     x_min: Optional[int] = None  # todo :: are they floats?
     x_max: Optional[int] = None
     y_min: Optional[int] = None
     y_max: Optional[int] = None
-    # todo :: consider axis-values type for str, Number
-    x_order: Optional[List[Union[str, Number]]] = None
-    y_order: Optional[List[Union[str, Number]]] = None
-    rotate_x_labels: bool = False
 
 
 @dataclass
@@ -60,6 +65,7 @@ class GridMeasures:
 @dataclass
 class Grid:
     trajectory_list: List[Trajectory]
+    quantization: GridQuantization = field(default=GridQuantization)
     style: GridStyle = field(default_factory=GridStyle)
 
     def shared_all_trajectory_process(self):
@@ -72,20 +78,23 @@ class Grid:
         # todo :: consider this logic when a subset is None?
         # does that even make any sense?
         # if not, can cover with some simpler logic
-        if self.style.x_min is not None:
-            x_min = self.style.x_min
-        if self.style.x_max is not None:
-            x_max = self.style.x_max
+        if self.quantization.x_min is not None:
+            x_min = self.quantization.x_min
+        if self.quantization.x_max is not None:
+            x_max = self.quantization.x_max
 
-        if self.style.y_min is not None:
-            y_min = self.style.y_min
-        if self.style.y_max is not None:
-            y_max = self.style.y_max
+        if self.quantization.y_min is not None:
+            y_min = self.quantization.y_min
+        if self.quantization.y_max is not None:
+            y_max = self.quantization.y_max
 
         max_duration = 0
         loops_list = []
         for trajectory in self.trajectory_list:
-            x_data, y_data, t_data, loops = trajectory.get_states(self.style.x_order, self.style.y_order)
+            x_data, y_data, t_data, loops = trajectory.get_states(
+                self.quantization.x_order,
+                self.quantization.y_order,
+            )
 
             # Get min and max values
             # todo :: this is probably silly...
@@ -134,8 +143,8 @@ class Grid:
                 scale_factor /= 10
             return scale_factor
 
-        cell_size_x = self.style.tick_increment_x or calculate_scale(x_max - x_min)
-        cell_size_y = self.style.tick_increment_y or calculate_scale(y_max - y_min)
+        cell_size_x = self.quantization.tick_increment_x or calculate_scale(x_max - x_min)
+        cell_size_y = self.quantization.tick_increment_y or calculate_scale(y_max - y_min)
         def something_round(v, cell):
             # todo :: what is this surely there's builtins
             return v + cell - (v % cell or cell)
@@ -205,8 +214,8 @@ class Grid:
                 self.trajectory_list,
                 cell_size_x,
                 cell_size_y,
-                x_order=self.style.x_order,
-                y_order=self.style.y_order,
+                x_order=self.quantization.x_order,
+                y_order=self.quantization.y_order,
             ),
             loops_list,
         ):
@@ -215,8 +224,8 @@ class Grid:
                 loops=loops,
                 node_scale=1000 / max_duration,
                 # todo :: variable name consistency...
-                x_ordering=self.style.x_order,
-                y_ordering=self.style.y_order,
+                x_ordering=self.quantization.x_order,
+                y_ordering=self.quantization.y_order,
             )
 
         # all of this needs to go in a separate function, called with show()
@@ -250,11 +259,11 @@ class Grid:
         ax.xaxis.set_major_locator(ticker.FixedLocator(rounded_x_points))
         ax.yaxis.set_major_locator(ticker.FixedLocator(rounded_y_points))
         ax.xaxis.set_major_formatter(ticker.FixedFormatter(
-            self.style.x_order
+            self.quantization.x_order
             or [str(i) for i in rounded_x_points]
         ))
         ax.yaxis.set_major_formatter(ticker.FixedFormatter(
-            self.style.y_order
+            self.quantization.y_order
             or [str(i) for i in rounded_y_points]
         ))
 
@@ -300,8 +309,8 @@ class Grid:
                 zip(
                     # todo :: should factor out uses of .style that affect computation,
                     # as opposed to uses that only affect rendering
-                    maybe_reorder(trajectory.data_x, self.style.x_order),
-                    maybe_reorder(trajectory.data_y, self.style.y_order),
+                    maybe_reorder(trajectory.data_x, self.quantization.x_order),
+                    maybe_reorder(trajectory.data_y, self.quantization.y_order),
                 )
             )
 
