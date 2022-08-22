@@ -67,6 +67,9 @@ class Grid:
         y_max = y_min
         loops_list = []
 
+        # todo :: consider this logic when a subset is None?
+        # does that even make any sense?
+        # if not, can cover with some simpler logic
         if self.style.x_min is not None:
             x_min = self.style.x_min
         if self.style.x_max is not None:
