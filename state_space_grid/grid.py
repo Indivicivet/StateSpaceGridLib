@@ -60,12 +60,10 @@ class Grid:
 
     def shared_all_trajectory_process(self):
         # todo :: sensible name :)
-        max_duration = 0
         x_min = self.trajectory_list[0].data_x[0]
         y_min = self.trajectory_list[0].data_y[0]
         x_max = x_min
         y_max = y_min
-        loops_list = []
 
         # todo :: consider this logic when a subset is None?
         # does that even make any sense?
@@ -80,6 +78,8 @@ class Grid:
         if self.style.y_max is not None:
             y_max = self.style.y_max
 
+        max_duration = 0
+        loops_list = []
         for trajectory in self.trajectory_list:
             x_data, y_data, t_data, loops = trajectory.get_states(self.style.x_order, self.style.y_order)
 
