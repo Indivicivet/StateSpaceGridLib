@@ -13,7 +13,6 @@ import numpy as np
 class TrajectoryStyle:
     connection_style: str = "arc3,rad=0.0"
     arrow_style: str = "-|>"
-    merge_repeated_states: bool = True
 
 
 @dataclass
@@ -59,7 +58,8 @@ class Trajectory:
     def get_states(
         self,
         x_ordering: Optional[list]= None,
-        y_ordering: Optional[list] = None
+        y_ordering: Optional[list] = None,
+        merge_repeated_states: bool = True,
     ) -> Tuple[list, list, list, set]:
         # todo :: can we deal with reordering at the call site?
         def maybe_reorder(data, ordering=None):
@@ -67,7 +67,7 @@ class Trajectory:
                 return data
             return [ordering.index(x) for x in data]
 
-        if self.style.merge_repeated_states:
+        if merge_repeated_states:
             x_merged = [self.data_x[0]]
             y_merged = [self.data_y[0]]
             t_merged = [self.data_t[0]]
