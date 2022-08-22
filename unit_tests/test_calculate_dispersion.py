@@ -1,5 +1,5 @@
 import pytest
-from state_space_grid import grid, trajectory
+from state_space_grid import trajectory
 
 
 @pytest.mark.parametrize("x0", [0, 1, 3.7])
