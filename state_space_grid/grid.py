@@ -90,6 +90,45 @@ class Grid:
             loops_list.append(loops)
         return max_duration, x_min, y_min, x_max, y_max, loops_list
 
+    def get_rounded_parameters(self, style, x_min, x_max, y_min, y_max):
+        """returns:
+        (
+            cell width,
+            cell height,
+            rounded x min,
+            rounded y min,
+            rounded x max,
+            rounded y max,
+        )
+        """
+        cell_size_x = (
+            util.calculate_scale(x_max - x_min)
+            if style.tick_increment_x is None
+            else style.tick_increment_x
+        )
+        cell_size_y = (
+            util.calculate_scale(y_max - y_min)
+            if style.tick_increment_y is None
+            else style.tick_increment_y
+        )
+        return (
+            cell_size_x,
+            cell_size_y,
+            x_min - (x_min % cell_size_x),
+            y_min - (y_min % cell_size_y),
+            # todo :: what is this surely there's builtins
+            x_max + cell_size_x - (
+                x_max % cell_size_x
+                if x_max % cell_size_x
+                else cell_size_x
+            ),
+            y_max + cell_size_y - (
+                y_max % cell_size_y
+                if y_max % cell_size_y
+                else cell_size_y
+            ),
+        )
+
     def draw(self, save_as: Optional[str] = None):
         graph = nx.Graph()
         ax = plt.gca()
@@ -97,7 +136,7 @@ class Grid:
         max_duration, x_min, y_min, x_max, y_max, loops_list = self.shared_all_trajectory_process()
 
         cell_size_x, cell_size_y, rounded_x_min, rounded_y_min, rounded_x_max, rounded_y_max \
-            = calculate_extra_stuff(self.style, x_min, x_max, y_min, y_max)
+            = self.get_rounded_parameters(self.style, x_min, x_max, y_min, y_max)
 
         # draw background
         # todo :: whole bunch of stuff that is a bit messy here
@@ -203,7 +242,7 @@ class Grid:
         max_duration, x_min, y_min, x_max, y_max, _ = self.shared_all_trajectory_process()
 
         cell_size_x, cell_size_y, rounded_x_min, rounded_y_min, rounded_x_max, rounded_y_max \
-            = calculate_extra_stuff(self.style, x_min, x_max, y_min, y_max)
+            = self.get_rounded_parameters(self.style, x_min, x_max, y_min, y_max)
 
         trajectory_durations = [traj.data_t[-1] - traj.data_t[0] for traj in self.trajectory_list]
         event_numbers = [len(trajectory.data_x) for trajectory in self.trajectory_list]
@@ -250,46 +289,6 @@ class Grid:
                 for trajectory in self.trajectory_list
             ),
         )
-
-
-def calculate_extra_stuff(style, x_min, x_max, y_min, y_max):
-    """returns:
-    (
-        cell width,
-        cell height,
-        rounded x min,
-        rounded y min,
-        rounded x max,
-        rounded y max,
-    )
-    """
-    cell_size_x = (
-        util.calculate_scale(x_max - x_min)
-        if style.tick_increment_x is None
-        else style.tick_increment_x
-    )
-    cell_size_y = (
-        util.calculate_scale(y_max - y_min)
-        if style.tick_increment_y is None
-        else style.tick_increment_y
-    )
-    return (
-        cell_size_x,
-        cell_size_y,
-        x_min - (x_min % cell_size_x),
-        y_min - (y_min % cell_size_y),
-        # todo :: what is this surely there's builtins
-        x_max + cell_size_x - (
-            x_max % cell_size_x
-            if x_max % cell_size_x
-            else cell_size_x
-        ),
-        y_max + cell_size_y - (
-            y_max % cell_size_y
-            if y_max % cell_size_y
-            else cell_size_y
-        ),
-    )
 
 
 def offset_trajectories(
