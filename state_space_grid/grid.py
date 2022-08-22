@@ -20,6 +20,7 @@ class GridStyle:
     label_font_size: int = 14
     tick_font_size: int = 14
     title_font_size: int = 14
+    # todo :: with so many optionals maybe this is a mess :)
     tick_increment_x: Optional[int] = None
     tick_increment_y: Optional[int] = None
     x_label: Optional[str] = None
