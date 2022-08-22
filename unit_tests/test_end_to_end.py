@@ -30,7 +30,6 @@ def test_2():
             y_min=1
         ),
     )
-    # grid.draw(
     measures = my_grid.get_measures()
     assert measures.mean_duration == 14.8
     assert measures.mean_number_of_events == 8
