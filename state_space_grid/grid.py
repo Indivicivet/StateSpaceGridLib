@@ -299,9 +299,16 @@ def draw_background_and_view(
     )
 
 
-def draw_ticks(grid_style, ax,
-               rounded_x_min, rounded_x_max, rounded_y_min, rounded_y_max,
-               cell_size_x, cell_size_y):
+def draw_ticks(
+    grid_style,
+    ax,
+    rounded_x_min,
+    rounded_x_max,
+    rounded_y_min,
+    rounded_y_max,
+    cell_size_x,
+    cell_size_y,
+):
     # all of this needs to go in a separate function, called with show()
     # we need to store which axis is which column - kick up a fuss if future plots don't match this
     # we also need to store an idea of minimum scale - this is going to fuck us if scales don't match
