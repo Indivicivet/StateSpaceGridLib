@@ -27,15 +27,12 @@ def offset_within_bin(
         if partition_counts[(x, y)] > 1:
             # todo :: numpy
             angle = 2 * math.pi / partition_counts[(x, y)] * visit_count[(x, y)]
-            rotation = (
-                (math.cos(angle), -math.sin(angle)),
-                (math.sin(angle), math.cos(angle)),
-            )
+            sin = math.sin(angle)
+            cos = math.cos(angle)
             direction = (
-                - rotation[0][0] + rotation[0][1],
-                - rotation[1][0] + rotation[1][1],
                 # note: this sign convention is arbitrary and for fun
-            )
+                - cos - sin,
+                - sin + cos,
             )
             offset_x.append(x + direction[0] * cell_size_x / 4)
             offset_y.append(y + direction[1] * cell_size_y / 4)
