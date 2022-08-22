@@ -142,6 +142,9 @@ class Grid:
         )
 
     def draw(self, save_as: Optional[str] = None):
+        """
+        if save_as is None, will .show() the plot
+        """
         graph = nx.Graph()
         ax = plt.gca()
 
