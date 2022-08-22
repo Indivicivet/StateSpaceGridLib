@@ -28,6 +28,7 @@ class GridStyle:
     x_max: Optional[int] = None
     y_min: Optional[int] = None
     y_max: Optional[int] = None
+    # todo :: consider axis-values type for str, Number
     x_order: Optional[List[Union[str, Number]]] = None
     y_order: Optional[List[Union[str, Number]]] = None
     rotate_x_labels: bool = False
