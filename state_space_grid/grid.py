@@ -64,7 +64,6 @@ class GridMeasures:
 class Grid:
     trajectory_list: List[Trajectory]
     quantization: GridQuantization = field(default=GridQuantization)
-    style: GridStyle = field(default_factory=GridStyle)
 
     def shared_all_trajectory_process(self):
         # todo :: sensible name :)
@@ -155,7 +154,11 @@ class Grid:
             something_round(y_max, cell_size_y),
         )
 
-    def draw(self, save_as: Optional[str] = None):
+    def draw(
+        self,
+        save_as: Optional[str] = None,
+        style: GridStyle = field(default_factory=GridStyle),
+    ):
         """
         if save_as is None, will .show() the plot
         """
@@ -247,12 +250,12 @@ class Grid:
         ax.tick_params(left=True, bottom=True, labelleft=True, labelbottom=True)
         ax.tick_params(
             axis='x',
-            labelsize=self.style.tick_font_size,
-            rotation=90 * self.style.rotate_x_labels,
+            labelsize=style.tick_font_size,
+            rotation=90 * style.rotate_x_labels,
         )
         ax.tick_params(
             axis='y',
-            labelsize=self.style.tick_font_size,
+            labelsize=style.tick_font_size,
         )
         ax.xaxis.set_major_locator(ticker.FixedLocator(rounded_x_points))
         ax.yaxis.set_major_locator(ticker.FixedLocator(rounded_y_points))
@@ -266,11 +269,11 @@ class Grid:
         ))
 
         # Set axis labels
-        ax.set_xlabel(self.style.x_label, fontsize=self.style.label_font_size)
-        ax.set_ylabel(self.style.y_label, fontsize=self.style.label_font_size)
+        ax.set_xlabel(style.x_label, fontsize=style.label_font_size)
+        ax.set_ylabel(style.y_label, fontsize=style.label_font_size)
 
-        if self.style.title:
-            ax.set_title(self.style.title, fontsize=self.style.title_font_size)
+        if style.title:
+            ax.set_title(style.title, fontsize=style.title_font_size)
 
         ax.set_aspect('auto')
         plt.tight_layout()
