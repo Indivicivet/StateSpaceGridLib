@@ -14,9 +14,8 @@ def plot_example_data(data_path):
     )
     my_grid = grid.Grid(
         [traj1],
-        style=grid.GridStyle(x_label="variable 1", y_label="variable 2"),
     )
-    my_grid.draw()
+    my_grid.draw(style=grid.GridStyle(x_label="variable 1", y_label="variable 2"))
 
 
 if __name__ == '__main__':
