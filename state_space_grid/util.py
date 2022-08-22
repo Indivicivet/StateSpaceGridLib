@@ -7,9 +7,9 @@ import math
 
 def offset_within_bin(
     x_data,
-    x_scale,
+    cell_size_x,
     y_data,
-    y_scale,
+    cell_size_y,
     bin_counts,
     visit_count,  # todo :: we mutate this :(
 ):
@@ -38,8 +38,8 @@ def offset_within_bin(
                     direction[0]*rotation[0][0] + direction[1]*rotation[0][1],
                     direction[0]*rotation[1][0] + direction[1]*rotation[1][1],
                 )
-            offset_x.append(x + direction[0] * x_scale / 4)
-            offset_y.append(y + direction[1] * y_scale / 4)
+            offset_x.append(x + direction[0] * cell_size_x / 4)
+            offset_y.append(y + direction[1] * cell_size_y / 4)
         else:
             offset_x.append(x)
             offset_y.append(y)
