@@ -18,6 +18,7 @@ def offset_within_bin(
     warning: mutates arguments!!
     in particular, `visit_count`
     """
+    # todo :: this sounds dodgy for multiple trajectories, should write test code
     partition_counts = {
         (x, y): 1 << (count - 1).bit_length()
         for (x, y), count in bin_counts.items()
