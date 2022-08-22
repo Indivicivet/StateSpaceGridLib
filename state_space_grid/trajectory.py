@@ -5,6 +5,9 @@ from dataclasses import dataclass, field
 from itertools import zip_longest
 from typing import ClassVar, Optional
 
+import networkx as nx
+import numpy as np
+
 
 @dataclass
 class TrajectoryStyle:
@@ -117,6 +120,40 @@ class Trajectory:
             )
             - 1
         ) / (total_cells - 1)
+
+    def draw_graph(self, loops, grid_style, graph, max_duration):
+        x_data, y_data, t_data, _ = self.get_states(grid_style.x_order, grid_style.y_order)
+        node_number_positions = dict(enumerate(zip(x_data, y_data)))
+
+        # List of tuples to define edges between nodes
+        edges = (
+                [(i, i + 1) for i in range(len(x_data) - 1)]
+                + [(loop_node, loop_node) for loop_node in loops]
+        )
+
+        durations = list(t2 - t1 for t1, t2 in zip(t_data, t_data[1:]))
+
+        node_sizes = (1000 / max_duration) * np.array(durations)
+
+        # Add nodes and edges to graph
+        graph.add_nodes_from(node_number_positions.keys())
+        graph.add_edges_from(edges)
+
+        # Draw graphs
+        nx.draw_networkx_nodes(graph, node_number_positions, node_size=node_sizes, node_color='indigo')
+        nx.draw_networkx_edges(
+            graph,
+            node_number_positions,
+            node_size=node_sizes,
+            nodelist=list(range(len(x_data))),
+            edgelist=edges,
+            arrows=True,
+            arrowstyle=self.style.arrow_style,
+            node_shape='.',
+            arrowsize=10,
+            width=2,
+            connectionstyle=self.style.connection_style,
+        )
 
     # construct trajectory from legacy trj file
     @classmethod

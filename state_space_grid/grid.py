@@ -192,7 +192,7 @@ class Grid:
         offset = offset_trajectories(self.trajectory_list, self.style, cell_size_x, cell_size_y)
 
         for offset_trajectory, loops in zip(offset, loops_list):
-            draw_graph(offset_trajectory, loops, self.style, graph, max_duration)
+            offset_trajectory.draw_graph(loops, self.style, graph, max_duration)
 
         # all of this needs to go in a separate function, called with show()
         # we need to store which axis is which column - kick up a fuss if future plots don't match this
@@ -344,38 +344,3 @@ def offset_trajectories(
             )
         )
     return new_trajectories
-
-
-def draw_graph(trajectory, loops, grid_style, graph, max_duration):
-    x_data, y_data, t_data, _ = trajectory.get_states(grid_style.x_order, grid_style.y_order)
-    node_number_positions = dict(enumerate(zip(x_data, y_data)))
-
-    # List of tuples to define edges between nodes
-    edges = (
-            [(i, i + 1) for i in range(len(x_data) - 1)]
-            + [(loop_node, loop_node) for loop_node in loops]
-    )
-
-    durations = list(t2 - t1 for t1, t2 in zip(t_data, t_data[1:]))
-
-    node_sizes = (1000 / max_duration) * np.array(durations)
-
-    # Add nodes and edges to graph
-    graph.add_nodes_from(node_number_positions.keys())
-    graph.add_edges_from(edges)
-
-    # Draw graphs
-    nx.draw_networkx_nodes(graph, node_number_positions, node_size=node_sizes, node_color='indigo')
-    nx.draw_networkx_edges(
-        graph,
-        node_number_positions,
-        node_size=node_sizes,
-        nodelist=list(range(len(x_data))),
-        edgelist=edges,
-        arrows=True,
-        arrowstyle=trajectory.style.arrow_style,
-        node_shape='.',
-        arrowsize=10,
-        width=2,
-        connectionstyle=trajectory.style.connection_style,
-    )
