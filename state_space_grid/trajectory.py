@@ -57,52 +57,29 @@ class Trajectory:
         y_ordering: Optional[list] = None
     ) -> tuple[list, list, list, set]:
         if self.style.merge_repeated_states:
-
-            def merge_equal_adjacent_states(
-                    x_data,
-                    y_data,
-                    t_data,
-                    # todo :: this x_ordering, y_ordering is used in multiple places
-                    # consider refactor
-                    x_ordering=None,
-                    y_ordering=None,
+            x_merged = [self.data_x[0]]
+            y_merged = [self.data_y[0]]
+            t_merged = [self.data_t[0]]
+            loops = set()
+            for x, x_1, y, y_1, t in zip(
+                    self.data_x,
+                    self.data_x[1:],
+                    self.data_y,
+                    self.data_y[1:],
+                    self.data_t[1:],
             ):
-                """
-                Merge adjacent equal states and return merged data.
-                Does not edit data within the trajectory as trajectories may
-                contain >2(+time) variables
-                """
-                x_merged = [x_data[0]]
-                y_merged = [y_data[0]]
-                t_merged = [t_data[0]]
-                loops = set()
-                for x, x_1, y, y_1, t in zip(
-                        x_data,
-                        x_data[1:],
-                        y_data,
-                        y_data[1:],
-                        t_data[1:],
-                ):
-                    if (x, y) == (x_1, y_1):
-                        loops.add(len(x_merged) - 1)
-                    else:
-                        x_merged.append(x_1)
-                        y_merged.append(y_1)
-                        t_merged.append(t)
-                t_merged.append(t_data[-1])
-                if x_ordering:
-                    x_merged = [x_ordering.index(val) for val in x_merged]
-                if y_ordering:
-                    y_merged = [y_ordering.index(val) for val in y_merged]
-                return x_merged, y_merged, t_merged, loops
-
-            return merge_equal_adjacent_states(
-                self.data_x,
-                self.data_y,
-                self.data_t,
-                x_ordering,
-                y_ordering,
-            )
+                if (x, y) == (x_1, y_1):
+                    loops.add(len(x_merged) - 1)
+                else:
+                    x_merged.append(x_1)
+                    y_merged.append(y_1)
+                    t_merged.append(t)
+            t_merged.append(self.data_t[-1])
+            if x_ordering:
+                x_merged = [x_ordering.index(val) for val in x_merged]
+            if y_ordering:
+                y_merged = [y_ordering.index(val) for val in y_merged]
+            return x_merged, y_merged, t_merged, loops
 
         def maybe_reorder(data, ordering=None):
             if not ordering:
