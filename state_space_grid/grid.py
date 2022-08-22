@@ -326,14 +326,24 @@ def draw_background_and_view(
     ])
 
     # Set background checkerboard:
-    set_background(
-        rounded_x_min,
-        rounded_y_min,
-        cell_size_x,
-        cell_size_y,
-        rounded_x_max,
-        rounded_y_max,
-        ax,
+    jj, ii = np.mgrid[
+         int(rounded_y_min / cell_size_y):int(rounded_y_max / cell_size_y) + 1,
+         int(rounded_x_min / cell_size_x):int(rounded_x_max / cell_size_x) + 1,
+     ]
+    ax.imshow(
+        # checkerboard
+        (jj + ii) % 2,
+        extent=[
+            int(rounded_x_min) - 0.5 * cell_size_x,
+            int(rounded_x_max) + 0.5 * cell_size_x,
+            int(rounded_y_min) - 0.5 * cell_size_y,
+            int(rounded_y_max) + 0.5 * cell_size_y,
+        ],
+        cmap=ListedColormap([
+            [220 / 256] * 3,
+            [1] * 3,
+        ]),
+        interpolation='none',
     )
 
 
@@ -372,26 +382,4 @@ def draw_graph(trajectory, loops, grid_style, graph, max_duration):
         arrowsize=10,
         width=2,
         connectionstyle=trajectory.style.connection_style,
-    )
-
-
-def set_background(x_min, y_min, x_scale, y_scale, x_max, y_max, ax):
-    jj, ii = np.mgrid[
-         int(y_min / y_scale):int(y_max / y_scale) + 1,
-         int(x_min / x_scale):int(x_max / x_scale) + 1,
-     ]
-    ax.imshow(
-        # checkerboard
-        (jj + ii) % 2,
-        extent=[
-            int(x_min) - 0.5 * x_scale,
-            int(x_max) + 0.5 * x_scale,
-            int(y_min) - 0.5 * y_scale,
-            int(y_max) + 0.5 * y_scale
-        ],
-        cmap=ListedColormap([
-            [220 / 256] * 3,
-            [1] * 3,
-        ]),
-        interpolation='none',
     )
