@@ -126,16 +126,8 @@ class Grid:
                 scale_factor /= 10
             return scale_factor
 
-        cell_size_x = (
-            calculate_scale(x_max - x_min)
-            if self.style.tick_increment_x is None
-            else self.style.tick_increment_x
-        )
-        cell_size_y = (
-            calculate_scale(y_max - y_min)
-            if self.style.tick_increment_y is None
-            else self.style.tick_increment_y
-        )
+        cell_size_x = self.style.tick_increment_x or calculate_scale(x_max - x_min)
+        cell_size_y = self.style.tick_increment_y or calculate_scale(y_max - y_min)
         return (
             cell_size_x,
             cell_size_y,
