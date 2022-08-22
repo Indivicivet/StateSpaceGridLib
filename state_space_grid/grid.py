@@ -134,7 +134,21 @@ class Grid:
         event_numbers = [len(trajectory.data_x) for trajectory in self.trajectory_list]
         visit_numbers = [trajectory.get_num_visits() for trajectory in self.trajectory_list]
         cell_ranges = [trajectory.get_cell_range() for trajectory in self.trajectory_list]
-        bin_counts = get_bin_counts(self.trajectory_list, self.style.x_order, self.style.y_order)
+
+        def maybe_reorder(data, ordering: Optional[list] = None):
+            # todo :: this breaks when ordering is Falsey (but not none) - investigate
+            if not ordering:
+                return data
+            return [ordering.index(val) for val in data]
+
+        bin_counts = Counter()
+        for trajectory in self.trajectory_list:
+            bin_counts += Counter(
+                zip(
+                    maybe_reorder(trajectory.data_x, self.style.x_order),
+                    maybe_reorder(trajectory.data_y, self.style.y_order),
+                )
+            )
 
         # todo :: hmmmmmmMMMMM
         return GridMeasures(
@@ -239,24 +253,6 @@ def process(
         int(max(y_max, temp_y_max)),
         loops,
     )
-
-
-def get_bin_counts(trajectories, x_ordering: list = None, y_ordering: list = None):
-    def maybe_reorder(data, ordering: Optional[list] = None):
-        # todo :: this breaks when ordering is Falsey (but not none) - investigate
-        if not ordering:
-            return data
-        return [ordering.index(val) for val in data]
-
-    bin_counts = Counter()
-    for trajectory in trajectories:
-        bin_counts += Counter(
-            zip(
-                maybe_reorder(trajectory.data_x, x_ordering),
-                maybe_reorder(trajectory.data_y, y_ordering),
-            )
-        )
-    return bin_counts
 
 
 def offset_trajectories(trajectories, grid_style, cell_size_x, cell_size_y):
