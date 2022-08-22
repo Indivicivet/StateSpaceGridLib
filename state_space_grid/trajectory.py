@@ -67,37 +67,37 @@ class Trajectory:
                 return data
             return [ordering.index(x) for x in data]
 
-        if merge_repeated_states:
-            x_merged = [self.data_x[0]]
-            y_merged = [self.data_y[0]]
-            t_merged = [self.data_t[0]]
-            loops = set()
-            for x, x_1, y, y_1, t in zip(
-                    self.data_x,
-                    self.data_x[1:],
-                    self.data_y,
-                    self.data_y[1:],
-                    self.data_t[1:],
-            ):
-                if (x, y) == (x_1, y_1):
-                    loops.add(len(x_merged) - 1)
-                else:
-                    x_merged.append(x_1)
-                    y_merged.append(y_1)
-                    t_merged.append(t)
-            t_merged.append(self.data_t[-1])
+        if not merge_repeated_states:
             return (
-                maybe_reorder(x_merged, x_ordering),
-                maybe_reorder(y_merged, y_ordering),
-                t_merged,
-                loops,
+                maybe_reorder(self.data_x, x_ordering),
+                maybe_reorder(self.data_y, y_ordering),
+                self.data_t,
+                set(),
             )
 
+        x_merged = [self.data_x[0]]
+        y_merged = [self.data_y[0]]
+        t_merged = [self.data_t[0]]
+        loops = set()
+        for x, x_1, y, y_1, t in zip(
+                self.data_x,
+                self.data_x[1:],
+                self.data_y,
+                self.data_y[1:],
+                self.data_t[1:],
+        ):
+            if (x, y) == (x_1, y_1):
+                loops.add(len(x_merged) - 1)
+            else:
+                x_merged.append(x_1)
+                y_merged.append(y_1)
+                t_merged.append(t)
+        t_merged.append(self.data_t[-1])
         return (
-            maybe_reorder(self.data_x, x_ordering),
-            maybe_reorder(self.data_y, y_ordering),
-            self.data_t,
-            set(),
+            maybe_reorder(x_merged, x_ordering),
+            maybe_reorder(y_merged, y_ordering),
+            t_merged,
+            loops,
         )
 
     def calculate_dispersion(
