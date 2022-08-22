@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pandas as pd
 
-import state_space_grid as ssg
+from state_space_grid import grid, trajectory
 
 
 DATA_PATH = Path(__file__).resolve().parent.parent / "examples" / "resources" / "ExampleData1.txt"
@@ -11,15 +11,15 @@ DATA_PATH = Path(__file__).resolve().parent.parent / "examples" / "resources" / 
 # todo :: sensible name
 def test_2():
     data1 = pd.read_csv(DATA_PATH.open())
-    traj1 = ssg.Trajectory(
+    traj1 = trajectory.Trajectory(
         data1["variable 1"].dropna().tolist(),
         data1["variable 2"].dropna().tolist(),
         data1["Onset"].dropna().tolist(),
     )
     # traj1.add_y_ordering(["Low", "Medium", "High"])
-    grid = ssg.Grid(
+    my_grid = grid.Grid(
         [traj1],
-        style=ssg.GridStyle(
+        style=grid.GridStyle(
             title="test 2",
             x_label="variable 1",
             y_label ="variable 2",
@@ -31,7 +31,7 @@ def test_2():
         ),
     )
     # grid.draw(
-    measures = grid.get_measures()
+    measures = my_grid.get_measures()
     assert measures.mean_duration == 14.8
     assert measures.mean_number_of_events == 8
     assert measures.mean_number_of_visits == 7

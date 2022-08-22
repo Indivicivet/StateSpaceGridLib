@@ -9,6 +9,5 @@ https://www.queensu.ca/psychology/sites/psycwww/files/uploaded_files/Faculty/Tom
 
 __version__ = "0.0.1"
 
-
-from state_space_grid.grid import Grid, GridStyle
-from state_space_grid.trajectory import Trajectory, TrajectoryStyle
+from . import grid
+from . import trajectory
