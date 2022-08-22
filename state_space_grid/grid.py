@@ -81,14 +81,12 @@ class Grid:
             if self.style.y_max is not None:
                 y_max = self.style.y_max
 
-            max_duration, x_min, y_min, x_max, y_max, loops =  (
-                max(*(t2 - t1 for t1, t2 in zip(t_data, t_data[1:])), max_duration),
-                int(min(x_min, temp_x_min)),
-                int(min(y_min, temp_y_min)),
-                int(max(x_max, temp_x_max)),
-                int(max(y_max, temp_y_max)),
-                loops,
-            )
+            max_duration = max(*(t2 - t1 for t1, t2 in zip(t_data, t_data[1:])), max_duration)
+            x_min = int(min(x_min, temp_x_min))
+            y_min = int(min(y_min, temp_y_min))
+            x_max = int(max(x_max, temp_x_max))
+            y_max = int(max(y_max, temp_y_max))
+            # todo :: is there a necessary loops reset I've accidentally removed?
             loops_list.append(loops)
         return max_duration, x_min, y_min, x_max, y_max, loops_list
 
