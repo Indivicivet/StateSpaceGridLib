@@ -127,8 +127,8 @@ class Trajectory:
 
         # List of tuples to define edges between nodes
         edges = (
-                [(i, i + 1) for i in range(len(x_data) - 1)]
-                + [(loop_node, loop_node) for loop_node in loops]
+            [(i, i + 1) for i in range(len(x_data) - 1)]
+            + [(loop_node, loop_node) for loop_node in loops]
         )
 
         durations = list(t2 - t1 for t1, t2 in zip(t_data, t_data[1:]))
