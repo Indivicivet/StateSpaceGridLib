@@ -121,7 +121,7 @@ class Trajectory:
             - 1
         ) / (total_cells - 1)
 
-    def draw_graph(self, loops, grid_style, graph, max_duration):
+    def add_to_graph(self, loops, grid_style, graph, max_duration):
         x_data, y_data, t_data, _ = self.get_states(grid_style.x_order, grid_style.y_order)
         node_number_positions = dict(enumerate(zip(x_data, y_data)))
 
