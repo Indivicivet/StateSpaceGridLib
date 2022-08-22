@@ -57,7 +57,13 @@ class Trajectory:
         y_ordering: Optional[list] = None
     ) -> tuple[list, list, list, set]:
         if self.style.merge_repeated_states:
-            return merge_equal_adjacent_states(self.data_x, self.data_y, self.data_t, x_ordering, y_ordering)
+            return merge_equal_adjacent_states(
+                self.data_x,
+                self.data_y,
+                self.data_t,
+                x_ordering,
+                y_ordering,
+            )
 
         def maybe_reorder(data, ordering=None):
             if not ordering:
