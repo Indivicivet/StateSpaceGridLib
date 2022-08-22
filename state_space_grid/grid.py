@@ -256,7 +256,8 @@ class Grid:
         )
 
         def maybe_reorder(data, ordering: Optional[list] = None):
-            # todo :: this breaks when ordering is Falsey (but not none) - investigate
+            # todo :: this is expected behaviour ordering is Falsey (but not none) - investigate
+            # (because it seems like it should only do nothing if ordering=None...)
             if not ordering:
                 return data
             return [ordering.index(val) for val in data]
