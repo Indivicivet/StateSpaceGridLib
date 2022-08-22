@@ -1,3 +1,4 @@
+import math
 from collections import Counter
 from dataclasses import dataclass, field
 from typing import Optional, Union, List, Any, Sequence
@@ -81,8 +82,16 @@ class Grid:
 
             # Get min and max values
             # todo :: this is probably silly...
-            temp_x_min, temp_x_max = util.calculate_min_max(x_data)
-            temp_y_min, temp_y_max = util.calculate_min_max(y_data)
+
+            def calculate_min_max(values):
+                """assumes categorical = string, ordinal = numeric"""
+                # todo :: there may be a better way to deal with these multiple cases
+                if isinstance(values[0], str):
+                    return 0, len(values)
+                return int(min(values)), math.ceil(max(values))
+
+            temp_x_min, temp_x_max = calculate_min_max(x_data)
+            temp_y_min, temp_y_max = calculate_min_max(y_data)
 
             max_duration = max(*(t2 - t1 for t1, t2 in zip(t_data, t_data[1:])), max_duration)
             x_min = min(x_min, int(temp_x_min))

@@ -18,13 +18,6 @@ def calculate_scale(difference):
     return scale_factor
 
 
-def calculate_min_max(values):
-    """assumes categorical = string, ordinal = numeric"""
-    if isinstance(values[0], str):
-        return 0, len(values)
-    return int(min(values)), math.ceil(max(values))
-
-
 def offset_within_bin(
     x_data, x_scale,
     y_data, y_scale,
