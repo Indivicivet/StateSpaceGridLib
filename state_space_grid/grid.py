@@ -319,7 +319,7 @@ class Grid:
             mean_number_of_events=mean(event_numbers),
             mean_number_of_visits=mean(visit_numbers),
             mean_cell_range=mean(cell_ranges),
-            overall_cell_range=sum(1 for x_and_count in bin_counts.values()),
+            overall_cell_range=len(bin_counts),
             # todo :: these should likely be the responsibility of GridMeasures
             mean_duration_per_event=mean(
                 map(lambda x, y: x / y, trajectory_durations, event_numbers)
