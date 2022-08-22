@@ -29,8 +29,9 @@ def offset_within_bin(
             angle = 2 * math.pi / partition_counts[(x, y)] * visit_count[(x, y)] + 0.75 * math.pi
             sin = math.sin(angle)
             cos = math.cos(angle)
-            offset_x.append(x + cos * cell_size_x / 4 * (2**0.5))
-            offset_y.append(y + sin * cell_size_y / 4 * (2**0.5))
+            scale = 2 ** 0.5 / 4
+            offset_x.append(x + cos * cell_size_x * scale)
+            offset_y.append(y + sin * cell_size_y * scale)
         else:
             offset_x.append(x)
             offset_y.append(y)
