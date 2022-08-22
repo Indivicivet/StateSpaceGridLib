@@ -22,8 +22,6 @@ class Trajectory:
     data_t: list
     # todo :: data_t (onsets) should be replaced by durations
 
-    # todo :: unsure whether or not Trajectory.style is the right abstraction
-    style: TrajectoryStyle = field(default_factory=TrajectoryStyle)
     id: int = None  # set in __post_init__
     # static count of number of trajectories - use as a stand in for ID
     # todo :: unsure if this is daft. probably daft?
@@ -119,7 +117,16 @@ class Trajectory:
             - 1
         ) / (total_cells - 1)
 
-    def add_to_graph(self, loops, grid_style, graph, max_duration):
+    def add_to_graph(
+        self,
+        loops,
+        grid_style,
+        graph,
+        max_duration,
+        style=None,
+    ):
+        if style is None:
+            style = TrajectoryStyle()
         x_data, y_data, t_data, _ = self.get_states(grid_style.x_order, grid_style.y_order)
         node_number_positions = dict(enumerate(zip(x_data, y_data)))
 
@@ -144,11 +151,11 @@ class Trajectory:
             nodelist=list(range(len(x_data))),
             edgelist=edges,
             arrows=True,
-            arrowstyle=self.style.arrow_style,
+            arrowstyle=style.arrow_style,
             node_shape='.',
             arrowsize=10,
             width=2,
-            connectionstyle=self.style.connection_style,
+            connectionstyle=style.connection_style,
         )
 
     # construct trajectory from legacy trj file
