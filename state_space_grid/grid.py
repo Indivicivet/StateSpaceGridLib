@@ -197,7 +197,13 @@ class Grid:
 
         # now we draw trajectories
         for offset_trajectory, loops in zip(
-            offset_trajectories(self.trajectory_list, self.style, cell_size_x, cell_size_y),
+            offset_trajectories(
+                self.trajectory_list,
+                cell_size_x,
+                cell_size_y,
+                x_order=self.style.x_order,
+                y_order=self.style.y_order,
+            ),
             loops_list,
         ):
             offset_trajectory.add_to_graph(
@@ -323,9 +329,11 @@ class Grid:
 
 def offset_trajectories(
     trajectories: Sequence[Trajectory],
-    grid_style: GridStyle,
     cell_size_x: float,  # todo :: I actually don't know what these are
     cell_size_y: float,  # todo :: I actually don't know what these are
+    # todo :: better abstraction/etc for these orderings...?
+    x_order=None,
+    y_order=None,
 ) -> list[Trajectory]:
     # todo :: later -- need to think about what this actually does
     # get total bin counts
@@ -334,14 +342,14 @@ def offset_trajectories(
     bin_counts = Counter(
         (x, y)
         for trajectory in trajectories
-        for (x, y) in zip(*trajectory.get_states(grid_style.x_order, grid_style.y_order)[:2])
+        for (x, y) in zip(*trajectory.get_states(x_order, y_order)[:2])
     )
     current_bin_counter = Counter()
     for trajectory in trajectories:
         # todo :: I imagine there's a cleaner way to do this...
         # If same state is repeated, offset states
         # so they don't sit on top of one another:
-        x_data, y_data, t_data, _ = trajectory.get_states(grid_style.x_order, grid_style.y_order)
+        x_data, y_data, t_data, _ = trajectory.get_states(x_order, y_order)
         new_trajectories.append(
             Trajectory(
                 *util.offset_within_bin(
