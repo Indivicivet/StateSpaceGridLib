@@ -126,6 +126,7 @@ class Trajectory:
         node_number_positions = dict(enumerate(zip(x_data, y_data)))
 
         # List of tuples to define edges between nodes
+        # todo :: I wonder if python has a built in multigraph datatype for this
         edges = (
             [(i, i + 1) for i in range(len(x_data) - 1)]
             + [(loop_node, loop_node) for loop_node in loops]
