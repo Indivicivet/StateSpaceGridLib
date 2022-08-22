@@ -19,8 +19,7 @@ style = grid.GridStyle(
 """
 
 
-# todo :: sensible name
-def test_2():
+def test_ExampleData1_measures():
     data1 = pd.read_csv(DATA_PATH.open())
     traj1 = trajectory.Trajectory(
         data1["variable 1"].dropna().tolist(),
