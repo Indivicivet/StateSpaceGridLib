@@ -137,7 +137,7 @@ class Trajectory:
 
         # Add nodes and edges to graph
         graph.add_nodes_from(node_number_positions.keys())
-        graph.add_edges_from(edges)
+        graph.add_edges_from(edges)  # todo :: is this needed? edges specified twice for nx?
 
         # Draw graphs
         nx.draw_networkx_nodes(graph, node_number_positions, node_size=node_sizes, node_color='indigo')
