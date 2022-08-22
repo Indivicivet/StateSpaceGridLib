@@ -1,6 +1,6 @@
 from collections import Counter
 from dataclasses import dataclass, field
-from typing import Optional, Union, List, Any
+from typing import Optional, Union, List, Any, Sequence
 from numbers import Number
 from statistics import mean
 
@@ -255,7 +255,12 @@ def process(
     )
 
 
-def offset_trajectories(trajectories, grid_style, cell_size_x, cell_size_y):
+def offset_trajectories(
+    trajectories: Sequence[Trajectory],
+    grid_style: GridStyle,
+    cell_size_x: float,  # todo :: I actually don't know what these are
+    cell_size_y: float,  # todo :: I actually don't know what these are
+) -> list[Trajectory]:
     # todo :: later -- need to think about what this actually does
     # get total bin counts
     new_trajectories = []
