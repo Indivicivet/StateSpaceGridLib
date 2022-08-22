@@ -21,7 +21,6 @@ class Trajectory:
     data_y: list
     data_t: list
     # todo :: data_t (onsets) should be replaced by durations
-    meta: dict = field(default_factory=dict)
 
     # todo :: unsure whether or not Trajectory.style is the right abstraction
     style: TrajectoryStyle = field(default_factory=TrajectoryStyle)

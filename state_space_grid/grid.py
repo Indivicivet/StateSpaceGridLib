@@ -346,7 +346,6 @@ def offset_trajectories(
                     current_bin_counter,
                 ),
                 t_data,
-                trajectory.meta,
                 trajectory.style,
             )
         )
