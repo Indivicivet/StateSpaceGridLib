@@ -122,8 +122,9 @@ class Trajectory:
         self,
         graph,
         loops,
-        grid_style,
         node_scale,
+        x_ordering=None,
+        y_ordering=None,
         style: Optional[TrajectoryStyle] = None,
     ):
         """
@@ -131,7 +132,7 @@ class Trajectory:
         """
         if style is None:
             style = TrajectoryStyle()
-        x_data, y_data, t_data, _ = self.get_states(grid_style.x_order, grid_style.y_order)
+        x_data, y_data, t_data, _ = self.get_states(x_ordering, y_ordering)
         node_number_positions = dict(enumerate(zip(x_data, y_data)))
 
         # List of tuples to define edges between nodes
