@@ -130,11 +130,7 @@ class Grid:
         cell_size_y = self.style.tick_increment_y or calculate_scale(y_max - y_min)
         def something_round(v, cell):
             # todo :: what is this surely there's builtins
-            return v + cell - (
-                v % cell
-                if v % cell
-                else cell
-            )
+            return v + cell - (v % cell or cell)
         return (
             cell_size_x,
             cell_size_y,
