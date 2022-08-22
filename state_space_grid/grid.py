@@ -244,10 +244,15 @@ class Grid:
         cell_size_x, cell_size_y, rounded_x_min, rounded_y_min, rounded_x_max, rounded_y_max \
             = self.get_rounded_parameters(x_min, x_max, y_min, y_max)
 
-        trajectory_durations = [traj.data_t[-1] - traj.data_t[0] for traj in self.trajectory_list]
-        event_numbers = [len(trajectory.data_x) for trajectory in self.trajectory_list]
-        visit_numbers = [trajectory.get_num_visits() for trajectory in self.trajectory_list]
-        cell_ranges = [trajectory.get_cell_range() for trajectory in self.trajectory_list]
+        trajectory_durations, event_numbers, visit_numbers, cell_ranges = zip(
+            (
+                traj.data_t[-1] - traj.data_t[0],
+                len(traj.data_x),
+                traj.get_num_visits(),
+                traj.get_cell_range()
+            )
+            for traj in self.trajectory_list
+        )
 
         def maybe_reorder(data, ordering: Optional[list] = None):
             # todo :: this breaks when ordering is Falsey (but not none) - investigate
