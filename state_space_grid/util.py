@@ -28,7 +28,7 @@ def offset_within_bin(
         if partition_counts[(x, y)] > 1:
             # note: this sign convention is arbitrary and for fun
             pos_cx = cmath.exp(
-                1j * (2 * math.pi / partition_counts[(x, y)] * visit_count[(x, y)] + 0.75 * math.pi)
+                1j * math.pi * (2 / partition_counts[(x, y)] * visit_count[(x, y)] + 0.75)
             ) * 2 ** 0.5 / 4
             offset_x.append(x + pos_cx.real * cell_size_x)
             offset_y.append(y + pos_cx.imag * cell_size_y)
