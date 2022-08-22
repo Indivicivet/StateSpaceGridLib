@@ -212,14 +212,6 @@ class Grid:
             int(rounded_y_max + 1),
             int(cell_size_y),
         )
-        tick_label_x = (
-                self.style.x_order
-                or [str(i) for i in rounded_x_points]
-        )
-        tick_label_y = (
-                self.style.y_order
-                or [str(i) for i in rounded_y_points]
-        )
         # Set ticks for states
         ax.tick_params(left=True, bottom=True, labelleft=True, labelbottom=True)
         ax.tick_params(
@@ -233,8 +225,14 @@ class Grid:
         )
         ax.xaxis.set_major_locator(ticker.FixedLocator(rounded_x_points))
         ax.yaxis.set_major_locator(ticker.FixedLocator(rounded_y_points))
-        ax.xaxis.set_major_formatter(ticker.FixedFormatter(tick_label_x))
-        ax.yaxis.set_major_formatter(ticker.FixedFormatter(tick_label_y))
+        ax.xaxis.set_major_formatter(ticker.FixedFormatter(
+            self.style.x_order
+            or [str(i) for i in rounded_x_points]
+        ))
+        ax.yaxis.set_major_formatter(ticker.FixedFormatter(
+            self.style.y_order
+            or [str(i) for i in rounded_y_points]
+        ))
 
         # Set axis labels
         ax.set_xlabel(self.style.x_label, fontsize=self.style.label_font_size)
