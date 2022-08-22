@@ -58,9 +58,18 @@ class Trajectory:
     ) -> tuple[list, list, list, set]:
         if self.style.merge_repeated_states:
             return merge_equal_adjacent_states(self.data_x, self.data_y, self.data_t, x_ordering, y_ordering)
-        x_data = [x_ordering.index(val) for val in self.data_x] if x_ordering else self.data_x
-        y_data = [y_ordering.index(val) for val in self.data_y] if y_ordering else self.data_y
-        return x_data, y_data, self.data_t, set()
+
+        def maybe_reorder(data, ordering=None):
+            if not ordering:
+                return data
+            return [ordering.index(x) for x in data]
+
+        return (
+            maybe_reorder(self.data_x, x_ordering),
+            maybe_reorder(self.data_y, y_ordering),
+            self.data_t,
+            set(),
+        )
 
     def calculate_dispersion(
         self,
