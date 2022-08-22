@@ -156,7 +156,7 @@ class Grid:
             ),
             dispersion=mean(
                 calculate_dispersion(
-                    [trajectory],
+                    trajectory,
                     (int((x_max - x_min) / cell_size_x) + 1) * (int((y_max - y_min) / cell_size_y) + 1),
                 )
                 for trajectory in self.trajectory_list
@@ -165,12 +165,11 @@ class Grid:
 
 
 def calculate_dispersion(
-    trajectories: list[Trajectory],
+    trajectory: Trajectory,
     total_cells: int,
 ) -> float:
     cell_durations = Counter(
         t2 - t1
-        for trajectory in trajectories
         for x, y, t1, t2 in zip(
             trajectory.data_x,
             trajectory.data_y,

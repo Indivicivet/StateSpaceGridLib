@@ -12,7 +12,7 @@ def test_calculate_dispersion_single_point(x0, y0, t1, grid_points):
         data_y=[y0],
         data_t=[0, t1],
     )
-    result = grid.calculate_dispersion([traj], grid_points)
+    result = grid.calculate_dispersion(traj, grid_points)
     assert result == 0
 
 
@@ -28,7 +28,7 @@ def test_calculate_dispersion_uniform_distribution(n_times):
         data_y=list(range(n_times)),
         data_t=list(range(n_times + 1)),
     )
-    result = grid.calculate_dispersion([traj], n_times + 1)
+    result = grid.calculate_dispersion(traj, n_times + 1)
     assert result == 0
 
 
@@ -38,6 +38,6 @@ def test_calculate_dispersion_two_points():
         data_y=[1, 5],
         data_t=[0, 1, 3],
     )
-    result = grid.calculate_dispersion([traj], 99)
+    result = grid.calculate_dispersion(traj, 99)
     expected = 0.50510204
     assert abs(result - expected) < 1e-3, f"got {result}, expected about {expected}"
