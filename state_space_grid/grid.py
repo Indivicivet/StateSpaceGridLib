@@ -63,52 +63,31 @@ class Grid:
         y_max = y_min
         loops_list = []
 
-        def process(
-            grid_style: GridStyle,
-            trajectory: Trajectory,
-            max_duration: float,
-            x_min: int,
-            x_max: int,
-            y_min: int,
-            y_max: int,
-        ) -> tuple[float, int, int, int, int, set]:
-            """Get relevant data (and do merging of repeated states if desired)"""
-
-            x_data, y_data, t_data, loops = trajectory.get_states(grid_style.x_order, grid_style.y_order)
+        for trajectory in self.trajectory_list:
+            x_data, y_data, t_data, loops = trajectory.get_states(self.style.x_order, self.style.y_order)
 
             # Get min and max values
             # todo :: this is probably silly...
             temp_x_min, temp_x_max = util.calculate_min_max(x_data)
             temp_y_min, temp_y_max = util.calculate_min_max(y_data)
 
-            if grid_style.x_min is not None:
-                x_min = grid_style.x_min
-            if grid_style.x_max is not None:
-                x_max = grid_style.x_max
+            if self.style.x_min is not None:
+                x_min = self.style.x_min
+            if self.style.x_max is not None:
+                x_max = self.style.x_max
 
-            if grid_style.y_min is not None:
-                y_min = grid_style.y_min
-            if grid_style.y_max is not None:
-                y_max = grid_style.y_max
+            if self.style.y_min is not None:
+                y_min = self.style.y_min
+            if self.style.y_max is not None:
+                y_max = self.style.y_max
 
-            return (
+            max_duration, x_min, y_min, x_max, y_max, loops =  (
                 max(*(t2 - t1 for t1, t2 in zip(t_data, t_data[1:])), max_duration),
                 int(min(x_min, temp_x_min)),
                 int(min(y_min, temp_y_min)),
                 int(max(x_max, temp_x_max)),
                 int(max(y_max, temp_y_max)),
                 loops,
-            )
-
-        for trajectory in self.trajectory_list:
-            max_duration, x_min, y_min, x_max, y_max, loops = process(
-                self.style,
-                trajectory,
-                max_duration,
-                x_min,
-                x_max,
-                y_min,
-                y_max,
             )
             loops_list.append(loops)
         return max_duration, x_min, y_min, x_max, y_max, loops_list
