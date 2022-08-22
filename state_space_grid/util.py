@@ -3,6 +3,7 @@ A number of utility functions acting on data that ideally don't want to appear i
 """
 
 import math
+import cmath
 
 
 def offset_within_bin(
@@ -26,12 +27,11 @@ def offset_within_bin(
     for x, y in zip(x_data, y_data):
         if partition_counts[(x, y)] > 1:
             # note: this sign convention is arbitrary and for fun
-            angle = 2 * math.pi / partition_counts[(x, y)] * visit_count[(x, y)] + 0.75 * math.pi
-            sin = math.sin(angle)
-            cos = math.cos(angle)
-            scale = 2 ** 0.5 / 4
-            offset_x.append(x + cos * cell_size_x * scale)
-            offset_y.append(y + sin * cell_size_y * scale)
+            pos_cx = cmath.exp(
+                1j * (2 * math.pi / partition_counts[(x, y)] * visit_count[(x, y)] + 0.75 * math.pi)
+            ) * 2 ** 0.5 / 4
+            offset_x.append(x + pos_cx.real * cell_size_x)
+            offset_y.append(y + pos_cx.imag * cell_size_y)
         else:
             offset_x.append(x)
             offset_y.append(y)
