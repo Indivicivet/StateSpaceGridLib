@@ -28,8 +28,8 @@ class GridStyle:
     x_max: Optional[int] = None
     y_min: Optional[int] = None
     y_max: Optional[int] = None
-    x_order: List[Union[str, Number]] = field(default_factory=list)
-    y_order: List[Union[str, Number]] = field(default_factory=list)
+    x_order: Optional[List[Union[str, Number]]] = None
+    y_order: Optional[List[Union[str, Number]]] = None
     rotate_x_labels: bool = False
 
 
