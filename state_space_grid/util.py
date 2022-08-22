@@ -23,7 +23,7 @@ def offset_within_bin(
     }
     offset_x = []
     offset_y = []
-    for i, (x, y) in enumerate(zip(x_data, y_data)):
+    for x, y in zip(x_data, y_data):
         if partition_counts[(x, y)] > 1:
             # todo :: numpy
             direction = (-1, 1)  # todo :: ????
