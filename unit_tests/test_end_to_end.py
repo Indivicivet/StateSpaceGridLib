@@ -43,8 +43,8 @@ def test_ExampleData1_measures():
     assert measures.mean_cell_range == 6
     assert measures.overall_cell_range == 6
     assert measures.mean_duration_per_event == 1.85
-    assert abs(measures.mean_duration_per_visit - 2.1142857 < 1e-3)
-    assert abs(measures.mean_duration_per_cell - 2.46666 < 1e-3)
-    assert abs(measures.dispersion - 0.933333 < 1e-3)
+    assert abs(measures.mean_duration_per_visit - 2.1142857) < 1e-3
+    assert abs(measures.mean_duration_per_cell - 2.46666) < 1e-3
+    assert abs(measures.dispersion - 0.933333) < 1e-3
     assert measures.mean_missing_events == 0
     assert measures.mean_missing_duration == 0
