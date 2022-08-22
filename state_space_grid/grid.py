@@ -189,9 +189,10 @@ class Grid:
         )
 
         # now we draw trajectories
-        offset = offset_trajectories(self.trajectory_list, self.style, cell_size_x, cell_size_y)
-
-        for offset_trajectory, loops in zip(offset, loops_list):
+        for offset_trajectory, loops in zip(
+            offset_trajectories(self.trajectory_list, self.style, cell_size_x, cell_size_y),
+            loops_list,
+        ):
             offset_trajectory.draw_graph(loops, self.style, graph, max_duration)
 
         # all of this needs to go in a separate function, called with show()
