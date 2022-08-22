@@ -10,12 +10,6 @@ import numpy as np
 
 
 @dataclass
-class TrajectoryStyle:
-    connection_style: str = "arc3,rad=0.0"
-    arrow_style: str = "-|>"
-
-
-@dataclass
 class Trajectory:
     data_x: list
     data_y: list
@@ -125,13 +119,14 @@ class Trajectory:
         node_scale,
         x_ordering=None,
         y_ordering=None,
-        style: Optional[TrajectoryStyle] = None,
+        # simple params, since they're currently unused:
+        # todo :: could reimplement TrajectoryStyle if will be supported...
+        connection_style: str = "arc3,rad=0.0",
+        arrow_style: str = "-|>",
     ):
         """
         mutates `graph`
         """
-        if style is None:
-            style = TrajectoryStyle()
         x_data, y_data, t_data, _ = self.get_states(x_ordering, y_ordering)
         node_number_positions = dict(enumerate(zip(x_data, y_data)))
 
@@ -156,11 +151,11 @@ class Trajectory:
             nodelist=list(range(len(x_data))),
             edgelist=edges,
             arrows=True,
-            arrowstyle=style.arrow_style,
+            arrowstyle=arrow_style,
             node_shape='.',
             arrowsize=10,
             width=2,
-            connectionstyle=style.connection_style,
+            connectionstyle=connection_style,
         )
 
     # construct trajectory from legacy trj file
