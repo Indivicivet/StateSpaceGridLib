@@ -119,9 +119,9 @@ class Trajectory:
 
     def add_to_graph(
         self,
+        graph,
         loops,
         grid_style,
-        graph,
         node_scale,
         style: Optional[TrajectoryStyle] = None,
     ):
