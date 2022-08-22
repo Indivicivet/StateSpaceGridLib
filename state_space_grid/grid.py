@@ -128,22 +128,20 @@ class Grid:
 
         cell_size_x = self.style.tick_increment_x or calculate_scale(x_max - x_min)
         cell_size_y = self.style.tick_increment_y or calculate_scale(y_max - y_min)
+        def something_round(v, cell):
+            # todo :: what is this surely there's builtins
+            return v + cell - (
+                v % cell
+                if v % cell
+                else cell
+            )
         return (
             cell_size_x,
             cell_size_y,
             x_min - (x_min % cell_size_x),
             y_min - (y_min % cell_size_y),
-            # todo :: what is this surely there's builtins
-            x_max + cell_size_x - (
-                x_max % cell_size_x
-                if x_max % cell_size_x
-                else cell_size_x
-            ),
-            y_max + cell_size_y - (
-                y_max % cell_size_y
-                if y_max % cell_size_y
-                else cell_size_y
-            ),
+            something_round(x_max, cell_size_x),
+            something_round(y_max, cell_size_y),
         )
 
     def draw(self, save_as: Optional[str] = None):
