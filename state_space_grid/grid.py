@@ -155,35 +155,12 @@ class Grid:
                 map(lambda x, y: x / y, trajectory_durations, cell_ranges)
             ),
             dispersion=mean(
-                calculate_dispersion(
-                    trajectory,
+                trajectory.calculate_dispersion(
                     (int((x_max - x_min) / cell_size_x) + 1) * (int((y_max - y_min) / cell_size_y) + 1),
                 )
                 for trajectory in self.trajectory_list
             ),
         )
-
-
-def calculate_dispersion(
-    trajectory: Trajectory,
-    total_cells: int,
-) -> float:
-    cell_durations = Counter(
-        t2 - t1
-        for x, y, t1, t2 in zip(
-            trajectory.data_x,
-            trajectory.data_y,
-            trajectory.data_t,
-            trajectory.data_t[1:],
-        )
-    )
-    return 1 - (
-        (
-            total_cells * sum(x ** 2 for x in cell_durations.values())
-            / cell_durations.total() ** 2
-        )
-        - 1
-    ) / (total_cells - 1)
 
 
 def calculate_extra_stuff(style, x_min, x_max, y_min, y_max):

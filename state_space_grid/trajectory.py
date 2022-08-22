@@ -62,6 +62,27 @@ class Trajectory:
         y_data = [y_ordering.index(val) for val in self.data_y] if y_ordering else self.data_y
         return x_data, y_data, self.data_t, set()
 
+    def calculate_dispersion(
+        self,
+        total_cells: int,
+    ) -> float:
+        cell_durations = Counter(
+            t2 - t1
+            for x, y, t1, t2 in zip(
+                self.data_x,
+                self.data_y,
+                self.data_t,
+                self.data_t[1:],
+            )
+        )
+        return 1 - (
+            (
+                total_cells * sum(x ** 2 for x in cell_durations.values())
+                / cell_durations.total() ** 2
+            )
+            - 1
+        ) / (total_cells - 1)
+
     # construct trajectory from legacy trj file
     @classmethod
     def from_legacy_trj(
