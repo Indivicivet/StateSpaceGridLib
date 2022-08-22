@@ -27,17 +27,15 @@ def offset_within_bin(
         if partition_counts[(x, y)] > 1:
             # todo :: numpy
             direction = (-1, 1)  # todo :: ????
-            angle = 2 * math.pi / partition_counts[(x, y)]
+            angle = 2 * math.pi / partition_counts[(x, y)] * visit_count[(x, y)]
             rotation = (
                 (math.cos(angle), -math.sin(angle)),
                 (math.sin(angle), math.cos(angle)),
             )
-            for rotation_number in range(visit_count[(x, y)]):
-                # todo :: jesus christ
-                direction = (
-                    direction[0]*rotation[0][0] + direction[1]*rotation[0][1],
-                    direction[0]*rotation[1][0] + direction[1]*rotation[1][1],
-                )
+            direction = (
+                direction[0]*rotation[0][0] + direction[1]*rotation[0][1],
+                direction[0]*rotation[1][0] + direction[1]*rotation[1][1],
+            )
             offset_x.append(x + direction[0] * cell_size_x / 4)
             offset_y.append(y + direction[1] * cell_size_y / 4)
         else:
