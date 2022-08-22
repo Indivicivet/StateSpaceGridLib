@@ -113,16 +113,54 @@ class Grid:
         for offset_trajectory, loops in zip(offset, loops_list):
             draw_graph(offset_trajectory, loops, self.style, graph, max_duration)
 
-        draw_ticks(
-            self.style,
-            ax,
-            rounded_x_min,
-            rounded_x_max,
-            rounded_y_min,
-            rounded_y_max,
-            cell_size_x,
-            cell_size_y,
+        # all of this needs to go in a separate function, called with show()
+        # we need to store which axis is which column - kick up a fuss if future plots don't match this
+        # we also need to store an idea of minimum scale - this is going to fuck us if scales don't match
+        # - maybe just tell people if they have scale adjustment problems to specify their own
+
+        # Get tick labels - either numeric or categories
+        # todo :: this bit is a bit of a mess
+        rounded_x_points = range(
+            int(rounded_x_min),
+            int(rounded_x_max + 1),
+            int(cell_size_x),
         )
+        rounded_y_points = range(
+            int(rounded_y_min),
+            int(rounded_y_max + 1),
+            int(cell_size_y),
+        )
+        tick_label_x = (
+                self.style.x_order
+                or [str(i) for i in rounded_x_points]
+        )
+        tick_label_y = (
+                self.style.y_order
+                or [str(i) for i in rounded_y_points]
+        )
+        # Set ticks for states
+        ax.tick_params(left=True, bottom=True, labelleft=True, labelbottom=True)
+        ax.tick_params(
+            axis='x',
+            labelsize=self.style.tick_font_size,
+            rotation=90 * self.style.rotate_x_labels,
+        )
+        ax.tick_params(
+            axis='y',
+            labelsize=self.style.tick_font_size,
+        )
+        ax.xaxis.set_major_locator(ticker.FixedLocator(rounded_x_points))
+        ax.yaxis.set_major_locator(ticker.FixedLocator(rounded_y_points))
+        ax.xaxis.set_major_formatter(ticker.FixedFormatter(tick_label_x))
+        ax.yaxis.set_major_formatter(ticker.FixedFormatter(tick_label_y))
+
+        # Set axis labels
+        ax.set_xlabel(self.style.x_label, fontsize=self.style.label_font_size)
+        ax.set_ylabel(self.style.y_label, fontsize=self.style.label_font_size)
+
+        if self.style.title:
+            ax.set_title(self.style.title, fontsize=self.style.title_font_size)
+
         ax.set_aspect('auto')
         plt.tight_layout()
 
@@ -297,65 +335,6 @@ def draw_background_and_view(
         rounded_y_max,
         ax,
     )
-
-
-def draw_ticks(
-    grid_style,
-    ax,
-    rounded_x_min,
-    rounded_x_max,
-    rounded_y_min,
-    rounded_y_max,
-    cell_size_x,
-    cell_size_y,
-):
-    # all of this needs to go in a separate function, called with show()
-    # we need to store which axis is which column - kick up a fuss if future plots don't match this
-    # we also need to store an idea of minimum scale - this is going to fuck us if scales don't match
-    # - maybe just tell people if they have scale adjustment problems to specify their own
-
-    # Get tick labels - either numeric or categories
-    # todo :: this bit is a bit of a mess
-    rounded_x_points = range(
-        int(rounded_x_min),
-        int(rounded_x_max + 1),
-        int(cell_size_x),
-    )
-    rounded_y_points = range(
-        int(rounded_y_min),
-        int(rounded_y_max + 1),
-        int(cell_size_y),
-    )
-    tick_label_x = (
-            grid_style.x_order
-            or [str(i) for i in rounded_x_points]
-    )
-    tick_label_y = (
-            grid_style.y_order
-            or [str(i) for i in rounded_y_points]
-    )
-    # Set ticks for states
-    ax.tick_params(left=True, bottom=True, labelleft=True, labelbottom=True)
-    ax.tick_params(
-        axis='x',
-        labelsize=grid_style.tick_font_size,
-        rotation=90 * grid_style.rotate_x_labels,
-    )
-    ax.tick_params(
-        axis='y',
-        labelsize=grid_style.tick_font_size,
-    )
-    ax.xaxis.set_major_locator(ticker.FixedLocator(rounded_x_points))
-    ax.yaxis.set_major_locator(ticker.FixedLocator(rounded_y_points))
-    ax.xaxis.set_major_formatter(ticker.FixedFormatter(tick_label_x))
-    ax.yaxis.set_major_formatter(ticker.FixedFormatter(tick_label_y))
-
-    # Set axis labels
-    ax.set_xlabel(grid_style.x_label, fontsize=grid_style.label_font_size)
-    ax.set_ylabel(grid_style.y_label, fontsize=grid_style.label_font_size)
-
-    if grid_style.title:
-        ax.set_title(grid_style.title, fontsize=grid_style.title_font_size)
 
 
 def draw_graph(trajectory, loops, grid_style, graph, max_duration):
