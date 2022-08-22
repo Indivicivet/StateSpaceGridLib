@@ -259,6 +259,7 @@ def offset_trajectories(trajectories, grid_style, cell_size_x, cell_size_y):
     # todo :: later -- need to think about what this actually does
     # get total bin counts
     new_trajectories = []
+    # todo :: are we independently getting bin counts in many places...
     bin_counts = Counter(
         (x, y)
         for trajectory in trajectories
