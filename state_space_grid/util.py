@@ -25,16 +25,16 @@ def offset_within_bin(
     offset_x = []
     offset_y = []
     for x, y in zip(x_data, y_data):
-        if partition_counts[(x, y)] > 1:
-            # note: this sign convention is arbitrary and for fun
-            pos_cx = cmath.exp(
+        pos_cx = (
+            cmath.exp(
+                # note: this sign convention is arbitrary and for fun
                 1j * math.pi * (2 / partition_counts[(x, y)] * visit_count[(x, y)] + 0.75)
             ) * 2 ** 0.5 / 4
-            offset_x.append(x + pos_cx.real * cell_size_x)
-            offset_y.append(y + pos_cx.imag * cell_size_y)
-        else:
-            offset_x.append(x)
-            offset_y.append(y)
+            if partition_counts[(x, y)] > 1
+            else 0
+        )
+        offset_x.append(x + pos_cx.real * cell_size_x)
+        offset_y.append(y + pos_cx.imag * cell_size_y)
         visit_count[(x, y)] += 1
 
     return offset_x, offset_y
