@@ -66,6 +66,16 @@ class Grid:
         y_max = y_min
         loops_list = []
 
+        if self.style.x_min is not None:
+            x_min = self.style.x_min
+        if self.style.x_max is not None:
+            x_max = self.style.x_max
+
+        if self.style.y_min is not None:
+            y_min = self.style.y_min
+        if self.style.y_max is not None:
+            y_max = self.style.y_max
+
         for trajectory in self.trajectory_list:
             x_data, y_data, t_data, loops = trajectory.get_states(self.style.x_order, self.style.y_order)
 
@@ -73,16 +83,6 @@ class Grid:
             # todo :: this is probably silly...
             temp_x_min, temp_x_max = util.calculate_min_max(x_data)
             temp_y_min, temp_y_max = util.calculate_min_max(y_data)
-
-            if self.style.x_min is not None:
-                x_min = self.style.x_min
-            if self.style.x_max is not None:
-                x_max = self.style.x_max
-
-            if self.style.y_min is not None:
-                y_min = self.style.y_min
-            if self.style.y_max is not None:
-                y_max = self.style.y_max
 
             max_duration = max(*(t2 - t1 for t1, t2 in zip(t_data, t_data[1:])), max_duration)
             x_min = min(x_min, int(temp_x_min))
