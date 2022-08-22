@@ -38,4 +38,5 @@ def offset_within_bin(
         visit_count[(x, y)] += 1
 
     return offset_x, offset_y
-    # todo :: should really return x_data', y_data', visit_count' also eh?
+    # todo :: should really return visit_count' also eh?
+    # (note: we don't change x_data and y_data -- is that incorrect?!)
