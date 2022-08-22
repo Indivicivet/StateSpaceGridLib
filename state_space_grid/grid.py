@@ -177,21 +177,14 @@ class Grid:
         # draw background
         # todo :: whole bunch of stuff that is a bit messy here
         # Make an estimate for scale size of checkerboard grid sizing
-
-        x_padding = cell_size_x / 2
-        y_padding = cell_size_y / 2
-
-        # Set view of axes
         ax.set_xlim([
-            rounded_x_min - x_padding,
-            rounded_x_max + x_padding,
+            rounded_x_min - cell_size_x / 2,
+            rounded_x_max + cell_size_x / 2,
         ])
         ax.set_ylim([
-            rounded_y_min - y_padding,
-            rounded_y_max + y_padding,
+            rounded_y_min - cell_size_y / 2,
+            rounded_y_max + cell_size_y / 2,
         ])
-
-        # Set background checkerboard:
         ax.imshow(
             # checkerboard
             sum(
