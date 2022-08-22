@@ -125,6 +125,9 @@ class Trajectory:
         node_scale,
         style: Optional[TrajectoryStyle] = None,
     ):
+        """
+        mutates `graph`
+        """
         if style is None:
             style = TrajectoryStyle()
         x_data, y_data, t_data, _ = self.get_states(grid_style.x_order, grid_style.y_order)
