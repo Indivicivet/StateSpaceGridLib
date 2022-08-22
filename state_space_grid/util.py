@@ -5,19 +5,6 @@ A number of utility functions acting on data that ideally don't want to appear i
 import math
 
 
-def calculate_scale(difference):
-    """
-    return desired scale
-    implemented as the biggest power of 10 smaller than the difference
-    """
-    scale_factor = 1
-    while scale_factor < difference:
-        scale_factor *= 10
-    while scale_factor > difference:
-        scale_factor /= 10
-    return scale_factor
-
-
 def offset_within_bin(
     x_data, x_scale,
     y_data, y_scale,

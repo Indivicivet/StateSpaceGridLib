@@ -113,13 +113,26 @@ class Grid:
             rounded y max,
         )
         """
+
+        def calculate_scale(difference):
+            """
+            return desired scale
+            implemented as the biggest power of 10 smaller than the difference
+            """
+            scale_factor = 1
+            while scale_factor < difference:
+                scale_factor *= 10
+            while scale_factor > difference:
+                scale_factor /= 10
+            return scale_factor
+
         cell_size_x = (
-            util.calculate_scale(x_max - x_min)
+            calculate_scale(x_max - x_min)
             if self.style.tick_increment_x is None
             else self.style.tick_increment_x
         )
         cell_size_y = (
-            util.calculate_scale(y_max - y_min)
+            calculate_scale(y_max - y_min)
             if self.style.tick_increment_y is None
             else self.style.tick_increment_y
         )
