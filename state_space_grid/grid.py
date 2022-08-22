@@ -22,10 +22,12 @@ class GridStyle:
     tick_font_size: int = 14
     title_font_size: int = 14
     # todo :: with so many optionals maybe this is a mess :)
+    # todo :: the following tick_increment/labels are unused, do we want to support?
     tick_increment_x: Optional[int] = None
     tick_increment_y: Optional[int] = None
     x_label: Optional[str] = None
     y_label: Optional[str] = None
+    # todo :: the following x/y_min/max are unused, do we want to support?
     x_min: Optional[int] = None  # todo :: are they floats?
     x_max: Optional[int] = None
     y_min: Optional[int] = None
