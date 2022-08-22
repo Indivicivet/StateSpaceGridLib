@@ -32,14 +32,6 @@ class GridStyle:
     y_order: List[Union[str, Number]] = field(default_factory=list)
     rotate_x_labels: bool = False
 
-    @property
-    def x_minmax_given(self):
-        return self.x_min is not None, self.x_max is not None
-
-    @property
-    def y_minmax_given(self):
-        return self.y_min is not None, self.y_max is not None
-
 
 @dataclass
 class GridMeasures:
