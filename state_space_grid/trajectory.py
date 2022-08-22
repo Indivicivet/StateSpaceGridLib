@@ -117,6 +117,8 @@ def merge_equal_adjacent_states(
     x_data,
     y_data,
     t_data,
+    # todo :: this x_ordering, y_ordering is used in multiple places
+    # consider refactor
     x_ordering=None,
     y_ordering=None,
 ):
