@@ -289,6 +289,7 @@ class Grid:
             ),
             dispersion=mean(
                 trajectory.calculate_dispersion(
+                    # todo :: what is this nonsense :)
                     (int((x_max - x_min) / cell_size_x) + 1) * (int((y_max - y_min) / cell_size_y) + 1),
                 )
                 for trajectory in self.trajectory_list
