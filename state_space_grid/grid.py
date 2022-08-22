@@ -358,10 +358,7 @@ def draw_graph(trajectory, loops, grid_style, graph, max_duration):
 
     durations = list(t2 - t1 for t1, t2 in zip(t_data, t_data[1:]))
 
-    node_sizes = list(  # todo :: maybe redundant list()
-        (1000 / max_duration)
-        * np.array(durations)
-    )
+    node_sizes = (1000 / max_duration) * np.array(durations)
 
     # Add nodes and edges to graph
     graph.add_nodes_from(node_number_positions.keys())
