@@ -20,6 +20,8 @@ class Trajectory:
     data_t: list
     # todo :: data_t (onsets) should be replaced by durations
     meta: dict = field(default_factory=dict)
+
+    # todo :: unsure whether or not Trajectory.style is the right abstraction
     style: TrajectoryStyle = field(default_factory=TrajectoryStyle)
     id: int = None  # set in __post_init__
     # static count of number of trajectories - use as a stand in for ID
