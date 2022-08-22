@@ -6,9 +6,12 @@ import math
 
 
 def offset_within_bin(
-    x_data, x_scale,
-    y_data, y_scale,
-    bin_counts, visit_count,
+    x_data,
+    x_scale,
+    y_data,
+    y_scale,
+    bin_counts,
+    visit_count,
 ):
     """warning: mutates arguments!!"""
     partition_counts = {
