@@ -235,14 +235,14 @@ def process(
     temp_x_min, temp_x_max = util.calculate_min_max(x_data)
     temp_y_min, temp_y_max = util.calculate_min_max(y_data)
 
-    if grid_style.x_minmax_given[0]:
+    if grid_style.x_min is not None:
         x_min = grid_style.x_min
-    if grid_style.x_minmax_given[1]:
+    if grid_style.x_max is not None:
         x_max = grid_style.x_max
 
-    if grid_style.x_minmax_given[0]:
+    if grid_style.y_min is not None:
         y_min = grid_style.y_min
-    if grid_style.x_minmax_given[1]:
+    if grid_style.y_max is not None:
         y_max = grid_style.y_max
 
     return (
