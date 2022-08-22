@@ -11,9 +11,12 @@ def offset_within_bin(
     y_data,
     y_scale,
     bin_counts,
-    visit_count,
+    visit_count,  # todo :: we mutate this :(
 ):
-    """warning: mutates arguments!!"""
+    """
+    warning: mutates arguments!!
+    in particular, `visit_count`
+    """
     partition_counts = {
         (x, y): 1 << (count - 1).bit_length()
         for (x, y), count in bin_counts.items()
