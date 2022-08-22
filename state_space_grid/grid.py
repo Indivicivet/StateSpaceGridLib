@@ -200,7 +200,7 @@ class Grid:
             offset_trajectories(self.trajectory_list, self.style, cell_size_x, cell_size_y),
             loops_list,
         ):
-            offset_trajectory.add_to_graph(loops, self.style, graph, 1000 / max_duration)
+            offset_trajectory.add_to_graph(graph, loops, self.style, 1000 / max_duration)
 
         # all of this needs to go in a separate function, called with show()
         # we need to store which axis is which column - kick up a fuss if future plots don't match this
