@@ -26,12 +26,12 @@ def offset_within_bin(
     for x, y in zip(x_data, y_data):
         if partition_counts[(x, y)] > 1:
             # todo :: numpy
-            angle = 2 * math.pi / partition_counts[(x, y)] * visit_count[(x, y)]
+            angle = 2 * math.pi / partition_counts[(x, y)] * visit_count[(x, y)] + 0.75 * math.pi
             sin = math.sin(angle)
             cos = math.cos(angle)
             # note: this sign convention is arbitrary and for fun
-            offset_x.append(x + (-cos - sin) * cell_size_x / 4)
-            offset_y.append(y + (-sin + cos) * cell_size_y / 4)
+            offset_x.append(x + cos * cell_size_x / 4 * (2**0.5))
+            offset_y.append(y + sin * cell_size_y / 4 * (2**0.5))
         else:
             offset_x.append(x)
             offset_y.append(y)
