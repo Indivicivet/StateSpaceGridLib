@@ -205,8 +205,10 @@ class Grid:
             offset_trajectory.add_to_graph(
                 graph=graph,
                 loops=loops,
-                style=self.style,
                 node_scale=1000 / max_duration,
+                # todo :: variable name consistency...
+                x_ordering=self.style.x_order,
+                y_ordering=self.style.y_order,
             )
 
         # all of this needs to go in a separate function, called with show()
