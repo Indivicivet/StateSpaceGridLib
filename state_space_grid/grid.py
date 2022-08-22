@@ -245,7 +245,7 @@ class Grid:
         cell_size_x, cell_size_y, rounded_x_min, rounded_y_min, rounded_x_max, rounded_y_max \
             = self.get_rounded_parameters(x_min, x_max, y_min, y_max)
 
-        trajectory_durations, event_numbers, visit_numbers, cell_ranges = zip(
+        trajectory_durations, event_numbers, visit_numbers, cell_ranges = zip(*[
             (
                 traj.data_t[-1] - traj.data_t[0],
                 len(traj.data_x),
@@ -253,7 +253,7 @@ class Grid:
                 traj.get_cell_range()
             )
             for traj in self.trajectory_list
-        )
+        ])
 
         def maybe_reorder(data, ordering: Optional[list] = None):
             # todo :: this is expected behaviour ordering is Falsey (but not none) - investigate
