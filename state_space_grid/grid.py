@@ -99,15 +99,45 @@ class Grid:
         cell_size_x, cell_size_y, rounded_x_min, rounded_y_min, rounded_x_max, rounded_y_max \
             = calculate_extra_stuff(self.style, x_min, x_max, y_min, y_max)
 
-        draw_background_and_view(
-            ax,
-            cell_size_x,
-            cell_size_y,
-            rounded_x_min,
-            rounded_x_max,
-            rounded_y_min,
-            rounded_y_max,
+        # draw background
+        # todo :: whole bunch of stuff that is a bit messy here
+        # Make an estimate for scale size of checkerboard grid sizing
+
+        x_padding = cell_size_x / 2
+        y_padding = cell_size_y / 2
+
+        # Set view of axes
+        ax.set_xlim([
+            rounded_x_min - x_padding,
+            rounded_x_max + x_padding,
+        ])
+        ax.set_ylim([
+            rounded_y_min - y_padding,
+            rounded_y_max + y_padding,
+        ])
+
+        # Set background checkerboard:
+        jj, ii = np.mgrid[
+                 int(rounded_y_min / cell_size_y):int(rounded_y_max / cell_size_y) + 1,
+                 int(rounded_x_min / cell_size_x):int(rounded_x_max / cell_size_x) + 1,
+                 ]
+        ax.imshow(
+            # checkerboard
+            (jj + ii) % 2,
+            extent=[
+                int(rounded_x_min) - 0.5 * cell_size_x,
+                int(rounded_x_max) + 0.5 * cell_size_x,
+                int(rounded_y_min) - 0.5 * cell_size_y,
+                int(rounded_y_max) + 0.5 * cell_size_y,
+            ],
+            cmap=ListedColormap([
+                [220 / 256] * 3,
+                [1] * 3,
+            ]),
+            interpolation='none',
         )
+
+        # now we draw trajectories
         offset = offset_trajectories(self.trajectory_list, self.style, cell_size_x, cell_size_y)
 
         for offset_trajectory, loops in zip(offset, loops_list):
@@ -298,53 +328,6 @@ def offset_trajectories(
             )
         )
     return new_trajectories
-
-
-def draw_background_and_view(
-    ax,
-    cell_size_x,
-    cell_size_y,
-    rounded_x_min,
-    rounded_x_max,
-    rounded_y_min,
-    rounded_y_max,
-):
-    # todo :: whole bunch of stuff that is a bit messy here
-    # Make an estimate for scale size of checkerboard grid sizing
-
-    x_padding = cell_size_x / 2
-    y_padding = cell_size_y / 2
-
-    # Set view of axes
-    ax.set_xlim([
-        rounded_x_min - x_padding,
-        rounded_x_max + x_padding,
-    ])
-    ax.set_ylim([
-        rounded_y_min - y_padding,
-        rounded_y_max + y_padding,
-    ])
-
-    # Set background checkerboard:
-    jj, ii = np.mgrid[
-         int(rounded_y_min / cell_size_y):int(rounded_y_max / cell_size_y) + 1,
-         int(rounded_x_min / cell_size_x):int(rounded_x_max / cell_size_x) + 1,
-     ]
-    ax.imshow(
-        # checkerboard
-        (jj + ii) % 2,
-        extent=[
-            int(rounded_x_min) - 0.5 * cell_size_x,
-            int(rounded_x_max) + 0.5 * cell_size_x,
-            int(rounded_y_min) - 0.5 * cell_size_y,
-            int(rounded_y_max) + 0.5 * cell_size_y,
-        ],
-        cmap=ListedColormap([
-            [220 / 256] * 3,
-            [1] * 3,
-        ]),
-        interpolation='none',
-    )
 
 
 def draw_graph(trajectory, loops, grid_style, graph, max_duration):
