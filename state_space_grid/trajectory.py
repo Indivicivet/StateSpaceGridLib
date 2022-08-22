@@ -56,6 +56,12 @@ class Trajectory:
         x_ordering: Optional[list]= None,
         y_ordering: Optional[list] = None
     ) -> tuple[list, list, list, set]:
+        # todo :: can we deal with reordering at the call site?
+        def maybe_reorder(data, ordering=None):
+            if not ordering:
+                return data
+            return [ordering.index(x) for x in data]
+
         if self.style.merge_repeated_states:
             x_merged = [self.data_x[0]]
             y_merged = [self.data_y[0]]
@@ -75,16 +81,12 @@ class Trajectory:
                     y_merged.append(y_1)
                     t_merged.append(t)
             t_merged.append(self.data_t[-1])
-            if x_ordering:
-                x_merged = [x_ordering.index(val) for val in x_merged]
-            if y_ordering:
-                y_merged = [y_ordering.index(val) for val in y_merged]
-            return x_merged, y_merged, t_merged, loops
-
-        def maybe_reorder(data, ordering=None):
-            if not ordering:
-                return data
-            return [ordering.index(x) for x in data]
+            return (
+                maybe_reorder(x_merged, x_ordering),
+                maybe_reorder(y_merged, y_ordering),
+                t_merged,
+                loops,
+            )
 
         return (
             maybe_reorder(self.data_x, x_ordering),
