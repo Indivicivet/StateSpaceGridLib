@@ -26,6 +26,8 @@ class GridStyle:
     x_label: Optional[str] = None
     y_label: Optional[str] = None
     rotate_x_labels: bool = False
+    checker_light: Sequence[float] = (220 / 256, ) * 3
+    checker_dark: Sequence[float] = (1, ) * 3
 
 
 # todo :: is this ideal class name? maybe.
@@ -198,8 +200,8 @@ class Grid:
                 int(rounded_y_max) + 0.5 * cell_size_y,
             ],
             cmap=ListedColormap([
-                [220 / 256] * 3,
-                [1] * 3,
+                style.checker_dark,
+                style.checker_light,
             ]),
             interpolation='none',
         )
