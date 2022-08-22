@@ -103,6 +103,7 @@ class Grid:
         return max_duration, x_min, y_min, x_max, y_max, loops_list
 
     def get_rounded_parameters(self, x_min, x_max, y_min, y_max):
+        # todo :: types will make the weird rounding behaviour here obvious, I hope...
         """returns:
         (
             cell width,
