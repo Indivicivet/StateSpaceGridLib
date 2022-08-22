@@ -124,7 +124,7 @@ class Trajectory:
         grid_style,
         graph,
         max_duration,
-        style=None,
+        style: Optional[TrajectoryStyle] = None,
     ):
         if style is None:
             style = TrajectoryStyle()
