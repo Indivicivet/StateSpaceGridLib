@@ -319,7 +319,7 @@ def offset_trajectories(
     grid_style: GridStyle,
     cell_size_x: float,  # todo :: I actually don't know what these are
     cell_size_y: float,  # todo :: I actually don't know what these are
-) -> list[Trajectory]:
+) -> List[Trajectory]:
     # todo :: later -- need to think about what this actually does
     # get total bin counts
     new_trajectories = []

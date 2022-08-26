@@ -3,7 +3,7 @@ import warnings
 from collections import Counter
 from dataclasses import dataclass, field
 from itertools import zip_longest
-from typing import ClassVar, Optional
+from typing import ClassVar, Optional, Tuple
 
 import networkx as nx
 import numpy as np
@@ -60,7 +60,7 @@ class Trajectory:
         self,
         x_ordering: Optional[list]= None,
         y_ordering: Optional[list] = None
-    ) -> tuple[list, list, list, set]:
+    ) -> Tuple[list, list, list, set]:
         # todo :: can we deal with reordering at the call site?
         def maybe_reorder(data, ordering=None):
             if not ordering:
@@ -116,7 +116,7 @@ class Trajectory:
         return 1 - (
             (
                 total_cells * sum(x ** 2 for x in cell_durations.values())
-                / cell_durations.total() ** 2
+                / sum(cell_durations.values()) ** 2
             )
             - 1
         ) / (total_cells - 1)
