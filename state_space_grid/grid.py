@@ -239,10 +239,16 @@ class Grid:
 
             # Add nodes and edges to graph
             graph.add_nodes_from(node_number_positions.keys())
-            graph.add_edges_from(edges)  # todo :: is this needed? edges specified twice for nx?
+            # todo :: is this needed? edges specified twice for nx?
+            graph.add_edges_from(edges)
 
             # Draw graphs
-            nx.draw_networkx_nodes(graph, node_number_positions, node_size=node_sizes, node_color='indigo')
+            nx.draw_networkx_nodes(
+                graph,
+                node_number_positions,
+                node_size=node_sizes,
+                node_color="indigo",
+            )
             nx.draw_networkx_edges(
                 graph,
                 node_number_positions,
@@ -251,7 +257,7 @@ class Grid:
                 edgelist=edges,
                 arrows=True,
                 arrowstyle=arrow_style,
-                node_shape='.',
+                node_shape=".",
                 arrowsize=10,
                 width=2,
                 connectionstyle=connection_style,
