@@ -162,6 +162,9 @@ class Grid:
         self,
         save_as: Optional[str] = None,
         style: GridStyle = field(default_factory=GridStyle),
+        # todo :: could reimplement TrajectoryStyle if will be supported...
+        connection_style: str = "arc3,rad=0.0",
+        arrow_style: str = "-|>",
     ):
         """
         if save_as is None, will .show() the plot
@@ -219,13 +222,40 @@ class Grid:
             ),
             loops_list,
         ):
-            offset_trajectory.add_to_graph(
-                graph=graph,
-                loops=loops,
-                node_scale=1000 / max_duration,
-                # todo :: variable name consistency...
-                x_ordering=self.quantization.x_order,
-                y_ordering=self.quantization.y_order,
+            x_data, y_data, t_data, _ = offset_trajectory.get_states(
+                self.quantization.x_order, self.quantization.y_order
+            )
+            node_number_positions = dict(enumerate(zip(x_data, y_data)))
+
+            # List of tuples to define edges between nodes
+            # todo :: I wonder if python has a built in multigraph datatype for this
+            edges = (
+                    [(i, i + 1) for i in range(len(x_data) - 1)]
+                    + [(loop_node, loop_node) for loop_node in loops]
+            )
+            node_sizes = (
+                (1000 / max_duration)
+                * np.array([t2 - t1 for t1, t2 in zip(t_data, t_data[1:])])
+            )
+
+            # Add nodes and edges to graph
+            graph.add_nodes_from(node_number_positions.keys())
+            graph.add_edges_from(edges)  # todo :: is this needed? edges specified twice for nx?
+
+            # Draw graphs
+            nx.draw_networkx_nodes(graph, node_number_positions, node_size=node_sizes, node_color='indigo')
+            nx.draw_networkx_edges(
+                graph,
+                node_number_positions,
+                node_size=node_sizes,
+                nodelist=list(range(len(x_data))),
+                edgelist=edges,
+                arrows=True,
+                arrowstyle=arrow_style,
+                node_shape='.',
+                arrowsize=10,
+                width=2,
+                connectionstyle=connection_style,
             )
 
         # all of this needs to go in a separate function, called with show()

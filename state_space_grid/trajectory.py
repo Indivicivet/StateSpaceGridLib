@@ -111,52 +111,6 @@ class Trajectory:
             - 1
         ) / (total_cells - 1)
 
-    def add_to_graph(
-        self,
-        graph,
-        loops,
-        node_scale,
-        x_ordering=None,
-        y_ordering=None,
-        # simple params, since they're currently unused:
-        # todo :: could reimplement TrajectoryStyle if will be supported...
-        connection_style: str = "arc3,rad=0.0",
-        arrow_style: str = "-|>",
-    ):
-        """
-        mutates `graph`
-        """
-        x_data, y_data, t_data, _ = self.get_states(x_ordering, y_ordering)
-        node_number_positions = dict(enumerate(zip(x_data, y_data)))
-
-        # List of tuples to define edges between nodes
-        # todo :: I wonder if python has a built in multigraph datatype for this
-        edges = (
-            [(i, i + 1) for i in range(len(x_data) - 1)]
-            + [(loop_node, loop_node) for loop_node in loops]
-        )
-        node_sizes = node_scale * np.array([t2 - t1 for t1, t2 in zip(t_data, t_data[1:])])
-
-        # Add nodes and edges to graph
-        graph.add_nodes_from(node_number_positions.keys())
-        graph.add_edges_from(edges)  # todo :: is this needed? edges specified twice for nx?
-
-        # Draw graphs
-        nx.draw_networkx_nodes(graph, node_number_positions, node_size=node_sizes, node_color='indigo')
-        nx.draw_networkx_edges(
-            graph,
-            node_number_positions,
-            node_size=node_sizes,
-            nodelist=list(range(len(x_data))),
-            edgelist=edges,
-            arrows=True,
-            arrowstyle=arrow_style,
-            node_shape='.',
-            arrowsize=10,
-            width=2,
-            connectionstyle=connection_style,
-        )
-
     # construct trajectory from legacy trj file
     @classmethod
     def from_legacy_trj(
