@@ -53,8 +53,10 @@ class GridMeasures:
     mean_duration_per_visit: float = 0
     mean_duration_per_cell: float = 0
     dispersion: float = 0
-    mean_missing_events: float = 0
-    mean_missing_duration: float = 0
+    #mean_missing_events: float = 0
+    #mean_missing_duration: float = 0
+    visited_entropy: float = 0
+    duaration_entropy: float = 0
 
 
 @dataclass
@@ -110,6 +112,8 @@ class Grid:
         visit_numbers = [trajectory.get_num_visits() for trajectory in self.trajectory_list]
         cell_ranges = [trajectory.get_cell_range() for trajectory in self.trajectory_list]
         bin_counts = get_bin_counts(self.trajectory_list, self.style.x_order, self.style.y_order)
+        visit_counts = get_visit_counts_per_traj(self.trajectory_list)
+        visit_durations = get_visit_durations_per_traj(self.trajectory_list)
 
         # todo :: hmmmmmmMMMMM
         return GridMeasures(
@@ -118,7 +122,7 @@ class Grid:
             mean_number_of_events=mean(event_numbers),
             mean_number_of_visits=mean(visit_numbers),
             mean_cell_range=mean(cell_ranges),
-            overall_cell_range=sum(1 for x_and_count in bin_counts.values()
+            overall_cell_range=sum(1 for _ in bin_counts.values()
             ),
             mean_duration_per_event=mean(
                 map(lambda x, y: x / y, trajectory_durations, event_numbers)
@@ -133,7 +137,9 @@ class Grid:
                 mean(calculate_dispersion(
                         [trajectory], x_max, x_min, y_max, y_min,
                         cell_size_x, cell_size_y)
-                     for trajectory in self.trajectory_list))
+                     for trajectory in self.trajectory_list)),
+            visited_entropy=mean(sum(x/total_count for x in cell_counts)
+                                 for cell_counts, total_count in zip(visit_counts, visit_numbers))
         )
 
 
@@ -215,6 +221,45 @@ def get_bin_counts(trajectories, x_ordering: list = None, y_ordering: list = Non
         for x, y in zip(x_data, y_data):
             bin_counts[(x, y)] += 1
     return bin_counts
+
+
+def get_visit_counts_per_traj(trajectories):
+    counts = []
+    for trajectory in trajectories:
+        bin_counts = Counter()
+        x_data = trajectory.data_x
+        y_data = trajectory.data_y
+        bin_counts[(x_data[0], y_data[0])] += 1
+        for x, x_1, y, y_1 in zip(x_data, x_data[1:], y_data, y_data[1:]):
+            if (x, y) != (x_1, y_1):
+                bin_counts[(x_1, y_1)] += 1
+        counts.append(bin_counts)
+    return counts
+
+
+def get_visit_durations_per_traj(trajectories):
+    counts = []
+    for trajectory in trajectories:
+        bin_counts = Counter()
+        x_data = trajectory.data_x
+        y_data = trajectory.data_y
+        t_data = trajectory.data_t
+        bin_counts[(x_data[0], y_data[0])] += 1
+        for x, y, t in zip(x_data, y_data, t_data):
+            bin_counts[(x, y)] += t
+        counts.append(bin_counts)
+    return counts
+
+
+def get_durations(trajectories):
+    cell_durations = Counter()
+    for trajectory in trajectories:
+        for duration, x, y in zip(
+                (t2 - t1 for t1, t2 in zip(trajectory.data_t, trajectory.data_t[1:])),
+                trajectory.data_x,
+                trajectory.data_y
+        ):
+            cell_durations[(x, y)] += duration
 
 
 def offset_trajectories(trajectories, grid_style, cell_size_x, cell_size_y):
