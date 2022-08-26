@@ -230,8 +230,10 @@ class Grid:
             # List of tuples to define edges between nodes
             # todo :: I wonder if python has a built in multigraph datatype for this
             edges = (
-                    [(i, i + 1) for i in range(len(x_data) - 1)]
-                    + [(loop_node, loop_node) for loop_node in loops]
+                # todo :: it may be nice if these were ordered? :)
+                # i.e. loops interleaved appropriately between links
+                [(i, i + 1) for i in range(len(x_data) - 1)]
+                + [(loop_node, loop_node) for loop_node in loops]
             )
             node_sizes = (1000 / max_duration) * np.diff(t_data)
 
