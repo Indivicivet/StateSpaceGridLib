@@ -69,7 +69,7 @@ class Grid:
     trajectory_list: List[Trajectory]
     quantization: GridQuantization = field(default=GridQuantization)
 
-    def shared_all_trajectory_process(self):
+    def __shared_all_trajectory_process(self):
         # todo :: sensible name :)
         x_min = self.trajectory_list[0].data_x[0]
         y_min = self.trajectory_list[0].data_y[0]
@@ -119,7 +119,7 @@ class Grid:
             loops_list.append(loops)
         return max_duration, x_min, y_min, x_max, y_max, loops_list
 
-    def get_rounded_parameters(self, x_min, x_max, y_min, y_max):
+    def __get_rounded_parameters(self, x_min, x_max, y_min, y_max):
         # todo :: types will make the weird rounding behaviour here obvious, I hope...
         """returns:
         (
@@ -174,10 +174,10 @@ class Grid:
 
         # todo :: seems like some weirdness in what we're actually getting out here
         # probably should refactor return values etc (separate functions?)
-        max_duration, x_min, y_min, x_max, y_max, loops_list = self.shared_all_trajectory_process()
+        max_duration, x_min, y_min, x_max, y_max, loops_list = self.__shared_all_trajectory_process()
 
         cell_size_x, cell_size_y, rounded_x_min, rounded_y_min, rounded_x_max, rounded_y_max \
-            = self.get_rounded_parameters(x_min, x_max, y_min, y_max)
+            = self.__get_rounded_parameters(x_min, x_max, y_min, y_max)
 
         # draw background
         # todo :: whole bunch of stuff that is a bit messy here
@@ -318,10 +318,10 @@ class Grid:
             plt.show()
 
     def get_measures(self):
-        max_duration, x_min, y_min, x_max, y_max, _ = self.shared_all_trajectory_process()
+        max_duration, x_min, y_min, x_max, y_max, _ = self.__shared_all_trajectory_process()
 
         cell_size_x, cell_size_y, rounded_x_min, rounded_y_min, rounded_x_max, rounded_y_max \
-            = self.get_rounded_parameters(x_min, x_max, y_min, y_max)
+            = self.__get_rounded_parameters(x_min, x_max, y_min, y_max)
 
         trajectory_durations, event_numbers, visit_numbers, cell_ranges = zip(*[
             (
