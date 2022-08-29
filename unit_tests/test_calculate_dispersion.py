@@ -39,5 +39,5 @@ def test_calculate_dispersion_two_points():
         data_t=[0, 1, 3],
     )
     result = traj.calculate_dispersion(99)
-    expected = 0.50510204
+    expected = 0.44897959
     assert abs(result - expected) < 1e-3, f"got {result}, expected about {expected}"
