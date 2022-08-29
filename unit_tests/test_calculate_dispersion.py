@@ -21,7 +21,7 @@ def test_calculate_dispersion_uniform_distribution(n_times):
     """
     I think that dispersion is 0 if each cell is only hit once?
     -------
-
+    # todo :: well that's not correct is it^? (test broken)
     """
     traj = trajectory.Trajectory(
         data_x=list(range(n_times)),
