@@ -10,22 +10,12 @@ import numpy as np
 
 
 @dataclass
-class TrajectoryStyle:
-    connection_style: str = "arc3,rad=0.0"
-    arrow_style: str = "-|>"
-    merge_repeated_states: bool = True
-
-
-@dataclass
 class Trajectory:
     data_x: list
     data_y: list
     data_t: list
     # todo :: data_t (onsets) should be replaced by durations
-    meta: dict = field(default_factory=dict)
 
-    # todo :: unsure whether or not Trajectory.style is the right abstraction
-    style: TrajectoryStyle = field(default_factory=TrajectoryStyle)
     id: int = None  # set in __post_init__
     # static count of number of trajectories - use as a stand in for ID
     # todo :: unsure if this is daft. probably daft?
@@ -58,8 +48,9 @@ class Trajectory:
     # return formatted state data
     def get_states(
         self,
-        x_ordering: Optional[list]= None,
-        y_ordering: Optional[list] = None
+        x_ordering: Optional[list] = None,
+        y_ordering: Optional[list] = None,
+        merge_repeated_states: bool = True,
     ) -> Tuple[list, list, list, set]:
         # todo :: can we deal with reordering at the call site?
         def maybe_reorder(data, ordering=None):
@@ -67,37 +58,37 @@ class Trajectory:
                 return data
             return [ordering.index(x) for x in data]
 
-        if self.style.merge_repeated_states:
-            x_merged = [self.data_x[0]]
-            y_merged = [self.data_y[0]]
-            t_merged = [self.data_t[0]]
-            loops = set()
-            for x, x_1, y, y_1, t in zip(
-                    self.data_x,
-                    self.data_x[1:],
-                    self.data_y,
-                    self.data_y[1:],
-                    self.data_t[1:],
-            ):
-                if (x, y) == (x_1, y_1):
-                    loops.add(len(x_merged) - 1)
-                else:
-                    x_merged.append(x_1)
-                    y_merged.append(y_1)
-                    t_merged.append(t)
-            t_merged.append(self.data_t[-1])
+        if not merge_repeated_states:
             return (
-                maybe_reorder(x_merged, x_ordering),
-                maybe_reorder(y_merged, y_ordering),
-                t_merged,
-                loops,
+                maybe_reorder(self.data_x, x_ordering),
+                maybe_reorder(self.data_y, y_ordering),
+                self.data_t,
+                set(),
             )
 
+        x_merged = [self.data_x[0]]
+        y_merged = [self.data_y[0]]
+        t_merged = [self.data_t[0]]
+        loops = set()
+        for x, x_1, y, y_1, t in zip(
+                self.data_x,
+                self.data_x[1:],
+                self.data_y,
+                self.data_y[1:],
+                self.data_t[1:],
+        ):
+            if (x, y) == (x_1, y_1):
+                loops.add(len(x_merged) - 1)
+            else:
+                x_merged.append(x_1)
+                y_merged.append(y_1)
+                t_merged.append(t)
+        t_merged.append(self.data_t[-1])
         return (
-            maybe_reorder(self.data_x, x_ordering),
-            maybe_reorder(self.data_y, y_ordering),
-            self.data_t,
-            set(),
+            maybe_reorder(x_merged, x_ordering),
+            maybe_reorder(y_merged, y_ordering),
+            t_merged,
+            loops,
         )
 
     def calculate_dispersion(
@@ -119,38 +110,6 @@ class Trajectory:
             )
             - 1
         ) / (total_cells - 1)
-
-    def add_to_graph(self, loops, grid_style, graph, max_duration):
-        x_data, y_data, t_data, _ = self.get_states(grid_style.x_order, grid_style.y_order)
-        node_number_positions = dict(enumerate(zip(x_data, y_data)))
-
-        # List of tuples to define edges between nodes
-        # todo :: I wonder if python has a built in multigraph datatype for this
-        edges = (
-            [(i, i + 1) for i in range(len(x_data) - 1)]
-            + [(loop_node, loop_node) for loop_node in loops]
-        )
-        node_sizes = (1000 / max_duration) * np.array([t2 - t1 for t1, t2 in zip(t_data, t_data[1:])])
-
-        # Add nodes and edges to graph
-        graph.add_nodes_from(node_number_positions.keys())
-        graph.add_edges_from(edges)  # todo :: is this needed? edges specified twice for nx?
-
-        # Draw graphs
-        nx.draw_networkx_nodes(graph, node_number_positions, node_size=node_sizes, node_color='indigo')
-        nx.draw_networkx_edges(
-            graph,
-            node_number_positions,
-            node_size=node_sizes,
-            nodelist=list(range(len(x_data))),
-            edgelist=edges,
-            arrows=True,
-            arrowstyle=self.style.arrow_style,
-            node_shape='.',
-            arrowsize=10,
-            width=2,
-            connectionstyle=self.style.connection_style,
-        )
 
     # construct trajectory from legacy trj file
     @classmethod

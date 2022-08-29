@@ -22,18 +22,27 @@ class GridStyle:
     tick_font_size: int = 14
     title_font_size: int = 14
     # todo :: with so many optionals maybe this is a mess :)
-    tick_increment_x: Optional[int] = None
-    tick_increment_y: Optional[int] = None
+    # todo :: the following labels are unused, do we want to support?
     x_label: Optional[str] = None
     y_label: Optional[str] = None
+    rotate_x_labels: bool = False
+    checker_light: Sequence[float] = (220 / 256, ) * 3
+    checker_dark: Sequence[float] = (1, ) * 3
+
+
+# todo :: is this ideal class name? maybe.
+@dataclass
+class GridQuantization:
+    tick_increment_x: Optional[int] = None
+    tick_increment_y: Optional[int] = None
+    # todo :: consider axis-values type for str, Number
+    x_order: Optional[List[Union[str, Number]]] = None
+    y_order: Optional[List[Union[str, Number]]] = None
+    # todo :: the following x/y_min/max are unused, do we want to support?
     x_min: Optional[int] = None  # todo :: are they floats?
     x_max: Optional[int] = None
     y_min: Optional[int] = None
     y_max: Optional[int] = None
-    # todo :: consider axis-values type for str, Number
-    x_order: Optional[List[Union[str, Number]]] = None
-    y_order: Optional[List[Union[str, Number]]] = None
-    rotate_x_labels: bool = False
 
 
 @dataclass
@@ -58,7 +67,7 @@ class GridMeasures:
 @dataclass
 class Grid:
     trajectory_list: List[Trajectory]
-    style: GridStyle = field(default_factory=GridStyle)
+    quantization: GridQuantization = field(default=GridQuantization)
 
     def shared_all_trajectory_process(self):
         # todo :: sensible name :)
@@ -70,20 +79,23 @@ class Grid:
         # todo :: consider this logic when a subset is None?
         # does that even make any sense?
         # if not, can cover with some simpler logic
-        if self.style.x_min is not None:
-            x_min = self.style.x_min
-        if self.style.x_max is not None:
-            x_max = self.style.x_max
+        if self.quantization.x_min is not None:
+            x_min = self.quantization.x_min
+        if self.quantization.x_max is not None:
+            x_max = self.quantization.x_max
 
-        if self.style.y_min is not None:
-            y_min = self.style.y_min
-        if self.style.y_max is not None:
-            y_max = self.style.y_max
+        if self.quantization.y_min is not None:
+            y_min = self.quantization.y_min
+        if self.quantization.y_max is not None:
+            y_max = self.quantization.y_max
 
         max_duration = 0
         loops_list = []
         for trajectory in self.trajectory_list:
-            x_data, y_data, t_data, loops = trajectory.get_states(self.style.x_order, self.style.y_order)
+            x_data, y_data, t_data, loops = trajectory.get_states(
+                self.quantization.x_order,
+                self.quantization.y_order,
+            )
 
             # Get min and max values
             # todo :: this is probably silly...
@@ -132,8 +144,8 @@ class Grid:
                 scale_factor /= 10
             return scale_factor
 
-        cell_size_x = self.style.tick_increment_x or calculate_scale(x_max - x_min)
-        cell_size_y = self.style.tick_increment_y or calculate_scale(y_max - y_min)
+        cell_size_x = self.quantization.tick_increment_x or calculate_scale(x_max - x_min)
+        cell_size_y = self.quantization.tick_increment_y or calculate_scale(y_max - y_min)
         def something_round(v, cell):
             # todo :: what is this surely there's builtins
             return v + cell - (v % cell or cell)
@@ -146,13 +158,22 @@ class Grid:
             something_round(y_max, cell_size_y),
         )
 
-    def draw(self, save_as: Optional[str] = None):
+    def draw(
+        self,
+        save_as: Optional[str] = None,
+        style: GridStyle = field(default_factory=GridStyle),
+        # todo :: could reimplement TrajectoryStyle if will be supported...
+        connection_style: str = "arc3,rad=0.0",
+        arrow_style: str = "-|>",
+    ):
         """
         if save_as is None, will .show() the plot
         """
         graph = nx.Graph()
         ax = plt.gca()
 
+        # todo :: seems like some weirdness in what we're actually getting out here
+        # probably should refactor return values etc (separate functions?)
         max_duration, x_min, y_min, x_max, y_max, loops_list = self.shared_all_trajectory_process()
 
         cell_size_x, cell_size_y, rounded_x_min, rounded_y_min, rounded_x_max, rounded_y_max \
@@ -161,21 +182,14 @@ class Grid:
         # draw background
         # todo :: whole bunch of stuff that is a bit messy here
         # Make an estimate for scale size of checkerboard grid sizing
-
-        x_padding = cell_size_x / 2
-        y_padding = cell_size_y / 2
-
-        # Set view of axes
         ax.set_xlim([
-            rounded_x_min - x_padding,
-            rounded_x_max + x_padding,
+            rounded_x_min - cell_size_x / 2,
+            rounded_x_max + cell_size_x / 2,
         ])
         ax.set_ylim([
-            rounded_y_min - y_padding,
-            rounded_y_max + y_padding,
+            rounded_y_min - cell_size_y / 2,
+            rounded_y_max + cell_size_y / 2,
         ])
-
-        # Set background checkerboard:
         ax.imshow(
             # checkerboard
             sum(
@@ -191,18 +205,63 @@ class Grid:
                 int(rounded_y_max) + 0.5 * cell_size_y,
             ],
             cmap=ListedColormap([
-                [220 / 256] * 3,
-                [1] * 3,
+                style.checker_dark,
+                style.checker_light,
             ]),
             interpolation='none',
         )
 
         # now we draw trajectories
         for offset_trajectory, loops in zip(
-            offset_trajectories(self.trajectory_list, self.style, cell_size_x, cell_size_y),
+            offset_trajectories(
+                self.trajectory_list,
+                cell_size_x,
+                cell_size_y,
+                x_order=self.quantization.x_order,
+                y_order=self.quantization.y_order,
+            ),
             loops_list,
         ):
-            offset_trajectory.add_to_graph(loops, self.style, graph, max_duration)
+            x_data, y_data, t_data, _ = offset_trajectory.get_states(
+                self.quantization.x_order, self.quantization.y_order
+            )
+            node_number_positions = dict(enumerate(zip(x_data, y_data)))
+
+            # List of tuples to define edges between nodes
+            # todo :: I wonder if python has a built in multigraph datatype for this
+            edges = (
+                # todo :: it may be nice if these were ordered? :)
+                # i.e. loops interleaved appropriately between links
+                [(i, i + 1) for i in range(len(x_data) - 1)]
+                + [(loop_node, loop_node) for loop_node in loops]
+            )
+            node_sizes = (1000 / max_duration) * np.diff(t_data)
+
+            # Add nodes and edges to graph
+            graph.add_nodes_from(node_number_positions.keys())
+            # todo :: is this needed? edges specified twice for nx?
+            graph.add_edges_from(edges)
+
+            # Draw graphs
+            nx.draw_networkx_nodes(
+                graph,
+                node_number_positions,
+                node_size=node_sizes,
+                node_color="indigo",
+            )
+            nx.draw_networkx_edges(
+                graph,
+                node_number_positions,
+                node_size=node_sizes,
+                nodelist=list(range(len(x_data))),
+                edgelist=edges,
+                arrows=True,
+                arrowstyle=arrow_style,
+                node_shape=".",
+                arrowsize=10,
+                width=2,
+                connectionstyle=connection_style,
+            )
 
         # all of this needs to go in a separate function, called with show()
         # we need to store which axis is which column - kick up a fuss if future plots don't match this
@@ -225,30 +284,30 @@ class Grid:
         ax.tick_params(left=True, bottom=True, labelleft=True, labelbottom=True)
         ax.tick_params(
             axis='x',
-            labelsize=self.style.tick_font_size,
-            rotation=90 * self.style.rotate_x_labels,
+            labelsize=style.tick_font_size,
+            rotation=90 * style.rotate_x_labels,
         )
         ax.tick_params(
             axis='y',
-            labelsize=self.style.tick_font_size,
+            labelsize=style.tick_font_size,
         )
         ax.xaxis.set_major_locator(ticker.FixedLocator(rounded_x_points))
         ax.yaxis.set_major_locator(ticker.FixedLocator(rounded_y_points))
         ax.xaxis.set_major_formatter(ticker.FixedFormatter(
-            self.style.x_order
+            self.quantization.x_order
             or [str(i) for i in rounded_x_points]
         ))
         ax.yaxis.set_major_formatter(ticker.FixedFormatter(
-            self.style.y_order
+            self.quantization.y_order
             or [str(i) for i in rounded_y_points]
         ))
 
         # Set axis labels
-        ax.set_xlabel(self.style.x_label, fontsize=self.style.label_font_size)
-        ax.set_ylabel(self.style.y_label, fontsize=self.style.label_font_size)
+        ax.set_xlabel(style.x_label, fontsize=style.label_font_size)
+        ax.set_ylabel(style.y_label, fontsize=style.label_font_size)
 
-        if self.style.title:
-            ax.set_title(self.style.title, fontsize=self.style.title_font_size)
+        if style.title:
+            ax.set_title(style.title, fontsize=style.title_font_size)
 
         ax.set_aspect('auto')
         plt.tight_layout()
@@ -283,8 +342,10 @@ class Grid:
         for trajectory in self.trajectory_list:
             bin_counts += Counter(
                 zip(
-                    maybe_reorder(trajectory.data_x, self.style.x_order),
-                    maybe_reorder(trajectory.data_y, self.style.y_order),
+                    # todo :: should factor out uses of .style that affect computation,
+                    # as opposed to uses that only affect rendering
+                    maybe_reorder(trajectory.data_x, self.quantization.x_order),
+                    maybe_reorder(trajectory.data_y, self.quantization.y_order),
                 )
             )
 
@@ -295,7 +356,7 @@ class Grid:
             mean_number_of_events=mean(event_numbers),
             mean_number_of_visits=mean(visit_numbers),
             mean_cell_range=mean(cell_ranges),
-            overall_cell_range=sum(1 for x_and_count in bin_counts.values()),
+            overall_cell_range=len(bin_counts),
             # todo :: these should likely be the responsibility of GridMeasures
 
             mean_duration_per_event=mean(
@@ -319,11 +380,19 @@ class Grid:
 
 def offset_trajectories(
     trajectories: Sequence[Trajectory],
-    grid_style: GridStyle,
     cell_size_x: float,  # todo :: I actually don't know what these are
     cell_size_y: float,  # todo :: I actually don't know what these are
+    # todo :: better abstraction/etc for these orderings...?
+    x_order=None,
+    y_order=None,
 ) -> List[Trajectory]:
+    """
+    perturbs (quantized?) trajectory x and y values
+    to not overlap, by mapping overlapping values to angular
+    spaced points within a circle in each cell
 
+    amount to perturb by is based on cell_size_x and cell_size_y
+    """
     # todo :: later -- need to think about what this actually does
     # get total bin counts
     new_trajectories = []
@@ -331,14 +400,14 @@ def offset_trajectories(
     bin_counts = Counter(
         (x, y)
         for trajectory in trajectories
-        for (x, y) in zip(*trajectory.get_states(grid_style.x_order, grid_style.y_order)[:2])
+        for (x, y) in zip(*trajectory.get_states(x_order, y_order)[:2])
     )
     current_bin_counter = Counter()
     for trajectory in trajectories:
         # todo :: I imagine there's a cleaner way to do this...
         # If same state is repeated, offset states
         # so they don't sit on top of one another:
-        x_data, y_data, t_data, _ = trajectory.get_states(grid_style.x_order, grid_style.y_order)
+        x_data, y_data, t_data, _ = trajectory.get_states(x_order, y_order)
         new_trajectories.append(
             Trajectory(
                 *util.offset_within_bin(
@@ -350,8 +419,6 @@ def offset_trajectories(
                     current_bin_counter,
                 ),
                 t_data,
-                trajectory.meta,
-                trajectory.style,
             )
         )
     return new_trajectories
