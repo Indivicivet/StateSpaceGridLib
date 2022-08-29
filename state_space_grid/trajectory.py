@@ -97,12 +97,12 @@ class Trajectory:
     ) -> float:
         cell_durations = Counter()
         for x, y, t1, t2 in zip(
-                self.data_x,
-                self.data_y,
-                self.data_t,
-                self.data_t[1:],
-            ):
-            cell_durations[(x, y)] += t2-t1
+            self.data_x,
+            self.data_y,
+            self.data_t,
+            self.data_t[1:],
+        ):
+            cell_durations[(x, y)] += t2 - t1
         return 1 - (
             (
                 total_cells * sum(x ** 2 for x in cell_durations.values())
