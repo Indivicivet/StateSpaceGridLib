@@ -61,7 +61,7 @@ class GridMeasures:
     #mean_missing_events: float = 0
     #mean_missing_duration: float = 0
     visited_entropy: float = 0
-    duaration_entropy: float = 0
+    #duration_entropy: float = 0
 
 
 @dataclass
@@ -338,9 +338,8 @@ class Grid:
                 return data
             return [ordering.index(val) for val in data]
 
-        bin_counts = Counter()
-        for trajectory in self.trajectory_list:
-            bin_counts += Counter(
+        bin_counts = [
+            Counter(
                 zip(
                     # todo :: should factor out uses of .style that affect computation,
                     # as opposed to uses that only affect rendering
@@ -348,6 +347,9 @@ class Grid:
                     maybe_reorder(trajectory.data_y, self.quantization.y_order),
                 )
             )
+            for trajectory in self.trajectory_list
+        ]
+        cumulative_bin_counts = sum(bin_counts,Counter())
 
         # todo :: hmmmmmmMMMMM
         return GridMeasures(
@@ -356,7 +358,7 @@ class Grid:
             mean_number_of_events=mean(event_numbers),
             mean_number_of_visits=mean(visit_numbers),
             mean_cell_range=mean(cell_ranges),
-            overall_cell_range=len(bin_counts),
+            overall_cell_range=len(cumulative_bin_counts),
             # todo :: these should likely be the responsibility of GridMeasures
 
             mean_duration_per_event=mean(
@@ -375,6 +377,9 @@ class Grid:
                 )
                 for trajectory in self.trajectory_list
             ),
+            visited_entropy=mean(
+                sum(x / total_count for x in cell_counts.values())
+                for cell_counts, total_count in zip(bin_counts, visit_numbers)),
         )
 
 
