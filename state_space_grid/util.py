@@ -3,62 +3,41 @@ A number of utility functions acting on data that ideally don't want to appear i
 """
 
 import math
-
-
-def calculate_scale(difference):
-    """
-    return desired scale
-    implemented as the biggest power of 10 smaller than the difference
-    """
-    scale_factor = 1
-    while scale_factor < difference:
-        scale_factor *= 10
-    while scale_factor > difference:
-        scale_factor /= 10
-    return scale_factor
-
-
-def calculate_min_max(values):
-    """assumes categorical = string, ordinal = numeric"""
-    if isinstance(values[0], str):
-        return 0, len(values)
-    return int(min(values)), math.ceil(max(values))
+import cmath
 
 
 def offset_within_bin(
-    x_data, x_scale,
-    y_data, y_scale,
-    bin_counts, visit_count,
+    x_data,
+    cell_size_x,
+    y_data,
+    cell_size_y,
+    bin_counts,
+    visit_count,  # todo :: we mutate this :(
 ):
-    """warning: mutates arguments!!"""
+    """
+    warning: mutates arguments!!
+    in particular, `visit_count`
+    """
+    # todo :: this sounds dodgy for multiple trajectories, should write test code
     partition_counts = {
         (x, y): 1 << (count - 1).bit_length()
         for (x, y), count in bin_counts.items()
     }
     offset_x = []
     offset_y = []
-    for i, (x, y) in enumerate(zip(x_data, y_data)):
-        if partition_counts[(x, y)] > 1:
-            # todo :: numpy
-            direction = (-1, 1)  # todo :: ????
-            angle = 2 * math.pi / partition_counts[(x, y)]
-            rotation = (
-                (math.cos(angle), -math.sin(angle)),
-                (math.sin(angle), math.cos(angle)),
-            )
-            for rotation_number in range(visit_count[(x, y)]):
-                # todo :: jesus christ
-                direction = (
-                    direction[0]*rotation[0][0] + direction[1]*rotation[0][1],
-                    direction[0]*rotation[1][0] + direction[1]*rotation[1][1],
-                )
-            offset_x.append(x + direction[0] * x_scale / 4)
-            offset_y.append(y + direction[1] * y_scale / 4)
-            visit_count[(x, y)] += 1
-        else:
-            offset_x.append(x)
-            offset_y.append(y)
-            visit_count[(x, y)] += 1
+    for x, y in zip(x_data, y_data):
+        pos_cx = (
+            cmath.exp(
+                # note: this sign convention is arbitrary and for fun
+                1j * math.pi * (2 / partition_counts[(x, y)] * visit_count[(x, y)] + 0.75)
+            ) * 2 ** 0.5 / 4
+            if partition_counts[(x, y)] > 1
+            else 0
+        )
+        offset_x.append(x + pos_cx.real * cell_size_x)
+        offset_y.append(y + pos_cx.imag * cell_size_y)
+        visit_count[(x, y)] += 1
 
     return offset_x, offset_y
-    # todo :: should really return x_data', y_data', visit_count' also eh?
+    # todo :: should really return visit_count' also eh?
+    # (note: we don't change x_data and y_data -- is that incorrect?!)

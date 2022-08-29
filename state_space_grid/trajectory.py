@@ -3,13 +3,18 @@ import warnings
 from collections import Counter
 from dataclasses import dataclass, field
 from itertools import zip_longest
-from typing import ClassVar
+from typing import ClassVar, Optional, Tuple
+
+import networkx as nx
+import numpy as np
+
 
 @dataclass
 class TrajectoryStyle:
     connection_style: str = "arc3,rad=0.0"
     arrow_style: str = "-|>"
     merge_repeated_states: bool = True
+
 
 @dataclass
 class Trajectory:
@@ -18,6 +23,8 @@ class Trajectory:
     data_t: list
     # todo :: data_t (onsets) should be replaced by durations
     meta: dict = field(default_factory=dict)
+
+    # todo :: unsure whether or not Trajectory.style is the right abstraction
     style: TrajectoryStyle = field(default_factory=TrajectoryStyle)
     id: int = None  # set in __post_init__
     # static count of number of trajectories - use as a stand in for ID
@@ -29,8 +36,13 @@ class Trajectory:
             self.id = self.next_id
         type(self).next_id += 1
         # todo :: removed some "pop NaNs from the end" code here
-        assert(len(self.data_x) == (len(self.data_t) - 1) and len(self.data_y) == (len(self.data_t) - 1),
-               "Time data should be of length 1 longer than x and y data")
+        assert (
+            len(self.data_x) == (len(self.data_t) - 1)
+            and len(self.data_y) == (len(self.data_t) - 1)
+        ), (
+            "Time data should be of length 1 longer than x and y data"
+            f", but got lengths {len(self.data_x)=} {len(self.data_y)=} {len(self.data_t)=}"
+        )
 
     # return number of cell transitions plus 1
     def get_num_visits(self) -> int:
@@ -41,23 +53,111 @@ class Trajectory:
 
     # return number of unique cells visited
     def get_cell_range(self) -> int:
-        return len({(x,y) for x, y in zip(self.data_x, self.data_y)})
+        return len(set(zip(self.data_x, self.data_y)))
 
     # return formatted state data
-    def get_states(self, x_ordering: list = None, y_ordering: list = None):
+    def get_states(
+        self,
+        x_ordering: Optional[list]= None,
+        y_ordering: Optional[list] = None
+    ) -> Tuple[list, list, list, set]:
+        # todo :: can we deal with reordering at the call site?
+        def maybe_reorder(data, ordering=None):
+            if not ordering:
+                return data
+            return [ordering.index(x) for x in data]
+
         if self.style.merge_repeated_states:
-            return merge_equal_adjacent_states(self.data_x, self.data_y, self.data_t, x_ordering, y_ordering)
-        else:
-            x_data = [x_ordering.index(val) for val in self.data_x] if x_ordering else self.data_x
-            y_data = [y_ordering.index(val) for val in self.data_y] if y_ordering else self.data_y
-            return x_data, y_data, self.data_t, set()
+            x_merged = [self.data_x[0]]
+            y_merged = [self.data_y[0]]
+            t_merged = [self.data_t[0]]
+            loops = set()
+            for x, x_1, y, y_1, t in zip(
+                    self.data_x,
+                    self.data_x[1:],
+                    self.data_y,
+                    self.data_y[1:],
+                    self.data_t[1:],
+            ):
+                if (x, y) == (x_1, y_1):
+                    loops.add(len(x_merged) - 1)
+                else:
+                    x_merged.append(x_1)
+                    y_merged.append(y_1)
+                    t_merged.append(t)
+            t_merged.append(self.data_t[-1])
+            return (
+                maybe_reorder(x_merged, x_ordering),
+                maybe_reorder(y_merged, y_ordering),
+                t_merged,
+                loops,
+            )
+
+        return (
+            maybe_reorder(self.data_x, x_ordering),
+            maybe_reorder(self.data_y, y_ordering),
+            self.data_t,
+            set(),
+        )
+
+    def calculate_dispersion(
+        self,
+        total_cells: int,
+    ) -> float:
+        cell_durations = Counter()
+        for x, y, t1, t2 in zip(
+                self.data_x,
+                self.data_y,
+                self.data_t,
+                self.data_t[1:],
+            ):
+            cell_durations[(x, y)] += t2-t1
+        return 1 - (
+            (
+                total_cells * sum(x ** 2 for x in cell_durations.values())
+                / sum(cell_durations.values()) ** 2
+            )
+            - 1
+        ) / (total_cells - 1)
+
+    def add_to_graph(self, loops, grid_style, graph, max_duration):
+        x_data, y_data, t_data, _ = self.get_states(grid_style.x_order, grid_style.y_order)
+        node_number_positions = dict(enumerate(zip(x_data, y_data)))
+
+        # List of tuples to define edges between nodes
+        # todo :: I wonder if python has a built in multigraph datatype for this
+        edges = (
+            [(i, i + 1) for i in range(len(x_data) - 1)]
+            + [(loop_node, loop_node) for loop_node in loops]
+        )
+        node_sizes = (1000 / max_duration) * np.array([t2 - t1 for t1, t2 in zip(t_data, t_data[1:])])
+
+        # Add nodes and edges to graph
+        graph.add_nodes_from(node_number_positions.keys())
+        graph.add_edges_from(edges)  # todo :: is this needed? edges specified twice for nx?
+
+        # Draw graphs
+        nx.draw_networkx_nodes(graph, node_number_positions, node_size=node_sizes, node_color='indigo')
+        nx.draw_networkx_edges(
+            graph,
+            node_number_positions,
+            node_size=node_sizes,
+            nodelist=list(range(len(x_data))),
+            edgelist=edges,
+            arrows=True,
+            arrowstyle=self.style.arrow_style,
+            node_shape='.',
+            arrowsize=10,
+            width=2,
+            connectionstyle=self.style.connection_style,
+        )
 
     # construct trajectory from legacy trj file
     @classmethod
     def from_legacy_trj(
-            cls,
-            filename,
-            params=(1, 2),
+        cls,
+        filename,
+        params=(1, 2),
     ):
         """For legacy .trj files. Stay away, they're ew!"""
         warnings.warn(
@@ -69,7 +169,7 @@ class Trajectory:
         v2 = []
         with open(filename) as f:
             for line in csv.reader(f, delimiter="\t"):
-                if line[0] == "Onset" or line[0] == "ONSET":
+                if line[0].lower() == "onset":
                     continue
                 if len(line) == 1:
                     onset.append(float(line[0]))
@@ -80,38 +180,3 @@ class Trajectory:
                 v1.append(int(line[params[0]]))
                 v2.append(int(line[params[1]]))
         return cls(v1, v2, onset)
-
-def merge_equal_adjacent_states(x_data, y_data, t_data, x_ordering = None, y_ordering = None):
-    """
-    Merge adjacent equal states and return merged data.
-    Does not edit data within the trajectory as trajectories may contain >2(+time) variables
-    """
-    x_merged = [x_data[0]]
-    y_merged = [y_data[0]]
-    t_merged = [t_data[0]]
-    loops = set()
-
-    for x, x_1, y, y_1, t, i in zip(
-            x_data,
-            x_data[1:],
-            y_data,
-            y_data[1:],
-            t_data[1:],
-            range(len(x_data))
-    ):
-        if (x, y) == (x_1, y_1):
-            loops.add(len(x_merged) - 1)
-        else:
-            x_merged.append(x_1)
-            y_merged.append(y_1)
-            t_merged.append(t)
-    t_merged.append(t_data[-1])
-
-    if x_ordering:
-        x_merged = [x_ordering.index(val) for val in x_merged]
-    if y_ordering:
-        y_merged = [y_ordering.index(val) for val in y_merged]
-
-    return x_merged, y_merged, t_merged, loops
-
-

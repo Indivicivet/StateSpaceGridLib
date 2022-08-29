@@ -21,6 +21,13 @@ To install as a library with pip, use
 
 pip install git+https://github.com/DyadicSolutions/StateSpaceGridLib
 
+## Todos
+
+- This readme is very out of date! Update to match current API
+- Add examples to readme
+- General code cleanliness
+- More unit tests :)
+
 ## Library API Reference
 
 #### Trajectory
