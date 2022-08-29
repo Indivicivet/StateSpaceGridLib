@@ -49,8 +49,10 @@ class GridMeasures:
     mean_duration_per_visit: float = 0
     mean_duration_per_cell: float = 0
     dispersion: float = 0
-    mean_missing_events: float = 0
-    mean_missing_duration: float = 0
+    #mean_missing_events: float = 0
+    #mean_missing_duration: float = 0
+    visited_entropy: float = 0
+    duaration_entropy: float = 0
 
 
 @dataclass
@@ -295,6 +297,7 @@ class Grid:
             mean_cell_range=mean(cell_ranges),
             overall_cell_range=sum(1 for x_and_count in bin_counts.values()),
             # todo :: these should likely be the responsibility of GridMeasures
+
             mean_duration_per_event=mean(
                 map(lambda x, y: x / y, trajectory_durations, event_numbers)
             ),
@@ -320,6 +323,7 @@ def offset_trajectories(
     cell_size_x: float,  # todo :: I actually don't know what these are
     cell_size_y: float,  # todo :: I actually don't know what these are
 ) -> List[Trajectory]:
+
     # todo :: later -- need to think about what this actually does
     # get total bin counts
     new_trajectories = []

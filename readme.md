@@ -19,7 +19,7 @@ A brief test is included to display the code in action.
 
 To install as a library with pip, use
 
-pip install git+https://github.com/maggym00/StateSpaceGridLib
+pip install git+https://github.com/DyadicSolutions/StateSpaceGridLib
 
 ## Todos
 
