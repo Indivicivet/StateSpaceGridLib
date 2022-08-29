@@ -11,5 +11,5 @@ https://www.queensu.ca/psychology/sites/psycwww/files/uploaded_files/Faculty/Tom
 
 __version__ = "0.0.1"
 
-from . import grid
-from . import trajectory
+from .grid import Grid, GridQuantization, GridStyle, GridMeasures
+from .trajectory import Trajectory
