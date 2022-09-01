@@ -23,13 +23,20 @@ def test_calculate_dispersion_uniform_distribution(n_times):
     -------
 
     """
+    x_data = []
+    y_data = []
+    for i in range(n_times):
+        for j in range(n_times):
+            x_data.append(i)
+            y_data.append(j)
+
     traj = trajectory.Trajectory(
-        data_x=list(range(n_times)),
-        data_y=list(range(n_times)),
-        data_t=list(range(n_times + 1)),
+        data_x=x_data,
+        data_y=y_data,
+        data_t=list(range(n_times**2 + 1)),
     )
-    result = traj.calculate_dispersion(n_times + 1)
-    assert result == 0
+    result = traj.calculate_dispersion(n_times**2)
+    assert result == 1.0
 
 
 def test_calculate_dispersion_two_points():
@@ -41,3 +48,4 @@ def test_calculate_dispersion_two_points():
     result = traj.calculate_dispersion(99)
     expected = 0.50510204
     assert abs(result - expected) < 1e-3, f"got {result}, expected about {expected}"
+
