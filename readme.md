@@ -238,11 +238,11 @@ Defined as mean of trajectory duration divided by trajectory cell range.
 GridMeasures.dispersion
 ```
 mean of trajectory dispersion across all trajectories. Dispersion for a single trajectory is calculated by the formula
-$$\text{dispersion}=\frac{n(\sum{\frac{d_i}{D}})-1}{n-1}$$
+$$\text{dispersion}=\frac{n(\sum_{i}{\frac{d_i}{D}})-1}{n-1}$$
 ```python
 GridMeasures.visited_entropy
 ```
 Entropy of visits, defined as 
-$$\sum{\frac{P_i}{\ln(P_i)}}$$
+$$\sum_{i}{\frac{P_i}{\ln(P_i)}}$$
 where $P_i$ is the probablity of visiting cell $i$, defined as
 $$P_i = \frac{\text{Number of visits to cell i}}{\text{total number of visits}}$$
