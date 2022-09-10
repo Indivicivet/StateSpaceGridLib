@@ -189,7 +189,7 @@ Object containing extra data relevant to grid measure calculation and visualisat
 ```python
 GridMeasures()    
 ```
-Data container for all measure data. Individual values can be read off, or the entire thing may be printed as is - the class contains a `__str()__` function for ease of quickly printing the data.
+Data container for all measure data. Individual values can be read off, or the entire thing may be printed as is.
 ```python
 GridMeasures.trajectory_ids
 ```
@@ -238,7 +238,7 @@ Defined as mean of trajectory duration divided by trajectory cell range.
 GridMeasures.dispersion
 ```
 mean of trajectory dispersion across all trajectories. Dispersion for a single trajectory is calculated by the formula
-$$dispersion=\frac{n(\sum{\frac{d_i}{D}})-1}{n-1}$$
+$$\text{dispersion}=\frac{n(\sum{\frac{d_i}{D}})-1}{n-1}$$
 ```python
 GridMeasures.visited_entropy
 ```
