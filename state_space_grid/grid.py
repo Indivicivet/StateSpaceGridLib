@@ -67,7 +67,7 @@ class GridMeasures:
 @dataclass
 class Grid:
     trajectory_list: List[Trajectory]
-    quantization: GridQuantization = field(default=GridQuantization)
+    quantization: GridQuantization = field(default_factory=GridQuantization)
 
     def __shared_all_trajectory_process(self):
         # todo :: sensible name :)
