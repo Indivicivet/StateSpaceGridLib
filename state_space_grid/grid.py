@@ -161,7 +161,7 @@ class Grid:
     def draw(
         self,
         save_as: Optional[str] = None,
-        style: GridStyle = field(default_factory=GridStyle),
+        style: Optional[GridStyle] = None,
         # todo :: could reimplement TrajectoryStyle if will be supported...
         connection_style: str = "arc3,rad=0.0",
         arrow_style: str = "-|>",
@@ -169,6 +169,9 @@ class Grid:
         """
         if save_as is None, will .show() the plot
         """
+        if style is None:
+            style = GridStyle()
+
         graph = nx.Graph()
         ax = plt.gca()
 
