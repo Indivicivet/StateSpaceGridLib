@@ -45,9 +45,7 @@ def test_ExampleData1_measures():
     assert measures.mean_duration_per_event == 1.85
     assert abs(measures.mean_duration_per_visit - 2.1142857) < 1e-3
     assert abs(measures.mean_duration_per_cell - 2.46666) < 1e-3
-    assert abs(measures.dispersion - 0.933333) < 1e-3
-    assert measures.mean_missing_events == 0
-    assert measures.mean_missing_duration == 0
+    assert abs(measures.dispersion - 0.87877) < 1e-3
 
 
 def test_ExampleData_measures_from_legacy_trj():
@@ -71,6 +69,4 @@ def test_ExampleData_measures_from_legacy_trj():
     assert abs(measures.mean_duration_per_event - 1.5555555) < 1e-3
     assert abs(measures.mean_duration_per_visit - 1.5555555) < 1e-3
     assert abs(measures.mean_duration_per_cell - 2.3333333) < 1e-3
-    assert abs(measures.dispersion - 0.9481481) < 1e-3
-    assert measures.mean_missing_events == 0
-    assert measures.mean_missing_duration == 0
+    assert abs(measures.dispersion - 0.82457) < 1e-3

@@ -28,13 +28,15 @@ class GridStyle:
     rotate_x_labels: bool = False
     checker_light: Sequence[float] = (220 / 256, ) * 3
     checker_dark: Sequence[float] = (1, ) * 3
+    connection_style: str = "arc3,rad=0.0",
+    arrow_style: str = "-|>",
 
 
 # todo :: is this ideal class name? maybe.
 @dataclass
 class GridQuantization:
-    tick_increment_x: Optional[int] = None
-    tick_increment_y: Optional[int] = None
+    cell_size_x: Optional[int] = None
+    cell_size_y: Optional[int] = None
     # todo :: consider axis-values type for str, Number
     x_order: Optional[List[Union[str, Number]]] = None
     y_order: Optional[List[Union[str, Number]]] = None
@@ -144,8 +146,8 @@ class Grid:
                 scale_factor /= 10
             return scale_factor
 
-        cell_size_x = self.quantization.tick_increment_x or calculate_scale(x_max - x_min)
-        cell_size_y = self.quantization.tick_increment_y or calculate_scale(y_max - y_min)
+        cell_size_x = self.quantization.cell_size_x or calculate_scale(x_max - x_min)
+        cell_size_y = self.quantization.cell_size_y or calculate_scale(y_max - y_min)
         def something_round(v, cell):
             # todo :: what is this surely there's builtins
             return v + cell - (v % cell or cell)
@@ -161,10 +163,7 @@ class Grid:
     def draw(
         self,
         save_as: Optional[str] = None,
-        style: Optional[GridStyle] = None,
-        # todo :: could reimplement TrajectoryStyle if will be supported...
-        connection_style: str = "arc3,rad=0.0",
-        arrow_style: str = "-|>",
+        style: Optional[GridStyle] = None
     ):
         """
         if save_as is None, will .show() the plot
