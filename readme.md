@@ -7,15 +7,14 @@ functionality of GridWare, a Java program for creating and analysing
 state space grids for visualising dyadic mutuality in psychology.
 
 The main features of StateSpaceGrid are Trajectory objects, Grid objects and
-their associated styles.
+the associated GridStyle and GridQuantization objects which hold any extra data needed for drawing grids and calculating measures.
 
-Trajectory objects hold the input data as a set of lists as well as information 
-about the visualisation of a single graph (line style, colour, etc.).
+Trajectory objects hold the input data as a set of lists, along with a single ID number.
 
 Grid objects hold trajectory objects and are the interface through which you
-can display the graphs.
+can display grids and calculate measures.
 
-A brief test is included to display the code in action.
+See unit_tests/test_end_to_end.py for a brief example of the code in action.
 
 To install as a library with pip, use
 
@@ -85,7 +84,7 @@ Return dispersion for trajectory.
 ```python
 Trajectory.from_legacy_trj(filename, params=(1,2))
 ```
-Return a trajectory object initialised from a Gridware trajectory file.
+Return a trajectory object initialised from a GridWare trajectory file.
 * `filename`
 
    The path to the trajectory file.
@@ -256,3 +255,5 @@ Entropy of visits, defined as
 $$\sum_{i}{\frac{P_i}{\ln(P_i)}}$$
 where $P_i$ is the probablity of visiting cell $i$, defined as
 $$P_i = \frac{\text{Number of visits to cell i}}{\text{total number of visits}}$$
+
+#Exa
