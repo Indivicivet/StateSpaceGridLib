@@ -150,17 +150,13 @@ Object containing visualisation customisation.
    Colour of dark squares on state space grid.
 #### GridQuantization
 ```python
-GridQuantization(tick_increment_x, tick_increment_y, x_order, y_order, x_min, x_max, y_min, y_max)
+GridQuantization(cell_size_x, cell_size_y, x_order, y_order, x_min, x_max, y_min, y_max)
 ```
 Object containing extra data relevant to grid measure calculation and visualisation.
-* `tick_increment_x`
-   
-   TODO: rename to cell_size_x
+* `cell_size_x`
     
    Width of a cell in the x axis. If left blank, a best guess will be calculated from the data available.
-* `tick_increment_y`
-
-   TODO: rename to cell_size_y
+* `cell_size_y`
    
    Height of a cell in the y axis. If left blank, a best guess will be calculated from the data available.
 * `x_order`
@@ -175,16 +171,16 @@ Object containing extra data relevant to grid measure calculation and visualisat
    eg. `["low", "medium", "high"]`
 * `x_min`
 
-   The lowest value in the measurement scale.
+   The lowest value in the measurement scale. If left blank this is the lowest value in the data given.
 * `x_max`
 
-   The highest value in the measurement scale.
+   The highest value in the measurement scale. If left blank, this is the highest value in the data given.
 * `y_min`
 
-   The lowest value in the measurement scale.
+   The lowest value in the measurement scale. If left blank this is the lowest value in the data given.
 * `y_max`
 
-   The highest value in the measurement scale.
+   The highest value in the measurement scale. If left blank, this is the highest value in the data given.
 #### GridMeasures
 ```python
 GridMeasures()    
