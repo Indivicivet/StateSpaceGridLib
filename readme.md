@@ -2,9 +2,115 @@
 
 ## Introduction
 
-StateSpaceGridLib is a python library loosely based around replicating the
-functionality of GridWare, a Java program for creating and analysing
-state space grids for visualising dyadic mutuality in psychology.
+StateSpaceGridLib (henceforth referred to as SSG) is a library that uses the Python programming language. It is loosely based around replicating the
+functionality of [GridWare](https://www.queensu.ca/psychology/adolescent-dynamics-lab/state-space-grids), an application created by Tom Hollenstein, Alex Lamey, and colleagues. Before using this library, it is advised to be familiar with the concept of [State Space Grids](https://link.springer.com/book/10.1007/978-1-4614-5007-8), and more broadly, the dynamic systems approach to development. 
+
+Briefly, state space grids were developed by Marc Lewis and colleagues (Lewis, Lamey & Douglas, 1999) as a way to represent synchronous ordinal time series on a 2-D grid, based on dynamic systems principles. It has most commonly been used as a graphical approach to depict an aspect of the trajectory of a dyad across time, for example, how emotional affect during an interaction between a parent and child changes across a 5-minute observational task. As such, the minimum number of variables to create a state space grid are two 'state' variables and one variable to represent timestamps throughout the duration of the interaction. Each interaction is referred to as a 'trajectory'. 
+
+In this context, we provide tools to:
+
+1. Display state space grids visually
+2. Handle data files from different formats (e.g. .csv files, .xls files, trj files)
+3. Obtain measures of dyadic trajectories across time (e.g. dispersion, range, transitions) 
+
+The first step to using this library is to install it with pip
+
+pip install git+https://github.com/DyadicSolutions/StateSpaceGridLib
+
+Once it has been installed, you can start to make use of the library within a Python script. (See [here](https://www.python.org/about/gettingstarted/) or [here](https://www.w3schools.com/python/python_intro.asp) for an introduction to Python programming). Python templates for this library can be found in [Examples](#examples), providing a basic starting point for using the different tools offered. 
+
+## Examples
+
+For Template 1 and 2, the csv data files provided display the recommended data file structure that can be used with the corresponding Python script without any changes required. It is perfectly fine for your data file structure to be completely different, though that would require some changes to the Python scripts. 
+
+### Template 1 for importing csv file to be used (only contains one trajectory, e.g. only one dyad from a study)
+Your data file should include, at a minimum, the timestamp variable and the time series data (two state variables). 
+
+In this example, we import a csv file that contains data on parent affect (first state variable) and child affect (second state variable) coded on a scale of 1-5 (1 being high negative, 5 being high positive), in 30-second bins over 5 minutes (timestamp variable with 11 values covering the range 0-5 minutes). 
+```csv
+
+```
+```python
+
+#script for obtaining measures of state space grid 
+
+import statespacegrid as ssg 
+import pandas as pd 
+
+if __name__=="__main__":
+        
+   raw_data = pd.read_csv('example1.csv')
+   formatted_data = {}
+   formatted_data["ID"]=0
+   formatted_data["Parent Affect"]=[]
+   formatted_data["Child Affect"]=[]
+   formatted_data["Time_Onset"]=[]
+   
+   for index, row in data.iterrows():
+      formatted_data["Parent Affect"].append(row["Parent Affect"])
+      formatted_data["Child Affect"].append(row["Child Affect"])
+      formatted_data["Time_Onset"].append(row["Time_Onset"])
+
+   trajectory = ssg.Trajectory(formatted_data["Parent Affect"],formatted_data["Child Affect"],formatted_data["Time_Onset"])
+   grid=ssg.Grid([trajectory])
+
+   #to print measures for this grid 
+
+   measure=grid.get_measures()
+   print(measure)
+   
+   #to get the image visualization of the grid - this will show up on your screen in a separate window 
+
+   grid.draw()
+   
+      
+```
+
+### Template 2 for importing csv file to be used (contains more than one trajectory, e.g. multiple dyads from a study/multiple participant IDs) 
+
+```csv
+
+```
+```python
+
+import statespacegrid as ssg 
+import pandas as pd 
+
+if __name__=="__main__":
+        
+   raw_data = pd.read_csv('example1.csv')
+   formatted_data = {}
+   formatted_data["ID"]=0
+   formatted_data["Parent Affect"]=[]
+   formatted_data["Child Affect"]=[]
+   formatted_data["Time_Onset"]=[]
+   
+   for index, row in data.iterrows():
+   
+      formatted_data["Parent Affect"].append(row["Parent Affect"])
+      formatted_data["Child Affect"].append(row["Child Affect"])
+      formatted_data["Time_Onset"].append(row["Time_Onset"])
+
+   trajectory = ssg.Trajectory(formatted_data["Parent Affect"],formatted_data["Child Affect"],formatted_data["Time_Onset"])
+      
+```
+
+### Template 3 for making use of trj files from Gridware with SSG 
+
+For more information on trj files, refer to the [Gridware manual](https://www.queensu.ca/psychology/sites/psycwww/files/uploaded_files/Faculty/Tom%20Hollenstein/GridWare/GridWare1.1_Manual.pdf)
+
+```tsv
+```
+
+### Template 3 for importing multiple trajectories (e.g. participants in a study with each dyad in a separate file) 
+
+## Todos
+
+- Add examples to readme
+- General code cleanliness
+- More unit tests :)
+
+## Library API Reference
 
 The main features of StateSpaceGrid are [Trajectory](#trajectory) objects, [Grid](#grid) objects and
 the associated [GridStyle](#gridstyle) and [GridQuantization](#gridquantization) objects which hold any extra data needed for drawing grids and calculating measures.
@@ -15,18 +121,6 @@ the associated [GridStyle](#gridstyle) and [GridQuantization](#gridquantization)
 can display grids and calculate measures.
 
 See [test_end_to_end.py](unit_tests/test_end_to_end.py), or the [examples](#examples) section of this readme for a brief example of the code in action.
-
-To install as a library with pip, use
-
-pip install git+https://github.com/DyadicSolutions/StateSpaceGridLib
-
-## Todos
-
-- Add examples to readme
-- General code cleanliness
-- More unit tests :)
-
-## Library API Reference
 
 ### Trajectory
 
@@ -257,4 +351,3 @@ $$\sum_{i}{\frac{P_i}{\ln(P_i)}}$$
 where $P_i$ is the probablity of visiting cell $i$, defined as
 $$P_i = \frac{\text{Number of visits to cell i}}{\text{total number of visits}}$$
 
-## Examples
