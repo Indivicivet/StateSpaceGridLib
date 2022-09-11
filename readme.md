@@ -7,7 +7,7 @@ functionality of GridWare, a Java program for creating and analysing
 state space grids for visualising dyadic mutuality in psychology.
 
 The main features of StateSpaceGrid are Trajectory objects, Grid objects and
-the associated GridStyle and GridQuantization objects which hold any extra data needed for drawing grids and calculating measures.
+the associated [GridStyle](gridstyle) and GridQuantization objects which hold any extra data needed for drawing grids and calculating measures.
 
 Trajectory objects hold the input data as a set of lists, along with a single ID number.
 
