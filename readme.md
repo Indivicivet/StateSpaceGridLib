@@ -14,7 +14,7 @@ the associated [GridStyle](#gridstyle) and [GridQuantization](#gridquantization)
 [Grid](#grid) objects hold trajectory objects and are the interface through which you
 can display grids and calculate measures.
 
-See unit_tests/test_end_to_end.py for a brief example of the code in action.
+See [test_end_to_end.py](unit_tests/test_end_to_end.py), or the [examples](#examples) section of this readme for a brief example of the code in action.
 
 To install as a library with pip, use
 
@@ -256,4 +256,4 @@ $$\sum_{i}{\frac{P_i}{\ln(P_i)}}$$
 where $P_i$ is the probablity of visiting cell $i$, defined as
 $$P_i = \frac{\text{Number of visits to cell i}}{\text{total number of visits}}$$
 
-#Exa
+## Examples
