@@ -6,12 +6,12 @@ StateSpaceGridLib is a python library loosely based around replicating the
 functionality of GridWare, a Java program for creating and analysing
 state space grids for visualising dyadic mutuality in psychology.
 
-The main features of StateSpaceGrid are Trajectory objects, Grid objects and
-the associated [GridStyle](#gridstyle) and GridQuantization objects which hold any extra data needed for drawing grids and calculating measures.
+The main features of StateSpaceGrid are [Trajectory](#trajectory) objects, [Grid](#grid) objects and
+the associated [GridStyle](#gridstyle) and [GridQuantization](#gridquantization) objects which hold any extra data needed for drawing grids and calculating measures.
 
-Trajectory objects hold the input data as a set of lists, along with a single ID number.
+[Trajectory](#trajectory) objects hold the input data as a set of lists, along with a single ID number.
 
-Grid objects hold trajectory objects and are the interface through which you
+[Grid](#grid) objects hold trajectory objects and are the interface through which you
 can display grids and calculate measures.
 
 See unit_tests/test_end_to_end.py for a brief example of the code in action.
@@ -95,14 +95,14 @@ Return a trajectory object initialised from a GridWare trajectory file.
 ```python
 Grid(trajectory_list, quantization=GridQuantization())
 ```
-Data now formatted as `Trajectory` objects can be collated within a `Grid` object for visualisation and the calculation of grid measures.
+Data now formatted as [Trajectory](#trajectory) objects can be collated within a `Grid` object for visualisation and the calculation of grid measures.
 * `trajectory_list`
    
-   A list of `Trajectory` objects containing the input data.
+   A list of [Trajectory](#trajectory) objects containing the input data.
 
 * `quantization`
 
-   A GridQuantization object containing data relevant to the calculation of grid measures. If left blank, this defaults to the default settings in GridQuantization.
+   A [GridQuantization](#gridquantization) object containing data relevant to the calculation of grid measures. If left blank, this defaults to the default settings in [GridQuantization](#gridquantization).
 ```python
 Grid.draw(save_as=None, style=GridStyle())
 ```
@@ -112,7 +112,7 @@ Grid.draw(save_as=None, style=GridStyle())
    If provided, this is the name of the png file that the image of the grid is saved as.  If left blank, the grid will be displayed in a new window using whichever gui library matplotlib has access to.
 * `style`
 
-   GridStyle object containing options for the display of the grid in MatPLotLib.
+   [GridStyle](#gridstyle) object containing options for the display of the grid in MatPLotLib.
 ```python
 Grid.get_measures()
 ```
