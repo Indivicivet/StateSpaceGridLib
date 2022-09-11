@@ -23,14 +23,13 @@ pip install git+https://github.com/DyadicSolutions/StateSpaceGridLib
 
 ## Todos
 
-- This readme is very out of date! Update to match current API
 - Add examples to readme
 - General code cleanliness
 - More unit tests :)
 
 ## Library API Reference
 
-#### Trajectory
+### Trajectory
 
 ```python
 Trajectory(data_x, data_y, data_t, id=None)
@@ -93,7 +92,7 @@ Return a trajectory object initialised from a Gridware trajectory file.
 * `params`
 
    A tuple containing the two column names of the parameters of interest.
-#### Grid
+### Grid
 ```python
 Grid(trajectory_list, quantization=GridQuantization())
 ```
@@ -119,7 +118,7 @@ Grid.draw(save_as=None, style=GridStyle())
 Grid.get_measures()
 ```
 Calculate cumulative measures from all trajectories provided to the grid and return as a `GridMeasures` object.
-#### GridStyle
+### GridStyle
 ```python
 GridStyle(title="", label_font_size=14, tick_font_size=14, title_font_size=14, x_label=None, y_label=None, rotate_xlabels=False, checker_light=(220/256, 220/256, 220/256), checker_dark=(1, 1, 1), connection_style="arc3,rad=0.0", arrow_style="-|>")
 ```
@@ -159,7 +158,7 @@ Object containing visualisation customisation.
 
    Style of arrow on edges connecting nodes on the trajectory graph. See https://matplotlib.org/3.1.1/api/_as_gen/matplotlib.patches.ArrowStyle.html#matplotlib.patches.ArrowStyle for more information on the options.
 
-#### GridQuantization
+### GridQuantization
 ```python
 GridQuantization(cell_size_x=None, cell_size_y=None, x_order=None, y_order=None, x_min=None, x_max=None, y_min=None, y_max=None)
 ```
@@ -196,7 +195,7 @@ Object containing extra data relevant to grid measure calculation and visualisat
 * `y_max`
 
    The highest value in the y measurement scale. If left blank, this is the highest value in the data given.
-#### GridMeasures
+### GridMeasures
 ```python
 GridMeasures()    
 ```
